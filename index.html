@@ -4,1069 +4,857 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Clincoo App</title>
-  
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%233c2aff'/%3E%3Cstop offset='100%25' stop-color='%238a7dff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='16' fill='url(%23g)'/%3E%3Cg transform='translate(3, 4)'%3E%3Cpath d='M8 5.14v13.72c0 .79.87 1.27 1.54.84l11-6.86a1 1 0 0 0 0-1.68l-11-6.86A1 1 0 0 0 8 5.14z' fill='white' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-  
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  
   <style>
-   .no-scrollbar::-webkit-scrollbar { display: none; }
-   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-   
-   .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-   .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-   .custom-scrollbar::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-   
-    @keyframes shine {
-      0% { transform: translateX(-200%) skewX(-30deg); }
-      15% { transform: translateX(200%) skewX(-30deg); }
-      100% { transform: translateX(200%) skewX(-30deg); }
-    }
-   .shine-effect {
-      position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-      background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
-      transform: skewX(-30deg); animation: shine 4s infinite linear;
-    }
-    
-    @keyframes double-bounce {
-      0%, 5%, 15%, 100% { transform: translateY(0); }
-      7.5% { transform: translateY(-4px); }
-      10% { transform: translateY(0); }
-      12.5% { transform: translateY(-2px); }
-    }
-   .bounce-on-shine { animation: double-bounce 4s infinite linear; }
-   
-    @keyframes marquee {
-      0% { transform: translate3d(100%, 0, 0); }
-      100% { transform: translate3d(-100%, 0, 0); }
-    }
-   .animate-marquee {
-      animation: marquee 12s linear infinite;
-   }
-    
-    @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
-    }
-    .animate-slide-up {
-      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-
-    * { -webkit-tap-highlight-color: transparent; }
-
-    #static-splash-screen {
-      position: fixed;
-      inset: 0;
-      background-color: #111827;
-      z-index: 9999;
-      display: flex;
-      justify-content: center;
-      transition: opacity 0.5s ease;
-    }
-    #static-splash-container {
-      width: 100%;
-      max-width: 28rem;
-      background-color: #000000;
-      height: 100vh;
-      height: 100dvh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    }
-    
-    /* Auth input animations */
-    .auth-input:focus ~ .auth-label,
-    .auth-input:not(:placeholder-shown) ~ .auth-label {
-      transform: translateY(-1.5rem) scale(0.85);
-      color: #8a7dff;
-    }
+    .no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
+    .custom-scrollbar::-webkit-scrollbar{width:4px}.custom-scrollbar::-webkit-scrollbar-track{background:transparent}.custom-scrollbar::-webkit-scrollbar-thumb{background:#333;border-radius:10px}
+    @keyframes shine{0%{transform:translateX(-200%) skewX(-30deg)}15%{transform:translateX(200%) skewX(-30deg)}100%{transform:translateX(200%) skewX(-30deg)}}
+    .shine-effect{position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(to right,rgba(255,255,255,0) 0%,rgba(255,255,255,0.4) 50%,rgba(255,255,255,0) 100%);transform:skewX(-30deg);animation:shine 4s infinite linear}
+    @keyframes double-bounce{0%,5%,15%,100%{transform:translateY(0)}7.5%{transform:translateY(-4px)}10%{transform:translateY(0)}12.5%{transform:translateY(-2px)}}
+    .bounce-on-shine{animation:double-bounce 4s infinite linear}
+    @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+    .animate-slide-up{animation:slideUp 0.3s cubic-bezier(0.16,1,0.3,1) forwards}
+    @keyframes spin{to{transform:rotate(360deg)}}.spinner{animation:spin 1s linear infinite}
+    *{-webkit-tap-highlight-color:transparent}
+    #static-splash-screen{position:fixed;inset:0;background-color:#111827;z-index:9999;display:flex;justify-content:center;transition:opacity 0.5s ease}
+    #static-splash-container{width:100%;max-width:28rem;background-color:#000000;height:100vh;height:100dvh;display:flex;justify-content:center;align-items:center;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25)}
+    .auth-input:focus~.auth-label,.auth-input:not(:placeholder-shown)~.auth-label{transform:translateY(-1.5rem) scale(0.85);color:#8a7dff}
   </style>
 </head>
 <body class="bg-gray-900 text-white font-sans antialiased m-0 p-0">
-  
   <div id="static-splash-screen">
     <div id="static-splash-container">
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(to bottom right, #3c2aff, #8a7dff); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(60,42,255,0.7);">
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M8 5.14v13.72c0 .79.87 1.27 1.54.84l11-6.86a1 1 0 0 0 0-1.68l-11-6.86A1 1 0 0 0 8 5.14z"/>
-          </svg>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(to bottom right,#3c2aff,#8a7dff);display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(60,42,255,0.7)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M8 5.14v13.72c0 .79.87 1.27 1.54.84l11-6.86a1 1 0 0 0 0-1.68l-11-6.86A1 1 0 0 0 8 5.14z"/></svg>
         </div>
-        <h1 style="font-family: 'Cinzel Decorative', serif; font-size: 1.5rem; font-weight: 700; letter-spacing: 0.15em; color: white; margin: 0;">CLINCOO</h1>
+        <h1 style="font-family:'Cinzel Decorative',serif;font-size:1.5rem;font-weight:700;letter-spacing:0.15em;color:white;margin:0">CLINCOO</h1>
       </div>
     </div>
   </div>
-
   <div id="root"></div>
-  
   <script type="text/babel">
-    const { useState, useEffect, useRef } = React;
-    
+    const { useState, useEffect, useRef, useCallback } = React;
+
+    const API_BASE = 'https://api.base44.com/api/apps/6a5573c6820c88c2da05205d/functions';
     const firebaseConfig = {
-      apiKey: "AIzaSyAKXOx1H-MngazKBwdvorOqA1STQJM3GPk",
-      authDomain: "clincoo-app.firebaseapp.com",
-      projectId: "clincoo-app",
-      storageBucket: "clincoo-app.firebasestorage.app",
-      messagingSenderId: "275264764855",
-      appId: "1:275264764855:web:4da43ad1d36b0621304632",
-      measurementId: "G-1JGWLNM40F"
+      apiKey:"AIzaSyAKXOx1H-MngazKBwdvorOqA1STQJM3GPk",
+      authDomain:"clincoo-app.firebaseapp.com",
+      projectId:"clincoo-app",
+      storageBucket:"clincoo-app.firebasestorage.app",
+      messagingSenderId:"275264764855",
+      appId:"1:275264764855:web:4da43ad1d36b0621304632"
+    };
+    let firebaseAppInstance=null, firebaseAuthInstance=null;
+
+    const api = {
+      get: async (path) => { try { const r=await fetch(`${API_BASE}/${path}`); return r.json(); } catch(e){ return {}; } },
+      post: async (path, body) => { try { const r=await fetch(`${API_BASE}/${path}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); return r.json(); } catch(e){ return {error:e.message}; } }
     };
 
-    // Firebase state manager outside component to avoid re-init
-    let firebaseAppInstance = null;
-    let firebaseAuthInstance = null;
-    
-    const Icon = ({ name, className }) => {
+    const fmt = (n) => { if(!n) return '0'; if(n>=1000000) return (n/1000000).toFixed(1)+'M'; if(n>=1000) return (n/1000).toFixed(1)+'K'; return String(n); };
+
+    const Icon = ({name,className}) => {
       const icons = {
-        Home: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
-        Search: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>,
-        PlaySquare: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m10 8 6 4-6 4Z"/></svg>,
-        Plus: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14"/><path d="M12 5v14"/></svg>,
-        MessageCircle: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>,
-        User: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
-        MoreVertical: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>,
-        Grid: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>,
-        Bookmark: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2-2v16z"/></svg>,
-        Link: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>,
-        CheckBadge: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none" className={className}><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>,
-        ThumbsUp: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>,
-        MessageSquare: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>,
-        Shorts: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className={className}><path d="M10 14.65v-5.3L15 12l-5 2.65zm7.77-4.27l-1.2-.5.5-1.2c.67-1.63-.12-3.5-1.75-4.17s-3.5.12-4.17 1.75L9.62 9.87l1.2.5-.5 1.2c-.67 1.63.12 3.5 1.75 4.17s3.5-.12 4.17-1.75l1.53-3.61zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>,
-        LogOut: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
-        Google: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" className={className}><path fill="#EA4335" d="M12 4.782c2.09 0 3.967.72 5.44 2.112l4.072-4.072C19.043 1.05 15.776 0 12 0 7.37 0 3.35 2.59 1.258 6.405l4.78 3.71C7.218 7.027 9.4 4.782 12 4.782z"/><path fill="#4285F4" d="M23.49 12.275c0-.85-.075-1.667-.217-2.463H12v4.66h6.446c-.277 1.51-1.125 2.79-2.38 3.633l3.834 2.973c2.24-2.065 3.59-5.11 3.59-8.803z"/><path fill="#FBBC05" d="M6.038 10.115c-.244.726-.383 1.505-.383 2.31s.14 1.584.383 2.31l-4.78 3.71C.486 16.924 0 14.53 0 12c0-2.53.486-4.924 1.258-6.435l4.78 3.715z"/><path fill="#34A853" d="M12 24c3.776 0 6.942-1.25 9.255-3.385l-3.834-2.973c-1.252.84-2.856 1.34-5.42 1.34-2.6 0-4.782-2.245-5.96-5.333l-4.78 3.71C3.35 21.41 7.37 24 12 24z"/></svg>,
-        Mail: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>,
-        ArrowLeft: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+        Home:<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+        Search:<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>,
+        PlaySquare:<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m10 8 6 4-6 4Z"/></svg>,
+        Plus:<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14"/><path d="M12 5v14"/></svg>,
+        MessageCircle:<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>,
+        User:<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
+        MoreVertical:<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>,
+        CheckBadge:<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none" className={className}><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>,
+        ThumbsUp:<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>,
+        MessageSquare:<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>,
+        LogOut:<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
+        Google:<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" className={className}><path fill="#EA4335" d="M12 4.782c2.09 0 3.967.72 5.44 2.112l4.072-4.072C19.043 1.05 15.776 0 12 0 7.37 0 3.35 2.59 1.258 6.405l4.78 3.71C7.218 7.027 9.4 4.782 12 4.782z"/><path fill="#4285F4" d="M23.49 12.275c0-.85-.075-1.667-.217-2.463H12v4.66h6.446c-.277 1.51-1.125 2.79-2.38 3.633l3.834 2.973c2.24-2.065 3.59-5.11 3.59-8.803z"/><path fill="#FBBC05" d="M6.038 10.115c-.244.726-.383 1.505-.383 2.31s.14 1.584.383 2.31l-4.78 3.71C.486 16.924 0 14.53 0 12c0-2.53.486-4.924 1.258-6.435l4.78 3.715z"/><path fill="#34A853" d="M12 24c3.776 0 6.942-1.25 9.255-3.385l-3.834-2.973c-1.252.84-2.856 1.34-5.42 1.34-2.6 0-4.782-2.245-5.96-5.333l-4.78 3.71C3.35 21.41 7.37 24 12 24z"/></svg>,
+        Mail:<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>,
+        ArrowLeft:<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>,
+        Upload:<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>,
+        X:<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>,
+        Film:<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="20" height="20" x="2" y="2" rx="2.18" ry="2.18"/><line x1="7" x2="7" y1="2" y2="22"/><line x1="17" x2="17" y1="2" y2="22"/><line x1="2" x2="22" y1="7" y2="7"/><line x1="2" x2="22" y1="12" y2="12"/><line x1="2" x2="22" y1="17" y2="17"/></svg>,
+        Share2:<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>,
+        VolumeX:<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg>,
+        Volume2:<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>,
+        RefreshCw:<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>,
+        Shorts:<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className={className}><path d="M10 14.65v-5.3L15 12l-5 2.65zm7.77-4.27l-1.2-.5.5-1.2c.67-1.63-.12-3.5-1.75-4.17s-3.5.12-4.17 1.75L9.62 9.87l1.2.5-.5 1.2c-.67 1.63.12 3.5 1.75 4.17s3.5-.12 4.17-1.75l1.53-3.61zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>,
+        Link:<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>,
       };
       return icons[name] || null;
     };
 
-    const ReelItem = ({ reel, onLike, onRemix, muted, toggleMute }) => {
-      const videoRef = useRef(null);
-      const [playing, setPlaying] = useState(false);
-      const [showPlayOverlay, setShowPlayOverlay] = useState(false);
+    /* ══════════════════ UPLOAD MODAL ══════════════════ */
+    const UploadModal = ({onClose, user, clincoUser, onUploaded}) => {
+      const [step, setStep] = useState('form');
+      const [videoFile, setVideoFile] = useState(null);
+      const [previewUrl, setPreviewUrl] = useState('');
+      const [title, setTitle] = useState('');
+      const [description, setDescription] = useState('');
+      const [tags, setTags] = useState('');
+      const [progress, setProgress] = useState(0);
+      const [errorMsg, setErrorMsg] = useState('');
+      const fileRef = useRef(null);
 
-      useEffect(() => {
-        if (videoRef.current) {
-          const playPromise = videoRef.current.play();
-          if (playPromise !== undefined) {
-            playPromise.then(() => setPlaying(true)).catch(() => setPlaying(false));
-          }
-        }
-      }, []);
-
-      const handleVideoClick = () => {
-        if (videoRef.current) {
-          if (playing) {
-            videoRef.current.pause();
-            setPlaying(false);
-          } else {
-            const playPromise = videoRef.current.play();
-            if (playPromise !== undefined) {
-              playPromise.then(() => setPlaying(true)).catch(() => setPlaying(false));
-            } else {
-              setPlaying(true);
-            }
-          }
-          setShowPlayOverlay(true);
-          setTimeout(() => setShowPlayOverlay(false), 800);
-        }
+      const handleFile = (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        if (!f.type.startsWith('video/')) { setErrorMsg('Hanya file video yang didukung.'); return; }
+        if (f.size > 500*1024*1024) { setErrorMsg('Ukuran maksimal 500MB.'); return; }
+        setErrorMsg(''); setVideoFile(f); setPreviewUrl(URL.createObjectURL(f));
       };
 
-      const formatCount = (count) => {
-        if (count >= 1000) return (count / 1000).toFixed(1) + 'K';
-        return count;
+      const handleUpload = async () => {
+        if (!videoFile) { setErrorMsg('Pilih video dulu.'); return; }
+        if (!title.trim()) { setErrorMsg('Judul wajib diisi.'); return; }
+        setStep('uploading'); setProgress(10);
+        try {
+          const timer = setInterval(() => setProgress(p => Math.min(p+8, 80)), 700);
+          const fd = new FormData(); fd.append('file', videoFile);
+          let video_url = '';
+          try {
+            const r = await fetch('https://api.base44.com/api/apps/6a5573c6820c88c2da05205d/storage/upload',{method:'POST',body:fd});
+            if (r.ok) { const d=await r.json(); video_url=d.url||d.file_url||''; }
+          } catch(_) {}
+          clearInterval(timer); setProgress(90);
+          if (!video_url) video_url = previewUrl;
+          const tagList = tags.split(',').map(t=>t.trim()).filter(Boolean);
+          const uid = clincoUser?.id || user?.uid || user?.email || 'anon';
+          const res = await api.post('videoUpload',{user_id:uid,title:title.trim(),description:description.trim(),video_url,thumbnail_url:'',duration:0,tags:tagList});
+          setProgress(100);
+          if (res.success) { setStep('done'); setTimeout(()=>{onClose();onUploaded();},1500); }
+          else throw new Error(res.error||'Upload gagal');
+        } catch(err) { setErrorMsg(err.message); setStep('error'); }
       };
 
       return (
-        <div className="h-full w-full snap-start relative bg-black flex items-center justify-center overflow-hidden">
-          <video
-            ref={videoRef}
-            src={reel.videoUrl}
-            className="w-full h-full object-cover"
-            loop
-            muted={muted}
-            playsInline
-            onClick={handleVideoClick}
-          />
-          
-          {showPlayOverlay && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/10 pointer-events-none transition-opacity duration-300">
-              <div className="p-4 rounded-full bg-black/60 text-white animate-ping">
-                {playing ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                )}
-              </div>
-            </div>
-          )}
-
-          <div className="absolute right-3 flex flex-col items-center gap-4 z-10" style={{ bottom: 'calc(56px + env(safe-area-inset-bottom) + 16px)' }}>
-            <div className="w-10 h-10 rounded-full border-2 border-white overflow-hidden relative mb-1">
-              <img src={`https://placehold.co/44x44/333/fff?text=${reel.username.charAt(1).toUpperCase()}`} className="w-full h-full object-cover" alt="avatar" />
-              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-red-500 rounded-full w-4 h-4 flex items-center justify-center text-white text-[10px] font-bold">+</div>
-            </div>
-
-            <button onClick={() => onLike(reel.id)} className="flex flex-col items-center group active:scale-90 transition-transform">
-              <div className={`p-2 rounded-full bg-black/40 backdrop-blur-sm ${reel.liked ? 'text-red-500' : 'text-white'}`}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill={reel.liked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-                </svg>
-              </div>
-              <span className="text-[11px] font-semibold mt-0.5 drop-shadow-md">{formatCount(reel.likes)}</span>
-            </button>
-
-            <button className="flex flex-col items-center active:scale-90 transition-transform">
-              <div className="p-2 rounded-full bg-black/40 backdrop-blur-sm text-white">
-               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/></svg>
-              </div>
-              <span className="text-[11px] font-semibold mt-0.5 drop-shadow-md">{formatCount(reel.comments)}</span>
-            </button>
-
-            <button onClick={() => onRemix(reel.id)} className="flex flex-col items-center active:scale-90 transition-transform">
-              <div className={`p-2 rounded-full transition-all duration-300 ${reel.remixed ? 'bg-[#3c2aff]' : 'bg-black/40 backdrop-blur-sm'}`}>
-                <div className="relative w-6 h-6 flex items-center justify-center text-white">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                    <path d="M21 3v5h-5"/>
-                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                    <path d="M8 16H3v5"/>
-                  </svg>
-                  {reel.remixed && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <svg width="8" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                    </div>
-                  )}
+        <div className="fixed inset-0 z-[200] flex flex-col justify-end">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose}></div>
+          <div className="w-full max-w-md mx-auto bg-zinc-900 rounded-t-3xl z-10 animate-slide-up border-t border-zinc-800" style={{maxHeight:'92dvh',overflowY:'auto'}}>
+            <div className="sticky top-0 bg-zinc-900 px-6 pt-5 pb-3 flex items-center justify-between border-b border-zinc-800 rounded-t-3xl z-10">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#3c2aff] to-[#8a7dff] flex items-center justify-center">
+                  <Icon name="Film" className="w-4 h-4 text-white"/>
                 </div>
+                <h2 className="text-lg font-bold text-white">Upload Video</h2>
               </div>
-              <span className="text-[11px] font-semibold mt-0.5 drop-shadow-md">{formatCount(reel.remixes)}</span>
-            </button>
-
-            <button className="flex flex-col items-center active:scale-90 transition-transform">
-              <div className="p-2 rounded-full bg-black/40 backdrop-blur-sm text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
-              </div>
-              <span className="text-[11px] font-semibold mt-0.5 drop-shadow-md">{formatCount(reel.shares)}</span>
-            </button>          
-
-            <div className="w-9 h-9 rounded-full bg-zinc-800 border-4 border-zinc-700 flex items-center justify-center animate-[spin_4s_linear_infinite] mt-1 shadow-lg">
-              <div className="w-3 h-3 rounded-full bg-black border border-zinc-500"></div>
+              <button onClick={onClose} className="p-2 rounded-full hover:bg-zinc-800 text-gray-400"><Icon name="X" className="w-5 h-5"/></button>
             </div>
-          </div>
-
-          <div className="absolute left-4 right-16 z-10 text-left pointer-events-none" style={{ bottom: 'calc(56px + env(safe-area-inset-bottom) + 16px)' }}>
-            <h4 className="font-bold text-base drop-shadow-md mb-1 pointer-events-auto select-none">{reel.username}</h4>
-            <p className="text-sm line-clamp-3 text-gray-200 leading-snug drop-shadow-md pointer-events-auto mb-3 select-none">
-              {reel.description}
-            </p>
+            <div className="px-6 py-5">
+              {step==='form' && (<>
+                <div onClick={()=>fileRef.current?.click()} className="w-full aspect-video bg-zinc-800 rounded-2xl border-2 border-dashed border-zinc-600 flex flex-col items-center justify-center cursor-pointer hover:border-[#3c2aff] transition-colors mb-5 overflow-hidden relative">
+                  {previewUrl
+                    ? <video src={previewUrl} className="w-full h-full object-cover rounded-2xl" muted playsInline/>
+                    : <div className="flex flex-col items-center gap-2 text-gray-400">
+                        <div className="w-14 h-14 rounded-full bg-zinc-700 flex items-center justify-center mb-1"><Icon name="Upload" className="w-7 h-7"/></div>
+                        <p className="font-semibold text-white text-sm">Ketuk untuk pilih video</p>
+                        <p className="text-xs text-gray-500">MP4, MOV, WebM • Maks 500MB</p>
+                      </div>}
+                  {videoFile && <div className="absolute bottom-2 right-2 bg-black/70 text-xs text-white px-2 py-1 rounded-lg">{(videoFile.size/1024/1024).toFixed(1)} MB</div>}
+                </div>
+                <input ref={fileRef} type="file" accept="video/*" className="hidden" onChange={handleFile}/>
+                <div className="flex flex-col gap-4">
+                  <div>
+                    <label className="text-xs text-gray-400 font-medium mb-1.5 block">Judul *</label>
+                    <input type="text" value={title} onChange={e=>setTitle(e.target.value)} placeholder="Judul video kamu..." maxLength={100}
+                      className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#3c2aff] transition-colors text-sm"/>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-400 font-medium mb-1.5 block">Deskripsi</label>
+                    <textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Ceritain sesuatu tentang video ini..." rows={3}
+                      className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#3c2aff] transition-colors text-sm resize-none"/>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-400 font-medium mb-1.5 block">Tags (pisahkan koma)</label>
+                    <input type="text" value={tags} onChange={e=>setTags(e.target.value)} placeholder="viral, fyp, trending..."
+                      className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#3c2aff] transition-colors text-sm"/>
+                  </div>
+                </div>
+                {errorMsg && <div className="mt-4 text-red-400 text-sm bg-red-400/10 border border-red-400/20 rounded-xl px-4 py-3">{errorMsg}</div>}
+                <button onClick={handleUpload} className="w-full mt-6 bg-gradient-to-r from-[#3c2aff] to-[#8a7dff] text-white font-bold py-4 rounded-xl shadow-[0_4px_14px_0_rgba(60,42,255,0.4)] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                  <Icon name="Upload" className="w-5 h-5"/>Upload Sekarang
+                </button>
+              </>)}
+              {step==='uploading' && (
+                <div className="flex flex-col items-center py-10 gap-5">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#3c2aff] to-[#8a7dff] flex items-center justify-center shadow-[0_0_30px_rgba(60,42,255,0.5)]">
+                    <Icon name="Upload" className="w-9 h-9 text-white spinner"/>
+                  </div>
+                  <div className="w-full">
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="text-gray-300 font-medium">Mengupload video...</span>
+                      <span className="text-[#8a7dff] font-bold">{progress}%</span>
+                    </div>
+                    <div className="w-full h-2 bg-zinc-700 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-[#3c2aff] to-[#8a7dff] rounded-full transition-all duration-500" style={{width:`${progress}%`}}></div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500">Jangan tutup halaman ini</p>
+                </div>
+              )}
+              {step==='done' && (
+                <div className="flex flex-col items-center py-10 gap-4">
+                  <div className="w-20 h-20 rounded-full bg-green-500/20 border-2 border-green-500 flex items-center justify-center">
+                    <svg className="w-10 h-10 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                  <p className="font-bold text-xl text-white">Video Terupload! 🎉</p>
+                  <p className="text-gray-400 text-sm text-center">Video kamu sudah live dan bisa ditonton semua orang.</p>
+                </div>
+              )}
+              {step==='error' && (
+                <div className="flex flex-col items-center py-10 gap-4">
+                  <div className="w-20 h-20 rounded-full bg-red-500/20 border-2 border-red-500 flex items-center justify-center"><Icon name="X" className="w-10 h-10 text-red-400"/></div>
+                  <p className="font-bold text-xl text-white">Upload Gagal</p>
+                  <p className="text-red-400 text-sm text-center">{errorMsg}</p>
+                  <button onClick={()=>{setStep('form');setErrorMsg('');}} className="px-6 py-3 bg-zinc-800 rounded-xl text-white font-semibold text-sm hover:bg-zinc-700">Coba Lagi</button>
+                </div>
+              )}
+            </div>
+            <div className="h-8"></div>
           </div>
         </div>
       );
     };
 
-    const AuthBottomSheet = ({ onClose }) => {
-      const [mode, setMode] = useState('options'); 
+    /* ══════════════════ COMMENT SHEET ══════════════════ */
+    const CommentSheet = ({video, onClose, user, clincoUser}) => {
+      const [comments, setComments] = useState([]);
+      const [text, setText] = useState('');
+      const [loading, setLoading] = useState(true);
+      const [sending, setSending] = useState(false);
+      useEffect(()=>{ api.get(`videoComment?video_id=${video.id}`).then(d=>{setComments(d.comments||[]);setLoading(false);}); },[video.id]);
+      const send = async () => {
+        if(!text.trim()||!user) return;
+        setSending(true);
+        const uid = clincoUser?.id||user.uid||user.email;
+        const res = await api.post('videoComment',{user_id:uid,video_id:video.id,text:text.trim()});
+        if(res.success){setComments(p=>[res.comment,...p]);setText('');}
+        setSending(false);
+      };
+      return (
+        <div className="fixed inset-0 z-[150] flex flex-col justify-end">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose}></div>
+          <div className="w-full max-w-md mx-auto bg-zinc-900 rounded-t-3xl z-10 animate-slide-up border-t border-zinc-800 flex flex-col" style={{maxHeight:'75dvh'}}>
+            <div className="px-5 pt-4 pb-3 flex items-center justify-between border-b border-zinc-800 flex-shrink-0">
+              <h3 className="font-bold text-white">Komentar ({fmt(video.comments_count||comments.length)})</h3>
+              <button onClick={onClose} className="p-1.5 rounded-full hover:bg-zinc-800 text-gray-400"><Icon name="X" className="w-5 h-5"/></button>
+            </div>
+            <div className="flex-1 overflow-y-auto custom-scrollbar px-5 py-3">
+              {loading
+                ? <div className="flex justify-center py-8"><div className="w-6 h-6 border-2 border-[#3c2aff] border-t-transparent rounded-full spinner"></div></div>
+                : comments.length===0
+                  ? <div className="flex flex-col items-center py-10 text-gray-500"><Icon name="MessageCircle" className="w-10 h-10 mb-2 opacity-30"/><p className="text-sm">Belum ada komentar</p></div>
+                  : comments.map((c,i)=>(
+                    <div key={c.id||i} className="flex gap-3 mb-4">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#3c2aff] to-[#8a7dff] flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
+                        {(c.user_id||'U').charAt(0).toUpperCase()}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs text-gray-400 mb-0.5">{c.user_id?.substring(0,12)||'User'}</p>
+                        <p className="text-sm text-white leading-relaxed">{c.text}</p>
+                      </div>
+                    </div>
+                  ))}
+            </div>
+            <div className="px-4 py-3 border-t border-zinc-800 flex gap-3 items-center flex-shrink-0">
+              <input value={text} onChange={e=>setText(e.target.value)} onKeyDown={e=>e.key==='Enter'&&send()}
+                placeholder={user?"Tulis komentar...":"Login untuk komentar"} disabled={!user||sending}
+                className="flex-1 bg-zinc-800 border border-zinc-700 rounded-full px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#3c2aff] disabled:opacity-50"/>
+              <button onClick={send} disabled={!text.trim()||!user||sending}
+                className="w-10 h-10 rounded-full bg-gradient-to-br from-[#3c2aff] to-[#8a7dff] flex items-center justify-center disabled:opacity-40 active:scale-95">
+                {sending
+                  ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full spinner"></div>
+                  : <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>}
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    /* ══════════════════ REEL ITEM ══════════════════ */
+    const ReelItem = ({reel, muted, toggleMute, onLike, user, clincoUser, isActive}) => {
+      const vidRef = useRef(null);
+      const [playing, setPlaying] = useState(false);
+      const [overlay, setOverlay] = useState(false);
+      const [showCmt, setShowCmt] = useState(false);
+      const [liked, setLiked] = useState(false);
+      const [likes, setLikes] = useState(reel.likes_count||0);
+      const [liking, setLiking] = useState(false);
+
+      useEffect(()=>{
+        if(!vidRef.current) return;
+        if(isActive){ vidRef.current.play().then(()=>setPlaying(true)).catch(()=>setPlaying(false)); }
+        else { vidRef.current.pause(); setPlaying(false); }
+      },[isActive]);
+
+      const clickVideo = () => {
+        if(!vidRef.current) return;
+        if(playing){vidRef.current.pause();setPlaying(false);}
+        else{vidRef.current.play().then(()=>setPlaying(true)).catch(()=>{});}
+        setOverlay(true); setTimeout(()=>setOverlay(false),800);
+      };
+
+      const doLike = async () => {
+        if(!user){onLike('auth');return;}
+        if(liking) return;
+        setLiking(true);
+        const prev=liked; setLiked(!prev); setLikes(n=>prev?n-1:n+1);
+        const uid=clincoUser?.id||user?.uid||user?.email;
+        await api.post('videoLike',{user_id:uid,video_id:reel.id});
+        setLiking(false);
+      };
+
+      const avatarChar=(reel.title||reel.user_id||'V').charAt(0).toUpperCase();
+      const username=reel.user_id?`@${reel.user_id.substring(0,10)}`:'@clincoo';
+
+      return (<>
+        <div className="h-full w-full snap-start relative bg-black flex items-center justify-center overflow-hidden">
+          {reel.video_url
+            ? <video ref={vidRef} src={reel.video_url} className="w-full h-full object-cover" loop muted={muted} playsInline onClick={clickVideo}/>
+            : <div className="w-full h-full bg-gradient-to-br from-zinc-900 to-black flex items-center justify-center">
+                <div className="text-center text-gray-600"><Icon name="Film" className="w-16 h-16 mx-auto mb-3 opacity-30"/><p className="text-sm">Video tidak tersedia</p></div>
+              </div>}
+          {overlay && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/10 pointer-events-none">
+              <div className="p-4 rounded-full bg-black/60 text-white">
+                {playing
+                  ? <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                  : <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>}
+              </div>
+            </div>
+          )}
+          {/* Right actions */}
+          <div className="absolute right-3 flex flex-col items-center gap-4 z-10" style={{bottom:'calc(56px + env(safe-area-inset-bottom) + 16px)'}}>
+            <div className="w-10 h-10 rounded-full border-2 border-white overflow-hidden relative mb-1 flex-shrink-0">
+              <div className="w-full h-full bg-gradient-to-br from-[#3c2aff] to-[#8a7dff] flex items-center justify-center text-white text-xs font-bold">{avatarChar}</div>
+              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-red-500 rounded-full w-4 h-4 flex items-center justify-center text-white text-[10px] font-bold">+</div>
+            </div>
+            <button onClick={doLike} className="flex flex-col items-center active:scale-90 transition-transform">
+              <div className={`p-2 rounded-full bg-black/40 backdrop-blur-sm ${liked?'text-red-500':'text-white'}`}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill={liked?"currentColor":"none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                </svg>
+              </div>
+              <span className="text-[11px] font-semibold mt-0.5 drop-shadow-md">{fmt(likes)}</span>
+            </button>
+            <button onClick={()=>setShowCmt(true)} className="flex flex-col items-center active:scale-90 transition-transform">
+              <div className="p-2 rounded-full bg-black/40 backdrop-blur-sm text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/></svg>
+              </div>
+              <span className="text-[11px] font-semibold mt-0.5 drop-shadow-md">{fmt(reel.comments_count)}</span>
+            </button>
+            <button className="flex flex-col items-center active:scale-90 transition-transform">
+              <div className="p-2 rounded-full bg-black/40 backdrop-blur-sm text-white"><Icon name="Share2" className="w-6 h-6"/></div>
+              <span className="text-[11px] font-semibold mt-0.5 drop-shadow-md">{fmt(reel.shares_count)}</span>
+            </button>
+            <button onClick={toggleMute} className="flex flex-col items-center active:scale-90 transition-transform">
+              <div className="p-2 rounded-full bg-black/40 backdrop-blur-sm text-white">
+                {muted?<Icon name="VolumeX" className="w-5 h-5"/>:<Icon name="Volume2" className="w-5 h-5"/>}
+              </div>
+            </button>
+            <div className="w-9 h-9 rounded-full bg-zinc-800 border-4 border-zinc-700 flex items-center justify-center animate-[spin_4s_linear_infinite] mt-1 shadow-lg">
+              <div className="w-3 h-3 rounded-full bg-black border border-zinc-500"></div>
+            </div>
+          </div>
+          {/* Bottom info */}
+          <div className="absolute left-4 right-16 z-10 text-left pointer-events-none" style={{bottom:'calc(56px + env(safe-area-inset-bottom) + 16px)'}}>
+            <h4 className="font-bold text-base drop-shadow-md mb-1 pointer-events-auto select-none">{username}</h4>
+            <p className="text-sm line-clamp-3 text-gray-200 leading-snug drop-shadow-md pointer-events-auto mb-2 select-none">{reel.title||''} {reel.description||''}</p>
+            {reel.tags&&reel.tags.length>0&&(
+              <div className="flex flex-wrap gap-1">
+                {reel.tags.slice(0,3).map((t,i)=><span key={i} className="text-[#8a7dff] text-xs font-semibold drop-shadow-md pointer-events-auto">#{t}</span>)}
+              </div>
+            )}
+          </div>
+        </div>
+        {showCmt && <CommentSheet video={reel} onClose={()=>setShowCmt(false)} user={user} clincoUser={clincoUser}/>}
+      </>);
+    };
+
+    /* ══════════════════ AUTH SHEET ══════════════════ */
+    const AuthBottomSheet = ({onClose}) => {
+      const [mode, setMode] = useState('options');
       const [email, setEmail] = useState('');
       const [password, setPassword] = useState('');
       const [error, setError] = useState('');
       const [loading, setLoading] = useState(false);
 
-      const handleGoogleLogin = async () => {
-        setLoading(true);
-        setError('');
+      const googleLogin = async () => {
+        setLoading(true); setError('');
         try {
-          const { GoogleAuthProvider, signInWithPopup } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js');
-          const provider = new GoogleAuthProvider();
-          await signInWithPopup(firebaseAuthInstance, provider);
-        } catch (err) {
-          console.error(err);
-          setError('Gagal masuk dengan Google.');
-          setLoading(false);
-        }
+          const {GoogleAuthProvider,signInWithPopup}=await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js');
+          await signInWithPopup(firebaseAuthInstance, new GoogleAuthProvider());
+        } catch { setError('Gagal masuk dengan Google.'); setLoading(false); }
       };
 
-      const handleEmailSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setError('');
+      const emailSubmit = async (e) => {
+        e.preventDefault(); setLoading(true); setError('');
         try {
-          const { signInWithEmailAndPassword, createUserWithEmailAndPassword } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js');
-          
-          if (mode === 'email-login') {
-            await signInWithEmailAndPassword(firebaseAuthInstance, email, password);
-          } else {
-            await createUserWithEmailAndPassword(firebaseAuthInstance, email, password);
-          }
-        } catch (err) {
-          console.error(err);
-          if(err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
-            setError('Email atau password salah.');
-          } else if (err.code === 'auth/email-already-in-use') {
-            setError('Email sudah terdaftar.');
-          } else if (err.code === 'auth/weak-password') {
-            setError('Password minimal 6 karakter.');
-          } else {
-            setError('Terjadi kesalahan. Silakan coba lagi.');
-          }
+          const {signInWithEmailAndPassword,createUserWithEmailAndPassword}=await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js');
+          if(mode==='email-login') await signInWithEmailAndPassword(firebaseAuthInstance,email,password);
+          else await createUserWithEmailAndPassword(firebaseAuthInstance,email,password);
+        } catch(err) {
+          if(['auth/invalid-credential','auth/user-not-found','auth/wrong-password'].includes(err.code)) setError('Email atau password salah.');
+          else if(err.code==='auth/email-already-in-use') setError('Email sudah terdaftar.');
+          else if(err.code==='auth/weak-password') setError('Password minimal 6 karakter.');
+          else setError('Terjadi kesalahan. Silakan coba lagi.');
           setLoading(false);
         }
       };
 
       return (
         <div className="fixed inset-0 z-[100] flex flex-col justify-end">
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity" onClick={onClose}></div>
-          <div className="w-full max-w-md mx-auto bg-zinc-900 rounded-t-3xl p-6 relative z-10 animate-slide-up shadow-[0_-10px_40px_rgba(0,0,0,0.5)] border-t border-zinc-800 flex flex-col">
-            
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose}></div>
+          <div className="w-full max-w-md mx-auto bg-zinc-900 rounded-t-3xl p-6 relative z-10 animate-slide-up shadow-[0_-10px_40px_rgba(0,0,0,0.5)] border-t border-zinc-800">
             <div className="w-12 h-1.5 bg-zinc-700 rounded-full mx-auto mb-6"></div>
-
-            {mode === 'options' && (
-              <>
-                <div className="text-center mb-8">
-                  <h2 className="text-2xl font-bold text-white mb-2">Masuk ke Clincoo</h2>
-                  <p className="text-gray-400 text-sm">Simpan progres dan terhubung dengan komunitas</p>
-                </div>
-                
-                {error && <div className="text-red-400 text-sm text-center bg-red-400/10 py-2 rounded-lg border border-red-400/20 mb-4">{error}</div>}
-
-                <div className="flex flex-col gap-3">
-                  <button onClick={handleGoogleLogin} disabled={loading} className="w-full flex items-center justify-center gap-3 bg-white text-black font-semibold py-3.5 rounded-xl active:scale-[0.98] transition-all">
-                    {loading ? (
-                      <svg className="animate-spin h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                    ) : (
-                      <>
-                        <Icon name="Google" className="w-5 h-5" />
-                        Lanjutkan dengan Google
-                      </>
-                    )}
-                  </button>
-                  <button onClick={() => {setMode('email-login'); setError('');}} className="w-full flex items-center justify-center gap-3 bg-zinc-800 text-white font-semibold py-3.5 rounded-xl hover:bg-zinc-700 active:scale-[0.98] transition-all">
-                    <Icon name="Mail" className="w-5 h-5" />
-                    Lanjutkan dengan Email
-                  </button>
-                </div>
-                
-                <p className="text-center text-xs text-gray-500 mt-6">
-                  Dengan mendaftar, Anda menyetujui Syarat dan Ketentuan kami.
-                </p>
-              </>
-            )}
-
-            {(mode === 'email-login' || mode === 'email-signup') && (
-              <>
-                <div className="flex items-center mb-6">
-                  <button onClick={() => setMode('options')} className="p-2 -ml-2 rounded-full hover:bg-zinc-800 transition-colors text-white">
-                    <Icon name="ArrowLeft" className="w-6 h-6" />
-                  </button>
-                  <h2 className="text-xl font-bold text-white ml-2">
-                    {mode === 'email-login' ? 'Masuk dengan Email' : 'Daftar dengan Email'}
-                  </h2>
-                </div>
-
-                <form onSubmit={handleEmailSubmit} className="flex flex-col gap-4">
-                  <div className="relative">
-                    <input type="email" id="email" className="auth-input block w-full px-4 py-3.5 bg-zinc-800 border border-zinc-700 rounded-xl text-white appearance-none focus:outline-none focus:border-[#3c2aff] focus:ring-1 focus:ring-[#3c2aff] transition-all" placeholder=" " value={email} onChange={(e) => setEmail(e.target.value)} required />
-                    <label htmlFor="email" className="auth-label absolute left-4 top-3.5 text-gray-500 transition-all pointer-events-none bg-zinc-800 px-1">Email</label>
-                  </div>
-                  <div className="relative">
-                    <input type="password" id="password" className="auth-input block w-full px-4 py-3.5 bg-zinc-800 border border-zinc-700 rounded-xl text-white appearance-none focus:outline-none focus:border-[#3c2aff] focus:ring-1 focus:ring-[#3c2aff] transition-all" placeholder=" " value={password} onChange={(e) => setPassword(e.target.value)} required />
-                    <label htmlFor="password" className="auth-label absolute left-4 top-3.5 text-gray-500 transition-all pointer-events-none bg-zinc-800 px-1">Password</label>
-                  </div>
-
-                  {error && <div className="text-red-400 text-sm text-center bg-red-400/10 py-2 rounded-lg border border-red-400/20">{error}</div>}
-
-                  <button type="submit" disabled={loading} className="w-full mt-2 bg-gradient-to-r from-[#3c2aff] to-[#8a7dff] text-white font-bold py-3.5 rounded-xl shadow-[0_4px_14px_0_rgba(60,42,255,0.39)] hover:shadow-[0_6px_20px_rgba(60,42,255,0.23)] active:scale-[0.98] transition-all flex justify-center items-center h-12">
-                    {loading ? (
-                      <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                    ) : (
-                      mode === 'email-login' ? 'Masuk' : 'Daftar'
-                    )}
-                  </button>
-                </form>
-
-                <div className="mt-6 text-sm text-center text-gray-400">
-                  {mode === 'email-login' ? 'Belum punya akun? ' : 'Sudah punya akun? '}
-                  <button onClick={() => setMode(mode === 'email-login' ? 'email-signup' : 'email-login')} className="text-[#8a7dff] font-semibold hover:underline focus:outline-none">
-                    {mode === 'email-login' ? 'Daftar sekarang' : 'Masuk di sini'}
-                  </button>
-                </div>
-              </>
-            )}
-            
-          </div>
-        </div>
-      );
-    }
-
-    const ClincooApp = () => {
-      // Auth State
-      const [user, setUser] = useState(null);
-      const [isAuthChecking, setIsAuthChecking] = useState(true);
-      const [showAuthSheet, setShowAuthSheet] = useState(false);
-      const [pendingTab, setPendingTab] = useState(null);
-
-      // App State
-      const [scrollDirection, setScrollDirection] = useState('up');
-      const [lastScrollY, setLastScrollY] = useState(0);
-      const [isScrolled, setIsScrolled] = useState(false);
-      const [activeCategory, setActiveCategory] = useState('Semua');
-
-      const getInitialTab = () => {
-        try {
-          const path = window.location.pathname.replace(/^\//, '');
-          return ['home', 'reels', 'chat', 'profile'].includes(path) ? path : 'home';
-        } catch (error) {
-          return 'home';
-        }
-      };
-      
-      const [activeTab, setActiveTab] = useState(getInitialTab);
-      const [profileTab, setProfileTab] = useState('Beranda'); 
-
-      const [muted, setMuted] = useState(true);
-      const containerRef = useRef(null);
-
-      useEffect(() => {
-        let unsubscribe;
-        const setupFirebase = async () => {
-          try {
-            const { initializeApp } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js');
-            const { getAuth, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js');
-            
-            if (!firebaseAppInstance) {
-              firebaseAppInstance = initializeApp(firebaseConfig);
-              firebaseAuthInstance = getAuth(firebaseAppInstance);
-            }
-
-            unsubscribe = onAuthStateChanged(firebaseAuthInstance, (currentUser) => {
-              setUser(currentUser);
-              setIsAuthChecking(false);
-              
-              // Hide static splash after auth check is complete
-              const splash = document.getElementById('static-splash-screen');
-              if (splash) {
-                splash.style.opacity = '0';
-                setTimeout(() => splash.remove(), 500);
-              }
-            });
-          } catch (error) {
-            console.error("Firebase init failed:", error);
-            setIsAuthChecking(false);
-            // Hide splash even on error to avoid infinite loading
-            const splash = document.getElementById('static-splash-screen');
-            if (splash) splash.remove();
-          }
-        };
-
-        setupFirebase();
-
-        return () => {
-          if (unsubscribe) unsubscribe();
-        };
-      }, []);
-
-      useEffect(() => {
-        if (!isAuthChecking && !user && (activeTab === 'profile' || activeTab === 'chat')) {
-          setPendingTab(activeTab);
-          setActiveTab('home');
-          setShowAuthSheet(true);
-        }
-      }, [user, activeTab, isAuthChecking]);
-
-      useEffect(() => {
-        if (user && pendingTab) {
-          setActiveTab(pendingTab);
-          setPendingTab(null);
-          setShowAuthSheet(false);
-        } else if (user && showAuthSheet) {
-          setShowAuthSheet(false);
-        }
-      }, [user, pendingTab, showAuthSheet]);
-
-      const handleLogout = async () => {
-        try {
-          const { signOut } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js');
-          if (firebaseAuthInstance) {
-            await signOut(firebaseAuthInstance);
-            setActiveTab('home'); // Reset tab on logout
-          }
-        } catch (error) {
-          console.error("Logout failed", error);
-        }
-      };
-
-      const [reels, setReels] = useState([
-        {
-          id: 1,
-          videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-          username: "@clarissa.fit",
-          description: "Consistency is key! Keep pushing your limits every single day 💪✨ #fitness #workout #motivation",
-          likes: 1240,
-          comments: 89,
-          remixes: 12,
-          shares: 45,
-          liked: false,
-          remixed: false,
-        },
-        {
-          id: 2,
-          videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-          username: "@nature.vibes",
-          description: "A peaceful morning walk under the golden blooming trees. Spring is finally here 🌸🍃 #nature #aesthetic #peaceful",
-          likes: 934,
-          comments: 42,
-          remixes: 5,
-          shares: 12,
-          liked: false,
-          remixed: false,
-        },
-        {
-          id: 3,
-          videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
-          username: "@dance.crew",
-          description: "Freestyle street dance in the neon alleyways of Seoul. Rate this 1-10! 🔥⚡ #dance #streetdance #freestyle",
-          likes: 2450,
-          comments: 184,
-          remixes: 156,
-          shares: 98,
-          liked: false,
-          remixed: false,
-        }
-      ]);
-
-      const [chatList, setChatList] = useState([
-        { id: 1, name: 'Budi Santoso', message: 'Kapan kita mulai mabar bang?', time: '10:32', unread: 2, online: true, avatar: 'B' },
-        { id: 2, name: 'Siti Aminah', message: 'File project kemarin udah aku kirim ya. Tolong di cek.', time: '09:15', unread: 0, online: false, avatar: 'S' },
-        { id: 3, name: 'Gamer Squad', message: 'Andi: Gas rank malam ini!', time: 'Kemarin', unread: 5, online: false, avatar: 'G' },
-        { id: 4, name: 'Joko', message: 'Ok mantap!', time: 'Kemarin', unread: 0, online: true, avatar: 'J' },
-        { id: 5, name: 'Rina', message: 'Hahahaha lucu banget videonya 😂', time: 'Senin', unread: 0, online: false, avatar: 'R' },
-        { id: 6, name: 'Agus (Dev)', message: 'Ada bug di halaman profile bro', time: 'Minggu', unread: 0, online: false, avatar: 'A' },
-        { id: 7, name: 'Nanda', message: 'Makasih infonya!', time: '12 Nov', unread: 0, online: false, avatar: 'N' },
-        { id: 8, name: 'Customer Service', message: 'Laporan Anda sudah kami terima.', time: '10 Nov', unread: 0, online: true, avatar: 'C' },
-      ]);
-
-      const toggleLikeReel = (id) => {
-        setReels(reels.map(r => {
-          if (r.id === id) {
-            return { ...r, liked: !r.liked, likes: r.liked ? r.likes - 1 : r.likes + 1 };
-          }
-          return r;
-        }));
-      };
-
-      const toggleRemixReel = (id) => {
-        setReels(reels.map(r => {
-          if (r.id === id) {
-            return { ...r, remixed: !r.remixed, remixes: r.remixed ? r.remixes - 1 : r.remixes + 1 };
-          }
-          return r;
-        }));
-      };
-
-      const handleTabChange = (tab) => {
-        if ((tab === 'profile' || tab === 'chat') && !user) {
-          setPendingTab(tab);
-          setShowAuthSheet(true);
-        } else {
-          setActiveTab(tab);
-        }
-      };
-
-      useEffect(() => {
-        const handleScroll = () => {
-          if (containerRef.current) {
-            const currentScrollY = containerRef.current.scrollTop;
-            if (currentScrollY <= 0) {
-              setScrollDirection('up');
-              setIsScrolled(false);
-              setLastScrollY(currentScrollY);
-              return;
-            }
-            if (Math.abs(currentScrollY - lastScrollY) < 10) return;
-            if (currentScrollY > lastScrollY && currentScrollY > 60) {
-              setScrollDirection('down');
-            } else if (currentScrollY < lastScrollY) {
-              setScrollDirection('up');
-            }
-            if (currentScrollY > 10) setIsScrolled(true); else setIsScrolled(false);
-            setLastScrollY(currentScrollY);
-          }
-        };
-        const container = containerRef.current;
-        if (container) container.addEventListener('scroll', handleScroll, { passive: true });
-        return () => { if (container) container.removeEventListener('scroll', handleScroll); };
-      }, [lastScrollY, user]); // Added user to dependencies in case ref changes
-
-      const categories = ['Semua', 'Video', 'Postingan', 'Gaming', 'Musik', 'Live', 'Podcast'];
-      const videoFeed = Array.from({ length: 5 });
-      const shortsFeed = Array.from({ length: 6 });
-
-      // Show nothing if checking auth (static splash handles the UI)
-      if (isAuthChecking) {
-        return null;
-      }
-
-      // Main App Layout
-      return (
-        <div className="flex justify-center bg-gray-900 min-h-screen font-sans">
-          <div className="w-full max-w-md bg-black text-white relative overflow-hidden h-[100dvh] flex flex-col shadow-2xl">
-            
-            {/* Header untuk Home */}
-            {activeTab === 'home' && (
-              <>
-                <header className={`fixed top-0 left-0 right-0 z-50 bg-black border-b border-black transition-transform duration-300 ease-in-out ${scrollDirection === 'down'? '-translate-y-full' : 'translate-y-0'}`}>
-                  <div className="flex items-center justify-between px-4 h-14 w-full max-w-md mx-auto">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#3c2aff] to-[#8a7dff] flex items-center justify-center shadow-[0_0_10px_rgba(60,42,255,0.7)]">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="white" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M8 5.14v13.72c0 .79.87 1.27 1.54.84l11-6.86a1 1 0 0 0 0-1.68l-11-6.86A1 1 0 0 0 8 5.14z"/>
-                        </svg>
-                      </div>
-                      <h1 className="text-lg font-bold tracking-[0.15em] text-white" style={{fontFamily: "'Cinzel Decorative', serif"}}>CLINCOO</h1>
-                    </div>
-                    <button className="p-2 rounded-full bg-black text-white active:bg-gray-800 transition-colors">
-                      <Icon name="Search" className="w-6 h-6" />
-                    </button>
-                  </div>
-                </header>
-                
-                {/* Categories - Khusus Home */}
-                <div className={`left-0 right-0 z-40 bg-black border-b border-black transition-all duration-300 w-full max-w-md mx-auto ${isScrolled? 'fixed top-14' : 'absolute top-14'} ${scrollDirection === 'down'? '-translate-y-full' : 'translate-y-0'}`}>
-                  <div className="flex overflow-x-auto py-2 px-4 gap-2 no-scrollbar pb-3">
-                    {categories.map((category) => (
-                      <button key={category} onClick={() => setActiveCategory(category)} className={`whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-semibold transition-colors duration-200 ${activeCategory === category? 'bg-white text-black' : 'bg-[#222] text-gray-300 hover:bg-[#333]'}`}>
-                        {category}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </>
-            )}
-
-            {/* Header untuk Chat */}
-            {activeTab === 'chat' && (
-              <header className={`fixed top-0 left-0 right-0 z-50 bg-black border-b border-gray-900 transition-transform duration-300 ease-in-out ${scrollDirection === 'down'? '-translate-y-full' : 'translate-y-0'}`}>
-                <div className="flex items-center justify-between px-4 h-14 w-full max-w-md mx-auto">
-                  <h1 className="text-xl font-bold text-white">Chat</h1>
-                  <div className="flex items-center gap-3">
-                    <button className="p-1.5 rounded-full text-white active:bg-gray-800 transition-colors">
-                      <Icon name="Search" className="w-6 h-6" />
-                    </button>
-                    <button className="p-1.5 rounded-full text-white active:bg-gray-800 transition-colors">
-                      <Icon name="MoreVertical" className="w-6 h-6" />
-                    </button>
-                  </div>
-                </div>
-              </header>
-            )}
-
-            {/* Header untuk Profile (YouTube Style) */}
-            {activeTab === 'profile' && (
-              <header className={`fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-md transition-transform duration-300 ease-in-out ${scrollDirection === 'down'? '-translate-y-full' : 'translate-y-0'}`}>
-                <div className="flex items-center justify-between px-4 h-14 w-full max-w-md mx-auto">
-                  <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#3c2aff] to-[#8a7dff] flex items-center justify-center shadow-[0_0_10px_rgba(60,42,255,0.7)]">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="white" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M8 5.14v13.72c0 .79.87 1.27 1.54.84l11-6.86a1 1 0 0 0 0-1.68l-11-6.86A1 1 0 0 0 8 5.14z"/>
-                        </svg>
-                      </div>
-                    <h1 className="text-xl font-bold text-white tracking-wide">Profile</h1>
-                  
-                  </div>
-                  <div className="flex gap-2">
-                    <button className="p-1.5 rounded-full text-white active:bg-gray-800 transition-colors">
-                      <Icon name="Search" className="w-6 h-6" />
-                    </button>
-                    <button onClick={handleLogout} className="p-1.5 rounded-full text-red-400 active:bg-gray-800 transition-colors" title="Logout">
-                      <Icon name="LogOut" className="w-6 h-6" />
-                    </button>
-                  </div>
-                </div>
-              </header>
-            )}
-            
-            <main ref={containerRef} className={`flex-1 custom-scrollbar ${
-              activeTab === 'reels' ? 'pt-0 h-full overflow-hidden' : 
-              activeTab === 'home' ? 'overflow-y-auto overflow-x-hidden pt-[112px] pb-[calc(96px+env(safe-area-inset-bottom))]' : 
-              activeTab === 'profile' ? 'overflow-y-auto overflow-x-hidden pt-[56px] pb-[calc(96px+env(safe-area-inset-bottom))]' :
-              'overflow-y-auto overflow-x-hidden pt-[56px] pb-[calc(96px+env(safe-area-inset-bottom))]'
-            }`}>
-              
-              {activeTab === 'home' ? (
-                <>
-                  <div className="w-full aspect-video bg-zinc-900 relative mb-4">
-                    <div className="absolute inset-0 flex items-center justify-center text-gray-600">
-                      <Icon name="PlaySquare" className="w-12 h-12 opacity-50" />
-                      <span className="ml-2 font-semibold">Featured Video</span>
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/95 to-transparent">
-                      <h3 className="font-bold text-lg leading-tight truncate">Amazing New Gameplay Trailer 2026</h3>
-                      <p className="text-sm text-gray-400 mt-1">Sponsor Channel • 1.2M views</p>
-                    </div>
-                  </div>
-                  <div className="mb-6">
-                    <div className="px-4 mb-2 flex items-center gap-2">
-                      <Icon name="Shorts" className="w-6 h-6 text-white" />
-                      <h2 className="font-bold text-lg">Shorts</h2>
-                    </div>
-                    <div className="flex overflow-x-auto gap-3 px-4 pb-2 no-scrollbar snap-x">
-                      {shortsFeed.map((_, index) => (
-                        <div key={index} className="min-w-[140px] h-[250px] bg-zinc-900 rounded-xl flex-shrink-0 relative snap-start overflow-hidden group">
-                          <div className={`absolute inset-0 opacity-40 bg-gradient-to-b from-transparent to-black`}></div>
-                          <img src={`https://placehold.co/140x250/333/666?text=Short+${index + 1}`} alt="Short thumbnail" className="w-full h-full object-cover mix-blend-overlay" />
-                          <div className="absolute bottom-2 left-2 right-2 text-sm font-medium line-clamp-2 drop-shadow-md">
-                            Viral moment caught on camera #{index + 1}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-6 px-0 pb-6">
-                    {videoFeed.map((_, index) => (
-                      <div key={index} className="w-full">
-                        <div className="w-full aspect-video bg-zinc-900 relative">
-                           <img src={`https://placehold.co/600x338/222/555?text=Video+Thumbnail+${index + 1}`} alt="Video thumbnail" className="w-full h-full object-cover" />
-                          <div className="absolute bottom-2 right-2 bg-black/80 text-xs px-1.5 py-0.5 rounded font-medium">10:05</div>
-                        </div>
-                        <div className="flex gap-3 p-4">
-                          <div className="w-10 h-10 rounded-full bg-zinc-800 flex-shrink-0 mt-1 overflow-hidden">
-                             <img src={`https://placehold.co/40x40/444/777?text=U`} alt="Avatar" />
-                          </div>
-                          <div className="flex flex-col">
-                            <h3 className="font-semibold text-base leading-tight line-clamp-2">Understanding the Universe: A Deep Dive into Black Holes</h3>
-                            <p className="text-sm text-gray-400 mt-1">Space Channel • 345K views • 2 days ago</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              ) : activeTab === 'reels' ? (
-                <div className="h-full w-full overflow-y-scroll snap-y snap-mandatory no-scrollbar">
-                  {reels.map((reel) => (
-                    <ReelItem
-                      key={reel.id}
-                      reel={reel}
-                      onLike={toggleLikeReel}
-                      onRemix={toggleRemixReel}
-                      muted={muted}
-                      toggleMute={() => setMuted(!muted)}
-                    />
-                  ))}
-                </div>
-              ) : activeTab === 'chat' ? (
-                <div className="flex flex-col w-full h-full">
-                  {chatList.map((chat) => (
-                    <div key={chat.id} className="flex items-center gap-4 py-3 px-4 active:bg-gray-900 transition-colors cursor-pointer select-none">
-                      <div className="relative flex-shrink-0">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center text-lg font-bold text-white shadow-sm border border-gray-700">
-                          {chat.avatar}
-                        </div>
-                        {chat.online && (
-                          <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-black rounded-full"></div>
-                        )}
-                      </div>
-                      
-                      <div className="flex-1 min-w-0 border-b border-gray-900 pb-4 pt-1">
-                        <div className="flex justify-between items-baseline mb-1">
-                          <h3 className={`font-semibold text-[15px] truncate ${chat.unread > 0 ? 'text-white' : 'text-gray-200'}`}>
-                            {chat.name}
-                          </h3>
-                          <span className={`text-xs flex-shrink-0 ml-2 ${chat.unread > 0 ? 'text-[#3c2aff] font-semibold' : 'text-gray-500'}`}>
-                            {chat.time}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center gap-2">
-                          <p className={`text-[13px] truncate ${chat.unread > 0 ? 'text-gray-200 font-medium' : 'text-gray-400'}`}>
-                            {chat.message}
-                          </p>
-                          {chat.unread > 0 && (
-                            <div className="w-5 h-5 rounded-full bg-[#3c2aff] flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">
-                              {chat.unread}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col w-full min-h-full text-white relative bg-[#0f0f0f]">
-                  
-                  {/* Banner Image Area */}
-                  <div className="w-full h-[100px] sm:h-[130px] relative bg-zinc-800">
-                    <img src="https://placehold.co/600x200/111/333?text=WELCOME+TO+THE+FUTURE" alt="Channel Banner" className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                  </div>
-
-                  {/* Profile Header Information (Left Aligned) */}
-                  <div className="px-4 pt-4 pb-2 relative z-10 flex flex-col items-start bg-[#0f0f0f]">
-                    <div className="flex items-center gap-4 w-full">
-                      {/* Avatar */}
-                      <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-zinc-800 overflow-hidden flex-shrink-0 p-1 bg-gradient-to-tr from-[#3c2aff] to-[#8a7dff] -mt-8 relative z-20 shadow-lg">
-                        <img src="https://placehold.co/150x150/1a1a1a/fff?text=V" alt="Profile" className="w-full h-full object-cover rounded-full border-[3px] border-[#0f0f0f]" />
-                      </div>
-                      
-                      {/* Name and Handle */}
-                      <div className="flex flex-col pt-1">
-                        <h2 className="text-[22px] font-bold flex items-center gap-1.5 leading-tight">
-                          Vinco
-                          <Icon name="CheckBadge" className="w-5 h-5 text-[#3c2aff]" />
-                        </h2>
-                        <div className="text-[13.5px] text-gray-400 flex flex-wrap items-center gap-1 mt-0.5">
-                           <span>{user?.email || '@vinconium'}</span>
-                           <span className="hidden sm:inline">•</span>
-                           <span>590 rb pengikut</span>
-                           <span>•</span>
-                           <span>274 konten</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Bio Description */}
-                    <p className="mt-3 text-[13.5px] text-gray-300 w-full leading-relaxed line-clamp-2">
-                      Mempermudah kerumitan dibalik teknologi & sains :) 
-                      <span className="font-bold text-[#8a7dff] cursor-pointer ml-1">...selengkapnya</span>
-                    </p>
-
-                    {/* Links */}
-                    <div className="mt-2 text-[13.5px] text-[#8a7dff] flex items-center gap-1.5 cursor-pointer font-medium w-full truncate">
-                      <Icon name="Link" className="w-4 h-4 text-[#8a7dff] flex-shrink-0"/>
-                      <span className="truncate">linktr.ee/vinconium <span className="text-gray-400">dan 3 link lainnya</span></span>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex gap-2 w-full mt-4">
-                      <button className="flex-1 bg-white text-black hover:bg-gray-200 py-2 rounded-xl font-bold text-[13px] transition-colors shadow-sm">
-                        Edit Profil
-                      </button>
-                      <button className="flex-1 bg-white/10 hover:bg-white/20 text-white py-2 rounded-xl font-semibold text-[13px] transition-colors">
-                        Kelola Konten
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Profile Navigation Tabs */}
-                  <div className="flex border-b border-white/5 mt-1 sticky top-14 bg-[#0f0f0f] z-30 overflow-x-auto no-scrollbar">
-                    {['Beranda', 'Video', 'Reels', 'Postingan'].map((tab) => (
-                      <button 
-                        key={tab} 
-                        onClick={() => setProfileTab(tab)} 
-                        className={`px-5 py-3.5 font-medium whitespace-nowrap border-b-2 transition-colors text-[14px] ${profileTab === tab ? 'border-[#3c2aff] text-white' : 'border-transparent text-gray-400 hover:text-gray-200'}`}
-                      >
-                         {tab}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="w-full bg-[#0f0f0f] min-h-[400px]">
-                    
-                    {/* BERANDA TAB */}
-                    {profileTab === 'Beranda' && (
-                      <div className="py-4">
-                        {/* Section: Untuk Anda */}
-                        <div className="mb-6">
-                           <h3 className="px-4 text-[16px] font-bold mb-3">Untuk Anda</h3>
-                           <div className="flex overflow-x-auto gap-3 px-4 pb-2 no-scrollbar">
-                             {Array.from({length: 4}).map((_, i) => (
-                               <div key={i} className="min-w-[260px] max-w-[260px] flex-shrink-0 cursor-pointer">
-                                  <div className="w-full aspect-video bg-zinc-800 rounded-xl overflow-hidden relative mb-2">
-                                     <img src={`https://placehold.co/400x225/222/555?text=Video+Untuk+Anda+${i+1}`} className="w-full h-full object-cover" />
-                                     <div className="absolute bottom-1.5 right-1.5 bg-black/80 text-[11px] font-medium px-1.5 py-0.5 rounded">12:22</div>
-                                  </div>
-                                  <h4 className="font-semibold text-[14px] line-clamp-2 leading-tight">Misteri Alam Semesta yang Belum Terpecahkan (Teori Konspirasi)</h4>
-                                  <p className="text-[12px] text-gray-400 mt-1">86 rb x ditonton • 8 bulan yang lalu</p>
-                               </div>
-                             ))}
-                           </div>
-                        </div>
-
-                        <hr className="border-white/10 my-4" />
-
-                        {/* Section: Shorts/Reels */}
-                        <div>
-                           <div className="px-4 flex items-center gap-2 mb-3">
-                              <Icon name="Shorts" className="w-6 h-6 text-white" />
-                              <h3 className="text-[16px] font-bold">Shorts</h3>
-                           </div>
-                           <div className="flex overflow-x-auto gap-2 px-4 pb-2 no-scrollbar">
-                              {Array.from({length: 6}).map((_, i) => (
-                               <div key={i} className="w-[140px] aspect-[9/16] bg-zinc-800 rounded-xl overflow-hidden relative flex-shrink-0 cursor-pointer">
-                                  <img src={`https://placehold.co/200x350/222/555?text=Short+${i+1}`} className="w-full h-full object-cover" />
-                                  <div className="absolute bottom-2 left-2 right-2 text-white font-medium text-[13px] line-clamp-2 drop-shadow-md">
-                                     Fakta unik yang jarang diketahui orang 🤔
-                                  </div>
-                               </div>
-                              ))}
-                           </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* VIDEO TAB */}
-                    {profileTab === 'Video' && (
-                      <div className="py-2">
-                        {/* Filters */}
-                        <div className="flex gap-2 px-4 py-2 mb-2">
-                          <button className="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors flex items-center gap-1">
-                            Terbaru <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6"/></svg>
-                          </button>
-                          <button className="bg-white text-black px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors">
-                            Khusus pelanggan
-                          </button>
-                          <button className="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors">
-                            Publik
-                          </button>
-                        </div>
-
-                        {/* Video List */}
-                        <div className="flex flex-col">
-                           {Array.from({length: 6}).map((_, i) => (
-                             <div key={i} className="flex gap-3 px-4 py-3 active:bg-white/5 cursor-pointer transition-colors">
-                                <div className="w-[160px] aspect-video bg-zinc-800 rounded-xl overflow-hidden relative flex-shrink-0">
-                                   <img src={`https://placehold.co/320x180/1a1a1a/444?text=Thumbnail+${i+1}`} className="w-full h-full object-cover" />
-                                   <div className="absolute bottom-1 right-1 bg-black/80 text-[11px] font-medium px-1.5 py-0.5 rounded">8:13</div>
-                                </div>
-                                <div className="flex flex-col flex-1 pr-4 relative">
-                                   <h4 className="font-semibold text-[14px] leading-tight line-clamp-2">Rahasia Perusahaan Teknologi Terbesar di Dunia</h4>
-                                   <div className="text-[12px] text-gray-400 mt-1 flex flex-col gap-0.5">
-                                      <span>37 rb x ditonton</span>
-                                      <span>2 bulan yang lalu</span>
-                                   </div>
-                                   <div className="absolute top-0 -right-2 p-1 text-gray-400">
-                                      <Icon name="MoreVertical" className="w-4 h-4" />
-                                   </div>
-                                </div>
-                             </div>
-                           ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* REELS/SHORTS TAB */}
-                    {profileTab === 'Reels' && (
-                      <div className="py-2">
-                        {/* Filters */}
-                        <div className="flex gap-2 px-4 py-2 mb-2">
-                          <button className="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors flex items-center gap-1">
-                            Terbaru <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6"/></svg>
-                          </button>
-                          <button className="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors">
-                            Terpopuler
-                          </button>
-                        </div>
-                        
-                        <div className="grid grid-cols-3 gap-[2px]">
-                           {Array.from({length: 12}).map((_, i) => (
-                             <div key={i} className="aspect-[3/4] bg-zinc-800 relative group overflow-hidden cursor-pointer">
-                                <img src={`https://placehold.co/200x266/1a1a1a/444?text=Reel+${i+1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80"></div>
-                                <div className="absolute bottom-2 left-2 flex flex-col text-white text-[13px] font-semibold drop-shadow-md pr-6">
-                                   <span className="line-clamp-2 leading-tight mb-1">Eksperimen gila yang pernah ada</span>
-                                   <span className="text-[11px] font-medium text-gray-200">1,2 jt x ditonton</span>
-                                </div>
-                                <div className="absolute top-1 right-1 p-1">
-                                   <Icon name="MoreVertical" className="w-4 h-4 text-white drop-shadow-md" />
-                                </div>
-                             </div>
-                           ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* POSTINGAN TAB */}
-                    {profileTab === 'Postingan' && (
-                      <div className="py-2 bg-[#0f0f0f]">
-                         {Array.from({length: 3}).map((_, i) => (
-                            <div key={i} className="border-b border-white/10 pb-4 mb-4">
-                               <div className="px-4 flex items-start gap-3">
-                                  <img src="https://placehold.co/40x40/1a1a1a/fff?text=V" className="w-9 h-9 rounded-full object-cover" />
-                                  <div className="flex-1">
-                                     <div className="flex items-center gap-1.5">
-                                        <span className="font-semibold text-[14px]">Vinco</span>
-                                        <span className="text-[12px] text-gray-400">11 hari yang lalu</span>
-                                     </div>
-                                     <p className="text-[14px] mt-1.5 leading-relaxed">
-                                        Berang-berang hanyalah kapibara yang lulus S1 Teknik Sipil. Kalian yang mana?
-                                     </p>
-                                  </div>
-                                  <Icon name="MoreVertical" className="w-5 h-5 text-gray-400" />
-                               </div>
-                               
-                               <div className="mt-3 mx-4 aspect-square bg-zinc-900 rounded-xl overflow-hidden relative">
-                                  <img src={`https://placehold.co/400x400/222/555?text=Meme+Post+${i+1}`} className="w-full h-full object-cover" />
-                               </div>
-                               
-                               <div className="px-4 mt-3 flex items-center justify-between text-gray-400">
-                                  <div className="flex items-center gap-4">
-                                     <button className="flex items-center gap-1.5 hover:text-white transition-colors">
-                                        <Icon name="ThumbsUp" className="w-5 h-5" />
-                                        <span className="text-[13px] font-medium">3,3 rb</span>
-                                     </button>
-                                     <button className="flex items-center gap-1.5 hover:text-white transition-colors rotate-180">
-                                        <Icon name="ThumbsUp" className="w-5 h-5" />
-                                     </button>
-                                  </div>
-                                  <button className="flex items-center gap-1.5 hover:text-white transition-colors">
-                                     <Icon name="MessageSquare" className="w-5 h-5" />
-                                     <span className="text-[13px] font-medium">60</span>
-                                  </button>
-                               </div>
-                            </div>
-                         ))}
-                      </div>
-                    )}
-                  </div>
-
-                </div>
-              )}
-            </main>
-            
-            <nav className={`fixed bottom-0 w-full max-w-md bg-black z-50 transition-transform duration-300 ease-in-out ${scrollDirection === 'down' && activeTab !== 'reels' ? 'translate-y-full' : 'translate-y-0'}`}>
-              <div className="flex items-center justify-around h-14 px-2 relative border-t border-white/10">
-                <button onClick={() => handleTabChange('home')} className={`h-full flex-1 flex justify-center items-center transition-colors active:bg-gray-800 rounded-lg ${activeTab === 'home'? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>
-                  <Icon name="Home" className="w-6 h-6" />
+            {mode==='options' && (<>
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-bold text-white mb-2">Masuk ke Clincoo</h2>
+                <p className="text-gray-400 text-sm">Simpan progres dan terhubung dengan komunitas</p>
+              </div>
+              {error && <div className="text-red-400 text-sm text-center bg-red-400/10 py-2 rounded-lg border border-red-400/20 mb-4">{error}</div>}
+              <div className="flex flex-col gap-3">
+                <button onClick={googleLogin} disabled={loading} className="w-full flex items-center justify-center gap-3 bg-white text-black font-semibold py-3.5 rounded-xl active:scale-[0.98] transition-all">
+                  {loading?<div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full spinner"></div>:<><Icon name="Google" className="w-5 h-5"/>Lanjutkan dengan Google</>}
                 </button>
-                <button onClick={() => handleTabChange('reels')} className={`h-full flex-1 flex justify-center items-center transition-colors active:bg-gray-800 rounded-lg ${activeTab === 'reels'? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>
-                  <Icon name="PlaySquare" className="w-6 h-6" />
-                </button>
-                
-                {/* Completed the cut-off Create Button */}
-                <div className="flex-1 flex justify-center relative items-center h-full">
-                  <button className="w-12 h-12 rounded-full flex items-center justify-center relative overflow-hidden group shadow-[0_0_15px_rgba(60,42,255,0.5)] active:scale-95 transition-transform" style={{ backgroundColor: '#3c2aff' }}>
-                    <div className="absolute inset-0 shine-effect"></div>
-                    <div className="relative z-10 flex items-center justify-center">
-                      <Icon name="Plus" className="w-7 h-7 text-white bounce-on-shine" />
-                    </div>
-                  </button>
-                </div>
-
-                <button onClick={() => handleTabChange('chat')} className={`h-full flex-1 flex justify-center items-center transition-colors active:bg-gray-800 rounded-lg ${activeTab === 'chat'? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>
-                  <div className="relative">
-                    <Icon name="MessageCircle" className="w-6 h-6" />
-                    <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-black"></div>
-                  </div>
-                </button>
-                <button onClick={() => handleTabChange('profile')} className={`h-full flex-1 flex justify-center items-center transition-colors active:bg-gray-800 rounded-lg ${activeTab === 'profile'? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>
-                  <Icon name="User" className="w-6 h-6" />
+                <button onClick={()=>{setMode('email-login');setError('');}} className="w-full flex items-center justify-center gap-3 bg-zinc-800 text-white font-semibold py-3.5 rounded-xl hover:bg-zinc-700 active:scale-[0.98] transition-all">
+                  <Icon name="Mail" className="w-5 h-5"/>Lanjutkan dengan Email
                 </button>
               </div>
-            </nav>
-
-            {showAuthSheet && <AuthBottomSheet onClose={() => { setShowAuthSheet(false); setPendingTab(null); }} />}
+              <p className="text-center text-xs text-gray-500 mt-6">Dengan mendaftar, Anda menyetujui Syarat dan Ketentuan kami.</p>
+            </>)}
+            {(mode==='email-login'||mode==='email-signup') && (<>
+              <div className="flex items-center mb-6">
+                <button onClick={()=>setMode('options')} className="p-2 -ml-2 rounded-full hover:bg-zinc-800 text-white"><Icon name="ArrowLeft" className="w-6 h-6"/></button>
+                <h2 className="text-xl font-bold text-white ml-2">{mode==='email-login'?'Masuk dengan Email':'Daftar dengan Email'}</h2>
+              </div>
+              <form onSubmit={emailSubmit} className="flex flex-col gap-4">
+                <div className="relative">
+                  <input type="email" id="em" className="auth-input block w-full px-4 py-3.5 bg-zinc-800 border border-zinc-700 rounded-xl text-white appearance-none focus:outline-none focus:border-[#3c2aff] focus:ring-1 focus:ring-[#3c2aff] transition-all" placeholder=" " value={email} onChange={e=>setEmail(e.target.value)} required/>
+                  <label htmlFor="em" className="auth-label absolute left-4 top-3.5 text-gray-500 transition-all pointer-events-none bg-zinc-800 px-1">Email</label>
+                </div>
+                <div className="relative">
+                  <input type="password" id="pw" className="auth-input block w-full px-4 py-3.5 bg-zinc-800 border border-zinc-700 rounded-xl text-white appearance-none focus:outline-none focus:border-[#3c2aff] focus:ring-1 focus:ring-[#3c2aff] transition-all" placeholder=" " value={password} onChange={e=>setPassword(e.target.value)} required/>
+                  <label htmlFor="pw" className="auth-label absolute left-4 top-3.5 text-gray-500 transition-all pointer-events-none bg-zinc-800 px-1">Password</label>
+                </div>
+                {error && <div className="text-red-400 text-sm text-center bg-red-400/10 py-2 rounded-lg border border-red-400/20">{error}</div>}
+                <button type="submit" disabled={loading} className="w-full mt-2 bg-gradient-to-r from-[#3c2aff] to-[#8a7dff] text-white font-bold py-3.5 rounded-xl shadow-[0_4px_14px_0_rgba(60,42,255,0.39)] active:scale-[0.98] transition-all flex justify-center items-center h-12">
+                  {loading?<div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full spinner"></div>:(mode==='email-login'?'Masuk':'Daftar')}
+                </button>
+              </form>
+              <div className="mt-6 text-sm text-center text-gray-400">
+                {mode==='email-login'?'Belum punya akun? ':'Sudah punya akun? '}
+                <button onClick={()=>setMode(mode==='email-login'?'email-signup':'email-login')} className="text-[#8a7dff] font-semibold hover:underline focus:outline-none">
+                  {mode==='email-login'?'Daftar sekarang':'Masuk di sini'}
+                </button>
+              </div>
+            </>)}
           </div>
         </div>
       );
     };
 
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<ClincooApp />);
+    /* ══════════════════ MAIN APP ══════════════════ */
+    const ClincooApp = () => {
+      const [user,setUser]=useState(null);
+      const [clincoUser,setClincoUser]=useState(null);
+      const [isAuthChecking,setIsAuthChecking]=useState(true);
+      const [showAuthSheet,setShowAuthSheet]=useState(false);
+      const [showUpload,setShowUpload]=useState(false);
+      const [pendingTab,setPendingTab]=useState(null);
+      const [scrollDir,setScrollDir]=useState('up');
+      const [lastScrollY,setLastScrollY]=useState(0);
+      const [isScrolled,setIsScrolled]=useState(false);
+      const [activeCategory,setActiveCategory]=useState('Semua');
+      const [activeTab,setActiveTab]=useState('home');
+      const [profileTab,setProfileTab]=useState('Beranda');
+      const [muted,setMuted]=useState(true);
+      const [reels,setReels]=useState([]);
+      const [reelsLoading,setReelsLoading]=useState(true);
+      const [homeFeed,setHomeFeed]=useState([]);
+      const [homeFeedLoading,setHomeFeedLoading]=useState(true);
+      const [activeReelIdx,setActiveReelIdx]=useState(0);
+      const [profileVideos,setProfileVideos]=useState([]);
+      const [profileLoading,setProfileLoading]=useState(false);
+      const containerRef=useRef(null);
+      const reelContainerRef=useRef(null);
+
+      const chatList=[
+        {id:1,name:'Budi Santoso',message:'Kapan kita mulai mabar bang?',time:'10:32',unread:2,online:true,avatar:'B'},
+        {id:2,name:'Siti Aminah',message:'File project kemarin udah aku kirim ya.',time:'09:15',unread:0,online:false,avatar:'S'},
+        {id:3,name:'Gamer Squad',message:'Andi: Gas rank malam ini!',time:'Kemarin',unread:5,online:false,avatar:'G'},
+        {id:4,name:'Joko',message:'Ok mantap!',time:'Kemarin',unread:0,online:true,avatar:'J'},
+        {id:5,name:'Rina',message:'Hahahaha lucu banget videonya 😂',time:'Senin',unread:0,online:false,avatar:'R'},
+      ];
+
+      const loadReels=useCallback(async()=>{ setReelsLoading(true); const d=await api.get('videoFeed?page=1&limit=20'); setReels(d.videos||[]); setReelsLoading(false); },[]);
+      const loadHome=useCallback(async()=>{ setHomeFeedLoading(true); const d=await api.get('videoExplore?page=1&limit=12'); setHomeFeed(d.videos||[]); setHomeFeedLoading(false); },[]);
+      const loadProfile=useCallback(async(uid)=>{ if(!uid) return; setProfileLoading(true); const d=await api.get(`userProfile?user_id=${uid}`); setProfileVideos(d.videos||[]); setProfileLoading(false); },[]);
+
+      useEffect(()=>{ loadReels(); loadHome(); },[]);
+
+      useEffect(()=>{
+        let unsub;
+        const setup=async()=>{
+          try {
+            const {initializeApp}=await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js');
+            const {getAuth,onAuthStateChanged}=await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js');
+            if(!firebaseAppInstance){ firebaseAppInstance=initializeApp(firebaseConfig); firebaseAuthInstance=getAuth(firebaseAppInstance); }
+            unsub=onAuthStateChanged(firebaseAuthInstance,async(fbUser)=>{
+              setUser(fbUser);
+              if(fbUser){
+                const uid=fbUser.uid||fbUser.email;
+                const pd=await api.get(`userProfile?user_id=${uid}`);
+                if(pd.success&&pd.user){ setClincoUser(pd.user); setProfileVideos(pd.videos||[]); }
+                else {
+                  const uname=((fbUser.displayName||fbUser.email||uid).replace(/[^a-z0-9]/gi,'').toLowerCase().substring(0,16)||'user')+Date.now().toString().slice(-4);
+                  const reg=await api.post('authRegister',{email:fbUser.email||uid,username:uname,display_name:fbUser.displayName||uname});
+                  if(reg.success) setClincoUser(reg.user);
+                }
+              } else { setClincoUser(null); setProfileVideos([]); }
+              setIsAuthChecking(false);
+              const splash=document.getElementById('static-splash-screen');
+              if(splash){splash.style.opacity='0';setTimeout(()=>splash.remove(),500);}
+            });
+          } catch {
+            setIsAuthChecking(false);
+            const splash=document.getElementById('static-splash-screen');
+            if(splash) splash.remove();
+          }
+        };
+        setup();
+        return()=>{if(unsub) unsub();};
+      },[]);
+
+      useEffect(()=>{
+        if(!isAuthChecking&&!user&&(activeTab==='profile'||activeTab==='chat')){ setPendingTab(activeTab); setActiveTab('home'); setShowAuthSheet(true); }
+      },[user,activeTab,isAuthChecking]);
+
+      useEffect(()=>{
+        if(user&&pendingTab){ setActiveTab(pendingTab); setPendingTab(null); setShowAuthSheet(false); }
+        else if(user&&showAuthSheet) setShowAuthSheet(false);
+      },[user,pendingTab,showAuthSheet]);
+
+      const logout=async()=>{ try{ const{signOut}=await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js'); if(firebaseAuthInstance){await signOut(firebaseAuthInstance);setActiveTab('home');} }catch{} };
+
+      const changeTab=(tab)=>{
+        if(tab==='upload'){ if(!user){setShowAuthSheet(true);return;} setShowUpload(true); return; }
+        if((tab==='profile'||tab==='chat')&&!user){ setPendingTab(tab); setShowAuthSheet(true); }
+        else { setActiveTab(tab); if(tab==='reels') setActiveReelIdx(0); if(tab==='profile'&&clincoUser) loadProfile(clincoUser.id); }
+      };
+
+      useEffect(()=>{
+        const el=containerRef.current; if(!el) return;
+        const onScroll=()=>{
+          const y=el.scrollTop;
+          if(y<=0){setScrollDir('up');setIsScrolled(false);setLastScrollY(y);return;}
+          if(Math.abs(y-lastScrollY)<10) return;
+          setScrollDir(y>lastScrollY&&y>60?'down':'up');
+          setIsScrolled(y>10); setLastScrollY(y);
+        };
+        el.addEventListener('scroll',onScroll,{passive:true});
+        return()=>el.removeEventListener('scroll',onScroll);
+      },[lastScrollY]);
+
+      useEffect(()=>{
+        const el=reelContainerRef.current; if(!el) return;
+        const onScroll=()=>{ const idx=Math.round(el.scrollTop/el.clientHeight); setActiveReelIdx(idx); };
+        el.addEventListener('scroll',onScroll,{passive:true});
+        return()=>el.removeEventListener('scroll',onScroll);
+      },[activeTab]);
+
+      const categories=['Semua','Video','Reels','Gaming','Musik','Live','Podcast'];
+
+      if(isAuthChecking) return null;
+
+      return (
+        <div className="flex justify-center bg-gray-900 min-h-screen font-sans">
+          <div className="w-full max-w-md bg-black text-white relative overflow-hidden h-[100dvh] flex flex-col shadow-2xl">
+
+            {/* HEADER HOME */}
+            {activeTab==='home' && (<>
+              <header className={`fixed top-0 left-0 right-0 z-50 bg-black border-b border-black transition-transform duration-300 ${scrollDir==='down'?'-translate-y-full':'translate-y-0'}`}>
+                <div className="flex items-center justify-between px-4 h-14 w-full max-w-md mx-auto">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#3c2aff] to-[#8a7dff] flex items-center justify-center shadow-[0_0_10px_rgba(60,42,255,0.7)]">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M8 5.14v13.72c0 .79.87 1.27 1.54.84l11-6.86a1 1 0 0 0 0-1.68l-11-6.86A1 1 0 0 0 8 5.14z"/></svg>
+                    </div>
+                    <h1 className="text-lg font-bold tracking-[0.15em] text-white" style={{fontFamily:"'Cinzel Decorative',serif"}}>CLINCOO</h1>
+                  </div>
+                  <button onClick={loadHome} className="p-2 rounded-full bg-black text-white active:bg-gray-800"><Icon name="RefreshCw" className="w-5 h-5"/></button>
+                </div>
+              </header>
+              <div className={`left-0 right-0 z-40 bg-black border-b border-black transition-all duration-300 w-full max-w-md mx-auto ${isScrolled?'fixed top-14':'absolute top-14'} ${scrollDir==='down'?'-translate-y-full':'translate-y-0'}`}>
+                <div className="flex overflow-x-auto py-2 px-4 gap-2 no-scrollbar pb-3">
+                  {categories.map(c=>(
+                    <button key={c} onClick={()=>setActiveCategory(c)} className={`whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-semibold transition-colors ${activeCategory===c?'bg-white text-black':'bg-[#222] text-gray-300 hover:bg-[#333]'}`}>{c}</button>
+                  ))}
+                </div>
+              </div>
+            </>)}
+
+            {/* HEADER CHAT */}
+            {activeTab==='chat' && (
+              <header className={`fixed top-0 left-0 right-0 z-50 bg-black border-b border-gray-900 transition-transform duration-300 ${scrollDir==='down'?'-translate-y-full':'translate-y-0'}`}>
+                <div className="flex items-center justify-between px-4 h-14 w-full max-w-md mx-auto">
+                  <h1 className="text-xl font-bold text-white">Chat</h1>
+                  <div className="flex items-center gap-3">
+                    <button className="p-1.5 rounded-full text-white active:bg-gray-800"><Icon name="Search" className="w-6 h-6"/></button>
+                    <button className="p-1.5 rounded-full text-white active:bg-gray-800"><Icon name="MoreVertical" className="w-6 h-6"/></button>
+                  </div>
+                </div>
+              </header>
+            )}
+
+            {/* HEADER PROFILE */}
+            {activeTab==='profile' && (
+              <header className={`fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-md transition-transform duration-300 ${scrollDir==='down'?'-translate-y-full':'translate-y-0'}`}>
+                <div className="flex items-center justify-between px-4 h-14 w-full max-w-md mx-auto">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#3c2aff] to-[#8a7dff] flex items-center justify-center shadow-[0_0_10px_rgba(60,42,255,0.7)]">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M8 5.14v13.72c0 .79.87 1.27 1.54.84l11-6.86a1 1 0 0 0 0-1.68l-11-6.86A1 1 0 0 0 8 5.14z"/></svg>
+                    </div>
+                    <h1 className="text-lg font-bold tracking-[0.15em]" style={{fontFamily:"'Cinzel Decorative',serif"}}>CLINCOO</h1>
+                  </div>
+                  <button onClick={logout} className="p-2 rounded-full text-gray-400 hover:text-white hover:bg-zinc-800"><Icon name="LogOut" className="w-5 h-5"/></button>
+                </div>
+              </header>
+            )}
+
+            {/* MAIN */}
+            <main ref={activeTab!=='reels'?containerRef:null}
+              className={`flex-1 overflow-hidden ${activeTab!=='reels'?'overflow-y-auto':''} ${activeTab!=='reels'?'pt-14':''}`}>
+
+              {/* HOME */}
+              {activeTab==='home' && (
+                <div style={{paddingTop:'48px'}}>
+                  {homeFeedLoading
+                    ? <div className="flex flex-col items-center justify-center py-20 gap-3"><div className="w-10 h-10 border-[3px] border-[#3c2aff] border-t-transparent rounded-full spinner"></div><p className="text-gray-500 text-sm">Memuat konten...</p></div>
+                    : homeFeed.length===0
+                      ? <div className="flex flex-col items-center justify-center py-20 gap-3 text-gray-500">
+                          <Icon name="Film" className="w-12 h-12 opacity-30"/>
+                          <p className="text-sm">Belum ada video. Upload yang pertama!</p>
+                          <button onClick={()=>changeTab('upload')} className="px-5 py-2.5 bg-gradient-to-r from-[#3c2aff] to-[#8a7dff] text-white text-sm font-semibold rounded-full mt-1">Upload Video</button>
+                        </div>
+                      : (<>
+                          <div className="mb-4">
+                            <div className="px-4 mb-2 flex items-center gap-2">
+                              <Icon name="Shorts" className="w-5 h-5 text-white"/>
+                              <h2 className="font-bold text-base">Reels Terbaru</h2>
+                            </div>
+                            <div className="flex overflow-x-auto gap-3 px-4 pb-2 no-scrollbar snap-x">
+                              {homeFeed.slice(0,6).map((v,i)=>(
+                                <div key={v.id||i} onClick={()=>setActiveTab('reels')} className="min-w-[130px] h-[230px] bg-zinc-900 rounded-xl flex-shrink-0 snap-start overflow-hidden relative cursor-pointer active:scale-95 transition-transform">
+                                  {v.thumbnail_url?<img src={v.thumbnail_url} className="w-full h-full object-cover" alt={v.title}/>:<div className="w-full h-full bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center"><Icon name="Film" className="w-8 h-8 text-zinc-600"/></div>}
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                                  <div className="absolute bottom-2 left-2 right-2 text-xs font-semibold text-white line-clamp-2 drop-shadow-md">{v.title||'Video'}</div>
+                                  <div className="absolute top-2 right-2 bg-black/60 text-[10px] text-white px-1.5 py-0.5 rounded-full">❤ {fmt(v.likes_count)}</div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="flex flex-col pb-24">
+                            {homeFeed.map((v,i)=>(
+                              <div key={v.id||i} onClick={()=>setActiveTab('reels')} className="w-full cursor-pointer active:opacity-80 transition-opacity">
+                                <div className="w-full aspect-video bg-zinc-900 relative overflow-hidden">
+                                  {v.thumbnail_url?<img src={v.thumbnail_url} alt={v.title} className="w-full h-full object-cover"/>:<div className="w-full h-full bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center"><Icon name="Film" className="w-10 h-10 text-zinc-600"/></div>}
+                                  <div className="absolute bottom-2 right-2 bg-black/80 text-xs px-1.5 py-0.5 rounded font-medium">{v.duration?`${Math.floor(v.duration/60)}:${String(v.duration%60).padStart(2,'0')}`: '—'}</div>
+                                  <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity bg-black/20">
+                                    <div className="w-12 h-12 rounded-full bg-black/70 flex items-center justify-center"><svg className="w-6 h-6 text-white ml-1" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v13.72c0 .79.87 1.27 1.54.84l11-6.86a1 1 0 0 0 0-1.68l-11-6.86A1 1 0 0 0 8 5.14z"/></svg></div>
+                                  </div>
+                                </div>
+                                <div className="flex gap-3 p-4">
+                                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#3c2aff] to-[#8a7dff] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">{(v.title||'V').charAt(0).toUpperCase()}</div>
+                                  <div className="flex-1">
+                                    <h3 className="font-semibold text-sm leading-tight line-clamp-2 text-white">{v.title||'Tanpa Judul'}</h3>
+                                    <p className="text-xs text-gray-400 mt-1">{fmt(v.views_count)} ditonton · {fmt(v.likes_count)} suka</p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </>)}
+                </div>
+              )}
+
+              {/* REELS */}
+              {activeTab==='reels' && (
+                <div ref={reelContainerRef} className="h-full w-full overflow-y-scroll snap-y snap-mandatory no-scrollbar">
+                  {reelsLoading
+                    ? <div className="h-full flex flex-col items-center justify-center gap-4"><div className="w-12 h-12 border-4 border-[#3c2aff] border-t-transparent rounded-full spinner"></div><p className="text-gray-400 text-sm">Memuat reels...</p></div>
+                    : reels.length===0
+                      ? <div className="h-full flex flex-col items-center justify-center gap-4 text-gray-500">
+                          <Icon name="Film" className="w-16 h-16 opacity-20"/>
+                          <p className="text-sm font-medium">Belum ada video</p>
+                          <p className="text-xs text-gray-600 text-center px-8">Jadilah yang pertama upload video di Clincoo!</p>
+                          <button onClick={()=>changeTab('upload')} className="mt-2 px-6 py-3 bg-gradient-to-r from-[#3c2aff] to-[#8a7dff] text-white text-sm font-bold rounded-full shadow-[0_4px_14px_rgba(60,42,255,0.4)]">Upload Video Pertama</button>
+                        </div>
+                      : reels.map((r,idx)=>(
+                          <ReelItem key={r.id||idx} reel={r} muted={muted} toggleMute={()=>setMuted(!muted)}
+                            onLike={a=>{if(a==='auth')setShowAuthSheet(true);}} user={user} clincoUser={clincoUser} isActive={idx===activeReelIdx}/>
+                        ))}
+                </div>
+              )}
+
+              {/* CHAT */}
+              {activeTab==='chat' && (
+                <div className="flex flex-col w-full h-full pb-16">
+                  {chatList.map(chat=>(
+                    <div key={chat.id} className="flex items-center gap-4 py-3 px-4 active:bg-gray-900 transition-colors cursor-pointer select-none">
+                      <div className="relative flex-shrink-0">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center text-lg font-bold text-white shadow-sm border border-gray-700">{chat.avatar}</div>
+                        {chat.online&&<div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-black rounded-full"></div>}
+                      </div>
+                      <div className="flex-1 min-w-0 border-b border-gray-900 pb-4 pt-1">
+                        <div className="flex justify-between items-baseline mb-1">
+                          <h3 className={`font-semibold text-[15px] truncate ${chat.unread>0?'text-white':'text-gray-200'}`}>{chat.name}</h3>
+                          <span className={`text-xs flex-shrink-0 ml-2 ${chat.unread>0?'text-[#3c2aff] font-semibold':'text-gray-500'}`}>{chat.time}</span>
+                        </div>
+                        <div className="flex justify-between items-center gap-2">
+                          <p className={`text-[13px] truncate ${chat.unread>0?'text-gray-200 font-medium':'text-gray-400'}`}>{chat.message}</p>
+                          {chat.unread>0&&<div className="w-5 h-5 rounded-full bg-[#3c2aff] flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">{chat.unread}</div>}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* PROFILE */}
+              {activeTab==='profile' && (
+                <div className="flex flex-col w-full min-h-full text-white bg-[#0f0f0f]">
+                  <div className="w-full h-[100px] relative bg-gradient-to-br from-[#3c2aff]/40 to-[#8a7dff]/20">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                  </div>
+                  <div className="px-4 pt-4 pb-2 relative z-10 flex flex-col items-start bg-[#0f0f0f]">
+                    <div className="flex items-center gap-4 w-full">
+                      <div className="w-20 h-20 rounded-full overflow-hidden flex-shrink-0 p-1 bg-gradient-to-tr from-[#3c2aff] to-[#8a7dff] -mt-8 relative z-20 shadow-lg">
+                        {user?.photoURL
+                          ? <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover rounded-full border-[3px] border-[#0f0f0f]"/>
+                          : <div className="w-full h-full rounded-full border-[3px] border-[#0f0f0f] bg-zinc-800 flex items-center justify-center text-2xl font-bold text-white">{(user?.displayName||user?.email||'U').charAt(0).toUpperCase()}</div>}
+                      </div>
+                      <div className="flex flex-col pt-1">
+                        <h2 className="text-[22px] font-bold flex items-center gap-1.5 leading-tight">
+                          {clincoUser?.display_name||user?.displayName||'Pengguna'}
+                          {clincoUser?.is_verified&&<Icon name="CheckBadge" className="w-5 h-5 text-[#3c2aff]"/>}
+                        </h2>
+                        <div className="text-[13.5px] text-gray-400 flex flex-wrap items-center gap-1 mt-0.5">
+                          <span>@{clincoUser?.username||'user'}</span>
+                          <span>·</span><span>{fmt(clincoUser?.followers_count||0)} pengikut</span>
+                          <span>·</span><span>{fmt(clincoUser?.videos_count||0)} video</span>
+                        </div>
+                      </div>
+                    </div>
+                    {clincoUser?.bio&&<p className="mt-3 text-[13.5px] text-gray-300 w-full leading-relaxed line-clamp-2">{clincoUser.bio}</p>}
+                    <div className="flex gap-2 w-full mt-4">
+                      <button className="flex-1 bg-white text-black hover:bg-gray-200 py-2 rounded-xl font-bold text-[13px] transition-colors shadow-sm">Edit Profil</button>
+                      <button onClick={()=>changeTab('upload')} className="flex-1 bg-gradient-to-r from-[#3c2aff] to-[#8a7dff] text-white py-2 rounded-xl font-semibold text-[13px] flex items-center justify-center gap-1.5">
+                        <Icon name="Upload" className="w-4 h-4"/>Upload
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex border-b border-white/5 mt-1 sticky top-14 bg-[#0f0f0f] z-30 overflow-x-auto no-scrollbar">
+                    {['Beranda','Video','Reels','Postingan'].map(tab=>(
+                      <button key={tab} onClick={()=>setProfileTab(tab)} className={`px-5 py-3.5 font-medium whitespace-nowrap border-b-2 transition-colors text-[14px] ${profileTab===tab?'border-[#3c2aff] text-white':'border-transparent text-gray-400 hover:text-gray-200'}`}>{tab}</button>
+                    ))}
+                  </div>
+
+                  <div className="w-full bg-[#0f0f0f] min-h-[300px] pb-24">
+                    {(profileTab==='Beranda'||profileTab==='Video') && (
+                      profileLoading
+                        ? <div className="flex justify-center py-8"><div className="w-8 h-8 border-2 border-[#3c2aff] border-t-transparent rounded-full spinner"></div></div>
+                        : profileVideos.length===0
+                          ? <div className="flex flex-col items-center py-10 gap-3 text-gray-500">
+                              <Icon name="Film" className="w-12 h-12 opacity-20"/>
+                              <p className="text-sm">Belum ada video. Yuk upload!</p>
+                              <button onClick={()=>changeTab('upload')} className="px-4 py-2 bg-zinc-800 rounded-full text-xs text-white font-medium hover:bg-zinc-700">Upload Video</button>
+                            </div>
+                          : profileTab==='Beranda'
+                            ? <div className="grid grid-cols-2 gap-2 p-4">
+                                {profileVideos.map((v,i)=>(
+                                  <div key={v.id||i} onClick={()=>setActiveTab('reels')} className="aspect-video bg-zinc-800 rounded-xl overflow-hidden relative cursor-pointer active:opacity-80">
+                                    {v.thumbnail_url?<img src={v.thumbnail_url} className="w-full h-full object-cover" alt={v.title}/>:<div className="w-full h-full flex items-center justify-center"><Icon name="Film" className="w-8 h-8 text-zinc-600"/></div>}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                                    <div className="absolute bottom-1.5 left-2 right-2 text-xs font-medium text-white line-clamp-1">{v.title||'Video'}</div>
+                                  </div>
+                                ))}
+                              </div>
+                            : <div className="flex flex-col py-2">
+                                {profileVideos.map((v,i)=>(
+                                  <div key={v.id||i} onClick={()=>setActiveTab('reels')} className="flex gap-3 px-4 py-3 active:bg-white/5 cursor-pointer">
+                                    <div className="w-[140px] aspect-video bg-zinc-800 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center">
+                                      {v.thumbnail_url?<img src={v.thumbnail_url} className="w-full h-full object-cover"/>:<Icon name="Film" className="w-6 h-6 text-zinc-600"/>}
+                                    </div>
+                                    <div className="flex-1"><h4 className="font-semibold text-[14px] line-clamp-2 text-white">{v.title||'Tanpa Judul'}</h4><p className="text-[12px] text-gray-400 mt-1">{fmt(v.views_count)} ditonton</p></div>
+                                  </div>
+                                ))}
+                              </div>
+                    )}
+                    {profileTab==='Reels' && (
+                      <div className="grid grid-cols-3 gap-[2px] py-2">
+                        {profileVideos.length===0
+                          ? <div className="col-span-3 flex flex-col items-center py-10 gap-2 text-gray-500"><Icon name="Shorts" className="w-10 h-10 opacity-20"/><p className="text-sm">Belum ada reels</p></div>
+                          : profileVideos.map((v,i)=>(
+                              <div key={v.id||i} onClick={()=>setActiveTab('reels')} className="aspect-[3/4] bg-zinc-800 relative overflow-hidden cursor-pointer active:opacity-80">
+                                {v.thumbnail_url?<img src={v.thumbnail_url} className="w-full h-full object-cover"/>:<div className="w-full h-full flex items-center justify-center"><Icon name="Film" className="w-6 h-6 text-zinc-600"/></div>}
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                                <div className="absolute bottom-2 left-1.5 right-1.5 text-[11px] font-medium text-white line-clamp-2 drop-shadow-md">{v.title||''}</div>
+                              </div>
+                            ))}
+                      </div>
+                    )}
+                    {profileTab==='Postingan' && (
+                      <div className="flex flex-col items-center justify-center min-h-[200px] text-gray-500 gap-3 py-10">
+                        <Icon name="MessageSquare" className="w-10 h-10 opacity-20"/>
+                        <p className="text-sm">Belum ada postingan</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </main>
+
+            {/* BOTTOM NAV */}
+            <nav className={`fixed bottom-0 w-full max-w-md bg-black z-50 transition-transform duration-300 ${scrollDir==='down'&&activeTab!=='reels'?'translate-y-full':'translate-y-0'}`}>
+              <div className="flex items-center justify-around h-14 px-2 relative border-t border-white/10">
+                <button onClick={()=>changeTab('home')} className={`h-full flex-1 flex justify-center items-center transition-colors active:bg-gray-800 rounded-lg ${activeTab==='home'?'text-white':'text-zinc-500 hover:text-zinc-300'}`}>
+                  <Icon name="Home" className="w-6 h-6"/>
+                </button>
+                <button onClick={()=>changeTab('reels')} className={`h-full flex-1 flex justify-center items-center transition-colors active:bg-gray-800 rounded-lg ${activeTab==='reels'?'text-white':'text-zinc-500 hover:text-zinc-300'}`}>
+                  <Icon name="PlaySquare" className="w-6 h-6"/>
+                </button>
+                <div className="flex-1 flex justify-center relative items-center h-full">
+                  <button onClick={()=>changeTab('upload')} className="w-12 h-12 rounded-full flex items-center justify-center relative overflow-hidden group shadow-[0_0_15px_rgba(60,42,255,0.5)] active:scale-95 transition-transform" style={{backgroundColor:'#3c2aff'}}>
+                    <div className="absolute inset-0 shine-effect"></div>
+                    <div className="relative z-10 flex items-center justify-center"><Icon name="Plus" className="w-7 h-7 text-white bounce-on-shine"/></div>
+                  </button>
+                </div>
+                <button onClick={()=>changeTab('chat')} className={`h-full flex-1 flex justify-center items-center transition-colors active:bg-gray-800 rounded-lg ${activeTab==='chat'?'text-white':'text-zinc-500 hover:text-zinc-300'}`}>
+                  <Icon name="MessageCircle" className="w-6 h-6"/>
+                </button>
+                <button onClick={()=>changeTab('profile')} className={`h-full flex-1 flex justify-center items-center transition-colors active:bg-gray-800 rounded-lg ${activeTab==='profile'?'text-white':'text-zinc-500 hover:text-zinc-300'}`}>
+                  {user?.photoURL
+                    ? <img src={user.photoURL} className={`w-7 h-7 rounded-full object-cover ${activeTab==='profile'?'ring-2 ring-[#3c2aff]':''}`} alt="avatar"/>
+                    : <Icon name="User" className="w-6 h-6"/>}
+                </button>
+              </div>
+              <div style={{height:'env(safe-area-inset-bottom)'}}></div>
+            </nav>
+          </div>
+
+          {showAuthSheet && <AuthBottomSheet onClose={()=>setShowAuthSheet(false)}/>}
+          {showUpload && <UploadModal onClose={()=>setShowUpload(false)} user={user} clincoUser={clincoUser} onUploaded={()=>{loadReels();loadHome();if(clincoUser)loadProfile(clincoUser.id);}}/>}
+        </div>
+      );
+    };
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<ClincooApp/>);
   </script>
 </body>
 </html>
