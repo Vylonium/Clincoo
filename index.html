@@ -407,7 +407,7 @@
             </div>
             <div className="px-4 py-3 border-t border-zinc-800 flex gap-3 items-center flex-shrink-0">
               <input value={text} onChange={e=>setText(e.target.value)} onKeyDown={e=>e.key==='Enter'&&send()}
-                placeholder={user?"Tulis komentar...":"Login untuk komentar"} disabled={!user||sending}
+                placeholder="Tulis komentar..." disabled={sending}
                 className="flex-1 bg-zinc-800 border border-zinc-700 rounded-full px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#3c2aff] disabled:opacity-50"/>
               <button onClick={send} disabled={!text.trim()||!user||sending}
                 className="w-10 h-10 rounded-full bg-gradient-to-br from-[#3c2aff] to-[#8a7dff] flex items-center justify-center disabled:opacity-40 active:scale-95">
@@ -445,7 +445,7 @@
       };
 
       const doLike = async () => {
-        if(!user){onLike('auth');return;}
+        // no auth needed for testing
         if(liking) return;
         setLiking(true);
         const prev=liked; setLiked(!prev); setLikes(n=>prev?n-1:n+1);
@@ -643,54 +643,41 @@
 
       useEffect(()=>{ loadReels(); loadHome(); },[]);
 
+      // ── BYPASS LOGIN: auto-create mock user for testing ──
       useEffect(()=>{
-        let unsub;
-        const setup=async()=>{
-          try {
-            const {initializeApp}=await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js');
-            const {getAuth,onAuthStateChanged}=await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js');
-            if(!firebaseAppInstance){ firebaseAppInstance=initializeApp(firebaseConfig); firebaseAuthInstance=getAuth(firebaseAppInstance); }
-            unsub=onAuthStateChanged(firebaseAuthInstance,async(fbUser)=>{
-              setUser(fbUser);
-              if(fbUser){
-                const uid=fbUser.uid||fbUser.email;
-                const pd=await api.get(`userProfile?user_id=${uid}`);
-                if(pd.success&&pd.user){ setClincoUser(pd.user); setProfileVideos(pd.videos||[]); }
-                else {
-                  const uname=((fbUser.displayName||fbUser.email||uid).replace(/[^a-z0-9]/gi,'').toLowerCase().substring(0,16)||'user')+Date.now().toString().slice(-4);
-                  const reg=await api.post('authRegister',{email:fbUser.email||uid,username:uname,display_name:fbUser.displayName||uname});
-                  if(reg.success) setClincoUser(reg.user);
-                }
-              } else { setClincoUser(null); setProfileVideos([]); }
-              setIsAuthChecking(false);
-              const splash=document.getElementById('static-splash-screen');
-              if(splash){splash.style.opacity='0';setTimeout(()=>splash.remove(),500);}
-            });
-          } catch {
-            setIsAuthChecking(false);
-            const splash=document.getElementById('static-splash-screen');
-            if(splash) splash.remove();
+        const setupTestUser=async()=>{
+          const testUid='test_user_'+Date.now().toString().slice(-6);
+          const pd=await api.get(`userProfile?user_id=${testUid}`);
+          if(pd.success&&pd.user){
+            setClincoUser(pd.user);
+            setProfileVideos(pd.videos||[]);
+          } else {
+            const reg=await api.post('authRegister',{email:'test@clincoo.app',username:'tester'+Date.now().toString().slice(-4),display_name:'Tester'});
+            if(reg.success) setClincoUser(reg.user);
           }
+          setUser({uid:testUid,email:'test@clincoo.app',displayName:'Tester'});
+          setIsAuthChecking(false);
+          const splash=document.getElementById('static-splash-screen');
+          if(splash){splash.style.opacity='0';setTimeout(()=>splash.remove(),500);}
         };
-        setup();
-        return()=>{if(unsub) unsub();};
+        setupTestUser();
       },[]);
 
-      useEffect(()=>{
-        if(!isAuthChecking&&!user&&(activeTab==='profile'||activeTab==='chat')){ setPendingTab(activeTab); setActiveTab('home'); setShowAuthSheet(true); }
-      },[user,activeTab,isAuthChecking]);
+      // Auth gate disabled for testing
+      // useEffect(()=>{
+      //   if(!isAuthChecking&&!user&&(activeTab==='profile'||activeTab==='chat')){ setPendingTab(activeTab); setActiveTab('home'); setShowAuthSheet(true); }
+      // },[user,activeTab,isAuthChecking]);
 
       useEffect(()=>{
         if(user&&pendingTab){ setActiveTab(pendingTab); setPendingTab(null); setShowAuthSheet(false); }
         else if(user&&showAuthSheet) setShowAuthSheet(false);
       },[user,pendingTab,showAuthSheet]);
 
-      const logout=async()=>{ try{ const{signOut}=await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js'); if(firebaseAuthInstance){await signOut(firebaseAuthInstance);setActiveTab('home');} }catch{} };
+      const logout=()=>{ setActiveTab('home'); };
 
       const changeTab=(tab)=>{
-        if(tab==='upload'){ if(!user){setShowAuthSheet(true);return;} setShowUpload(true); return; }
-        if((tab==='profile'||tab==='chat')&&!user){ setPendingTab(tab); setShowAuthSheet(true); }
-        else { setActiveTab(tab); if(tab==='reels') setActiveReelIdx(0); if(tab==='profile'&&clincoUser) loadProfile(clincoUser.id); }
+        if(tab==='upload'){ setShowUpload(true); return; }
+        setActiveTab(tab); if(tab==='reels') setActiveReelIdx(0); if(tab==='profile'&&clincoUser) loadProfile(clincoUser.id);
       };
 
       useEffect(()=>{
@@ -993,7 +980,7 @@
             </nav>
           </div>
 
-          {showAuthSheet && <AuthBottomSheet onClose={()=>setShowAuthSheet(false)}/>}
+          {/* Auth modal hidden for testing */}
           {showUpload && <UploadModal onClose={()=>setShowUpload(false)} user={user} clincoUser={clincoUser} onUploaded={()=>{loadReels();loadHome();if(clincoUser)loadProfile(clincoUser.id);}}/>}
         </div>
       );
