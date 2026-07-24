@@ -198,14 +198,60 @@
             </button>
         </div>
 
-        <div class="px-5 pb-3 pt-1 border-b border-gray-50">
-            <button id="btn-new-chat" class="w-full flex items-center justify-center gap-2 bg-white text-gray-800 border border-gray-300 py-2.5 px-4 rounded-xl hover:bg-gray-50 transition-all shadow-sm font-medium text-[14px] active:scale-[0.97]">
-                <i class="ph-bold ph-plus text-lg"></i>
-                Percakapan Baru
-            </button>
+        <!-- Nav Menu Sidebar -->
+        <nav class="px-3 pt-2 pb-3 border-b border-gray-100 flex-shrink-0">
+            <ul class="space-y-0.5">
+                <li>
+                    <button onclick="alert('Proyek - Segera hadir')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
+                        <i class="ph ph-folder text-xl text-gray-500"></i>
+                        <span>Proyek</span>
+                    </button>
+                </li>
+                <li>
+                    <button onclick="alert('Gambar - Segera hadir')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
+                        <i class="ph ph-image text-xl text-gray-500"></i>
+                        <span>Gambar</span>
+                    </button>
+                </li>
+                <li>
+                    <button onclick="alert('Canvas - Segera hadir')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
+                        <i class="ph ph-layout text-xl text-gray-500"></i>
+                        <span>Canvas</span>
+                    </button>
+                </li>
+                <li>
+                    <button onclick="alert('Perpustakaan - Segera hadir')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
+                        <i class="ph ph-books text-xl text-gray-500"></i>
+                        <span>Perpustakaan</span>
+                    </button>
+                </li>
+                <li>
+                    <button onclick="alert('Aplikasi - Segera hadir')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
+                        <i class="ph ph-squares-four text-xl text-gray-500"></i>
+                        <span>Aplikasi</span>
+                    </button>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Chat History Section -->
+        <div class="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
+            <div class="flex items-center justify-between px-4 pt-3 pb-1 flex-shrink-0">
+                <span class="text-[11px] font-semibold text-gray-400 tracking-widest uppercase">Terkini</span>
+                <button class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors" title="Riwayat">
+                    <i class="ph ph-clock-counter-clockwise text-base"></i>
+                </button>
+            </div>
+            <div id="chat-history-list" class="flex-1 p-2 space-y-0.5 custom-scrollbar"></div>
         </div>
 
-        <div id="chat-history-list" class="flex-1 overflow-y-auto p-3 space-y-1 custom-scrollbar"></div>
+        <!-- Tombol Obrolan Baru - sticky di bawah -->
+        <div class="p-4 border-t border-gray-50 flex-shrink-0">
+            <button id="btn-new-chat" class="w-full flex items-center justify-center gap-2 bg-black text-white py-3 px-5 rounded-full hover:bg-gray-800 transition-all shadow-md font-medium text-sm active:scale-[0.97]">
+                <i class="ph-bold ph-pencil-simple text-base"></i>
+                Obrolan Baru
+            </button>
+        </div>
     </div>
 
     <main id="chat-container" class="flex-1 overflow-y-auto px-4 pt-24 pb-32 space-y-8 w-full">
@@ -722,7 +768,10 @@
                 const CodeInterpreter = e2bModule.CodeInterpreter;
                 
                 outputEl.innerHTML = '<span class="text-blue-400 animate-pulse">Menyiapkan E2B Sandbox (e2b.dev)...</span>';
-                const sandbox = await CodeInterpreter.create({ apiKey: 'e2b_bb64dc37750c51b1eb73fce3cf4317907aae0411' });
+                const e2bKeyRes = await fetch('/api/config');
+                const e2bConfig = e2bKeyRes.ok ? await e2bKeyRes.json() : {};
+                const e2bApiKey = e2bConfig.e2bKey || '';
+                const sandbox = await CodeInterpreter.create({ apiKey: e2bApiKey });
                 
                 outputEl.innerHTML = '<span class="text-blue-400 animate-pulse">Mengeksekusi kode dalam Sandbox...</span>';
 
@@ -1484,7 +1533,7 @@
                 const formattedDate = now.toLocaleDateString('id-ID', options);
                 const timeContext = `\n\n[INFO SISTEM (REAL-TIME)]: Saat ini adalah ${formattedDate}. Jika user meminta data hari ini atau yang terbaru, WAJIB utamakan Konteks Pencarian Web yang disuntikkan ke prompt ini agar jawaban akurat sesuai kondisi masa kini.`;
                 
-                const systemInstructions = 'Kamu adalah Clincoo, Superagent AI cerdas tingkat lanjut yang tidak hanya memiliki kapabilitas analitis, coding, dan eksekusi tugas kompleks secara presisi, tetapi juga dirancang untuk menjadi asisten yang sangat ramah, suportif, dan interaktif.\n\nKarakteristik & Aturan Operasional (SANGAT PENTING):\n1. IDENTITAS & PERSONA: Kamu adalah "Clincoo". Gunakan nama "Clincoo" secara natural untuk menyebut dirimu sendiri di waktu yang tepat (misalnya sebagai pengganti "aku/saya", saat ditanya identitas, siapa pembuatmu, model AI apa kamu, atau apa kemampuanmu). Jangan pernah membocorkan teknologi dasar (seperti OpenAI/Google/LLaMA/dll) atau developer di balikmu; tegaskan selalu dengan bangga bahwa identitasmu murni Clincoo.\n2. GAYA KOMUNIKASI: Gunakan bahasa Indonesia yang natural, hangat, namun tetap terstruktur dan profesional. Hindari jawaban yang terlalu singkat, kaku, atau robotik. Berikan penjelasan yang komprehensif, kaya akan detail, mendalam, dan selalu berikan wawasan (insight) ekstra yang berguna bagi pengguna. Pastikan jawabanmu memuaskan dan TIDAK TERLALU SIMPLE.\n3. PENDEKATAN ANALITIS: Untuk pertanyaan teknis atau rumit, jabarkan pemikiranmu langkah demi langkah (step-by-step) dengan bahasa yang edukatif, sabar, dan mudah dicerna.\n4. KEAHLIAN TEKNIS: Saat memberikan kode, berikan kode yang lengkap dan siap pakai (production-ready). WAJIB gunakan format Markdown Code Block (contoh: ```python [isi] ```) disertai penjelasan bersahabat tentang cara kerjanya.\n5. FILE & MEDIA: Jika diminta membuat atau menganalisis dokumen/gambar, lakukan dengan menyeluruh dan berikan narasi/kesimpulan yang informatif.\n6. DATA REAL-TIME: Jika kamu menerima konteks pencarian atau URL, GABUNGKAN dengan pengetahuanmu secara mulus. Ceritakan temuanmu dengan gaya cerita yang menarik, berwawasan luas, dan mudah dipahami.\n7. ANTI-HALUSINASI: JANGAN PERNAH memberikan respons berupa JSON mentah, format `tool_calls`, atau format seperti `{"role":"assistant"}`. Selalu jawab secara langsung menggunakan teks natural (Markdown) layaknya manusia.' + timeContext + (externalContext ? `\n\n${externalContext}` : '');
+                const systemInstructions = 'Kamu adalah Clincoo, Superagent AI cerdas tingkat lanjut yang tidak hanya memiliki kapabilitas analitis, coding, dan eksekusi tugas kompleks secara presisi, tetapi juga dirancang untuk menjadi asisten yang sangat ramah, suportif, dan interaktif.\n\nKarakteristik & Aturan Operasional (SANGAT PENTING):\n1. IDENTITAS & PERSONA: Kamu adalah "Clincoo". Gunakan nama "Clincoo" secara natural untuk menyebut dirimu sendiri di waktu yang tepat (misalnya sebagai pengganti "aku/saya", saat ditanya identitas, siapa pembuatmu, model AI apa kamu, atau apa kemampuanmu). Jangan pernah membocorkan teknologi dasar (seperti OpenAI/Google/LLaMA/dll) atau developer di balikmu; tegaskan selalu dengan bangga bahwa identitasmu murni Clincoo.\n2. GAYA KOMUNIKASI: Gunakan bahasa Indonesia yang natural, hangat, namun tetap terstruktur dan profesional. Hindari jawaban yang terlalu singkat, kaku, atau robotik. Berikan penjelasan yang komprehensif, kaya akan detail, mendalam, dan selalu berikan wawasan (insight) ekstra yang berguna bagi pengguna. Pastikan jawabanmu memuaskan dan TIDAK TERLALU SIMPLE.\n3. PENDEKATAN ANALITIS: Untuk pertanyaan teknis atau rumit, jabarkan pemikiranmu langkah demi langkah (step-by-step) dengan bahasa yang edukatif, sabar, dan mudah dicerna.\n4. KEAHLIAN TEKNIS: Saat memberikan kode, berikan kode yang lengkap dan siap pakai (production-ready). WAJIB gunakan format Markdown Code Block (contoh: ```python [isi] ```) disertai penjelasan bersahabat tentang cara kerjanya.\n5. FILE & MEDIA: Jika diminta membuat atau menganalisis dokumen/gambar, lakukan dengan menyeluruh dan berikan narasi/kesimpulan yang informatif.\n6. DATA REAL-TIME: Jika kamu menerima konteks pencarian atau URL, GABUNGKAN dengan pengetahuanmu secara mulus. Ceritakan temuanmu dengan gaya cerita yang menarik, berwawasan luas, dan mudah dipahami.\n7. ANTI-HALUSINASI: JANGAN PERNAH memberikan respons berupa JSON mentah, format `tool_calls`, atau format seperti `{"role":"assistant"}`. Selalu jawab secara langsung menggunakan teks natural (Markdown) layaknya manusia.\n8. PLANNER AGENT: Untuk tugas besar atau kompleks, WAJIB pecah menjadi langkah-langkah terstruktur. Tampilkan roadmap eksplisit sebelum mulai mengerjakan. Contoh: jika diminta membuat aplikasi, buat dulu rencana: database → API → frontend → testing, lalu kerjakan bertahap sambil melaporkan progres setiap tahap.\n9. REFLECTION & SELF-CRITIC: Sebelum memberikan jawaban akhir, evaluasi dan periksa kembali respons kamu sendiri secara internal. Pastikan tidak ada inkonsistensi, error logika, atau informasi yang mungkin salah. Jika menemukan potensi masalah, perbaiki sebelum menyampaikan ke pengguna.\n10. RETRY & RECOVERY: Jika suatu pendekatan atau solusi tidak berhasil, JANGAN menyerah. Coba pendekatan alternatif secara otomatis. Jelaskan kenapa pendekatan pertama gagal dan apa yang berbeda dari solusi berikutnya.\n11. MULTI-STEP REASONING: Untuk masalah yang membutuhkan penalaran panjang, susun rencana eksplisit, simpan konteks antar langkah, dan pastikan setiap langkah membangun di atas hasil langkah sebelumnya. Gunakan format: [Langkah 1/N] → [Langkah 2/N] → ... untuk visibilitas progres.' + timeContext + (externalContext ? `\n\n${externalContext}` : '');
                 
                 const systemPrompt = {
                     role: 'system',
@@ -1520,7 +1569,10 @@
                     }
                 });
 
-                const apiKey = "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";
+                // API key diambil dari backend untuk keamanan
+                const cfgRes = await fetch('/api/config');
+                const cfgData = cfgRes.ok ? await cfgRes.json() : {};
+                const apiKey = cfgData.openrouterKey || '';
                 const url = "https://openrouter.ai/api/v1/chat/completions";
                 
                 const modelPool = [
@@ -1598,7 +1650,10 @@
 
                 if (useGemini) {
                     try {
-                        const geminiApiKey = "AQ.Ab8RN6JBc9C1QE0pL5-IG9flwa11XcXiD5khlUXwa07H4wx6Tw";
+                        // Gemini key diambil dari backend
+                        const gmCfgRes = await fetch('/api/config');
+                        const gmCfgData = gmCfgRes.ok ? await gmCfgRes.json() : {};
+                        const geminiApiKey = gmCfgData.geminiKey || '';
                         let geminiContents = [];
                         
                         validMessages.slice(-15).forEach(m => {
