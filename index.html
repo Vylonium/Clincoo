@@ -768,10 +768,7 @@
                 const CodeInterpreter = e2bModule.CodeInterpreter;
                 
                 outputEl.innerHTML = '<span class="text-blue-400 animate-pulse">Menyiapkan E2B Sandbox (e2b.dev)...</span>';
-                const e2bKeyRes = await fetch('/api/config');
-                const e2bConfig = e2bKeyRes.ok ? await e2bKeyRes.json() : {};
-                const e2bApiKey = e2bConfig.e2bKey || '';
-                const sandbox = await CodeInterpreter.create({ apiKey: e2bApiKey });
+                const sandbox = await CodeInterpreter.create({ apiKey: 'e2b_bb64dc37750c51b1eb73fce3cf4317907aae0411' });
                 
                 outputEl.innerHTML = '<span class="text-blue-400 animate-pulse">Mengeksekusi kode dalam Sandbox...</span>';
 
@@ -1577,31 +1574,25 @@
                     }
                 });
 
-                // API key diambil dari backend untuk keamanan
-                const cfgRes = await fetch('/api/config');
-                const cfgData = cfgRes.ok ? await cfgRes.json() : {};
-                const apiKey = cfgData.openrouterKey || '';
+                const apiKey = "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";
                 const url = "https://openrouter.ai/api/v1/chat/completions";
                 
+                // Model pool: prioritaskan model yang CEPAT jawab, hindari thinking-mode
+                // DeepSeek R1 (reasoning/thinking) diletakkan di akhir sebagai fallback
                 const modelPool = [
-                    "google/gemini-2.5-flash:free",
                     "google/gemini-2.0-flash-lite-preview-02-05:free",
-                    "google/gemini-2.0-pro-exp-02-05:free",
                     "meta-llama/llama-3.3-70b-instruct:free",
-                    "deepseek/deepseek-r1:free",
-                    "deepseek/deepseek-chat-v3-0324:free",
-                    "qwen/qwen3-235b-a22b:free",
-                    "qwen/qwen-2.5-coder-32b-instruct:free",
                     "qwen/qwen-2.5-72b-instruct:free",
-                    "meta-llama/llama-3.1-8b-instruct:free",
+                    "qwen/qwen-2.5-coder-32b-instruct:free",
+                    "deepseek/deepseek-chat-v3-0324:free",
                     "mistralai/mistral-nemo:free",
-                    "deepseek/deepseek-r1-distill-llama-70b:free",
-                    "microsoft/phi-3-medium-128k-instruct:free",
+                    "meta-llama/llama-3.1-8b-instruct:free",
                     "nousresearch/hermes-3-llama-3.1-405b:free",
                     "cognitivecomputations/dolphin-mixtral-8x7b:free",
-                    "huggingfaceh4/zephyr-7b-beta:free",
                     "openchat/openchat-7b:free",
-                    "gryphe/mythomax-l2-13b:free"
+                    "gryphe/mythomax-l2-13b:free",
+                    "huggingfaceh4/zephyr-7b-beta:free",
+                    "deepseek/deepseek-r1-distill-llama-70b:free"
                 ];
                 
                 let response = null;
@@ -1632,7 +1623,11 @@
                                 body: JSON.stringify({ 
                                     model: modelName,
                                     messages: apiHistory,
-                                    stream: true
+                                    stream: true,
+                                    max_tokens: 4096,
+                                    provider: {
+                                        allow_fallbacks: true
+                                    }
                                 }),
                                 signal: fetchTimeout.signal
                             });
@@ -1661,10 +1656,7 @@
 
                 if (useGemini) {
                     try {
-                        // Gemini key diambil dari backend
-                        const gmCfgRes = await fetch('/api/config');
-                        const gmCfgData = gmCfgRes.ok ? await gmCfgRes.json() : {};
-                        const geminiApiKey = gmCfgData.geminiKey || '';
+                        const geminiApiKey = "AQ.Ab8RN6JBc9C1QE0pL5-IG9flwa11XcXiD5khlUXwa07H4wx6Tw";
                         let geminiContents = [];
                         
                         validMessages.slice(-15).forEach(m => {
