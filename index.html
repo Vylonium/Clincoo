@@ -1440,14 +1440,22 @@
 
             const apiTimeout = setTimeout(() => {
                 if (!hasReceivedData) {
-                    const index = messages.findIndex(m => m.id === aiMsgObj.id);
-                    if (index !== -1) {
-                        messages[index].text = `Koneksi lambat. <span onclick="retryGeneration('${aiMsgObj.id}')" class="cursor-pointer underline font-medium" style="text-underline-offset: 3px;">coba lagi</span>`;
-                        messages[index].isError = true;
+                    // Auto retry sekali sebelum tampilkan error
+                    if (!aiMsgObj._retried) {
+                        aiMsgObj._retried = true;
+                        console.warn("Timeout, mencoba ulang otomatis...");
+                        stopGeneration();
+                        setTimeout(() => retryGeneration(aiMsgObj.id), 500);
+                    } else {
+                        const index = messages.findIndex(m => m.id === aiMsgObj.id);
+                        if (index !== -1) {
+                            messages[index].text = `Sedang memuat... <span onclick="retryGeneration('${aiMsgObj.id}')" class="cursor-pointer underline font-medium" style="text-underline-offset: 3px;">ketuk untuk melanjutkan</span>`;
+                            messages[index].isError = true;
+                        }
+                        stopGeneration();
                     }
-                    stopGeneration();
                 }
-            }, 45000); 
+            }, 90000); 
 
             if (requiresImage) {
                 try {
@@ -1576,16 +1584,19 @@
                 const url = "https://openrouter.ai/api/v1/chat/completions";
                 
                 const modelPool = [
+                    "google/gemini-2.5-flash:free",
                     "google/gemini-2.0-flash-lite-preview-02-05:free",
                     "google/gemini-2.0-pro-exp-02-05:free",
                     "meta-llama/llama-3.3-70b-instruct:free",
-                    "meta-llama/llama-3.1-8b-instruct:free",
+                    "deepseek/deepseek-r1:free",
+                    "deepseek/deepseek-chat-v3-0324:free",
+                    "qwen/qwen3-235b-a22b:free",
                     "qwen/qwen-2.5-coder-32b-instruct:free",
                     "qwen/qwen-2.5-72b-instruct:free",
+                    "meta-llama/llama-3.1-8b-instruct:free",
                     "mistralai/mistral-nemo:free",
                     "deepseek/deepseek-r1-distill-llama-70b:free",
                     "microsoft/phi-3-medium-128k-instruct:free",
-                    "microsoft/phi-3-mini-128k-instruct:free",
                     "nousresearch/hermes-3-llama-3.1-405b:free",
                     "cognitivecomputations/dolphin-mixtral-8x7b:free",
                     "huggingfaceh4/zephyr-7b-beta:free",
@@ -1605,7 +1616,7 @@
                         if (abortController.signal.aborted) break;
 
                         const fetchTimeout = new AbortController();
-                        const timeoutId = setTimeout(() => fetchTimeout.abort(), 6500); // Batas 6.5 detik tiap model
+                        const timeoutId = setTimeout(() => fetchTimeout.abort(), 12000); // Batas 12 detik tiap model
                         const onUserAbort = () => fetchTimeout.abort();
                         abortController.signal.addEventListener('abort', onUserAbort);
 
@@ -1776,14 +1787,21 @@
                             throw new Error("Pollinations API Error");
                         }
                     } catch (err) {
+                        // Pollinations juga gagal - coba auto-retry sekali
                         clearTimeout(apiTimeout);
                         clearInterval(statusInterval);
-                        const index = messages.findIndex(m => m.id === aiMsgObj.id);
-                        if (index !== -1) {
-                            messages[index].text = `Semua layanan AI sedang sibuk. <span onclick="retryGeneration('${aiMsgObj.id}')" class="cursor-pointer underline font-medium" style="text-underline-offset: 3px; pointer-events-auto;">coba lagi</span>`;
-                            messages[index].isError = true;
+                        if (!aiMsgObj._busyRetried) {
+                            aiMsgObj._busyRetried = true;
+                            console.warn("Semua provider gagal, auto-retry dalam 2 detik...");
+                            setTimeout(() => retryGeneration(aiMsgObj.id), 2000);
+                        } else {
+                            const index = messages.findIndex(m => m.id === aiMsgObj.id);
+                            if (index !== -1) {
+                                messages[index].text = `Jaringan sedang sibuk. <span onclick="retryGeneration('${aiMsgObj.id}')" class="cursor-pointer underline font-medium" style="text-underline-offset: 3px; pointer-events-auto;">ketuk untuk mencoba lagi</span>`;
+                                messages[index].isError = true;
+                            }
+                            stopGeneration();
                         }
-                        stopGeneration();
                     }
                 } else {
                     try {
