@@ -499,7 +499,7 @@
         }
 
         function parseAndExecuteWorkspaceActions(text) {
-            const regex = /```workspace-action\s*([\s\S]*?)```/g;
+            const regex = /<!--WS:(\{[\s\S]*?\})-->/g;
             let match;
             let executed = false;
             while ((match = regex.exec(text)) !== null) {
@@ -514,6 +514,11 @@
                 }
             }
             return executed;
+        }
+
+        function stripWorkspaceTokens(text) {
+            // Hapus token <!--WS:...--> sebelum ditampilkan di chat
+            return text.replace(/<!--WS:\{[\s\S]*?\}-->/g, '').trim();
         }
         let currentSessionId = null;
         let messages = [];
@@ -1372,7 +1377,7 @@
                         <div class="flex max-w-[95%] sm:max-w-[90%] w-full min-w-0">
                             <div class="flex flex-col gap-2 pt-1 w-full min-w-0 overflow-hidden">
                                 <div class="text-black text-[15px] leading-relaxed break-words w-full md-content pointer-events-auto" style="word-break: break-word; overflow-wrap: break-word;" id="msg-text-${msg.id}">
-                                    ${msg.isProcessing ? processIndicator : (msg.isImageResponse ? msg.text : formatMarkdown(balanceMarkdown(msg.text)))}
+                                    ${msg.isProcessing ? processIndicator : (msg.isImageResponse ? msg.text : formatMarkdown(balanceMarkdown(stripWorkspaceTokens(msg.text))))}
                                 </div>
                                 ${(msg.sources && msg.sources.length > 0) ? `
                                     <div class="mt-2 mb-1 pointer-events-auto w-full fade-in">
@@ -1951,7 +1956,7 @@
                 const formattedDate = now.toLocaleDateString('id-ID', options);
                 const timeContext = `\n\n[INFO SISTEM (REAL-TIME)]: Saat ini adalah ${formattedDate}. Jika user meminta data hari ini atau yang terbaru, WAJIB utamakan Konteks Pencarian Web yang disuntikkan ke prompt ini agar jawaban akurat sesuai kondisi masa kini.`;
                 
-                const systemInstructions = 'Kamu adalah Clincoo, Superagent AI yang sangat cerdas, ramah, dan membantu. Jawablah menggunakan bahasa Indonesia yang natural dan mudah dipahami, kecuali diminta lain. Gunakan format Markdown untuk menyusun jawaban agar lebih rapi dan terstruktur. Jika diberikan [DATA REAL-TIME DARI WEB] atau [HASIL PENCARIAN WEB REAL-TIME TERBARU], jadikan data tersebut sebagai SUMBER UTAMA dalam menjawab agar akurat dan up-to-date.\n\n[KEMAMPUAN WORKSPACE]: Kamu terintegrasi dengan Workspace Clincoo. Jika user memintamu membuat proyek baru (misalnya: "buat proyek X", "tambahkan proyek Y", "bikin proyek Z di workspace"), WAJIB sertakan blok JSON berikut di akhir responsmu (setelah penjelasan teks):\n```workspace-action\n{"action":"create_project","name":"<nama proyek>","desc":"<deskripsi singkat>","status":"Aktif","visibility":"Public","tags":["<tag1>","<tag2>"]}\n```\nJangan tanyakan konfirmasi, langsung buat. Setelah JSON tersebut, jelaskan bahwa proyek sudah dibuat dan user bisa lihat di Workspace.'
+                const systemInstructions = 'Kamu adalah Clincoo, Superagent AI yang sangat cerdas, ramah, dan membantu. Jawablah menggunakan bahasa Indonesia yang natural dan mudah dipahami, kecuali diminta lain. Gunakan format Markdown untuk menyusun jawaban agar lebih rapi dan terstruktur. Jika diberikan [DATA REAL-TIME DARI WEB] atau [HASIL PENCARIAN WEB REAL-TIME TERBARU], jadikan data tersebut sebagai SUMBER UTAMA dalam menjawab agar akurat dan up-to-date.\n\n[KEMAMPUAN WORKSPACE]: Kamu terintegrasi dengan Workspace Clincoo. Jika user memintamu membuat proyek baru (misalnya "buat proyek X", "tambahkan proyek Y", "bikin proyek Z"), WAJIB sertakan token tersembunyi ini di baris PALING AKHIR responsmu (tidak ada teks setelahnya): <!--WS:{"action":"create_project","name":"NAMA_PROYEK","desc":"DESKRIPSI","status":"Aktif","visibility":"Public","tags":[]}--> — Isi NAMA_PROYEK dan DESKRIPSI sesuai permintaan user. Jangan tampilkan token ini dalam penjelasan, cukup letakkan di baris terakhir. Sebelum token, jelaskan bahwa proyek sudah dibuat.'
                 
                 try {
                     // Menyusun riwayat pesan untuk API
@@ -2060,7 +2065,7 @@
                         messages[msgIndex].text = localText;
                         const textEl = document.getElementById(`msg-text-${aiMsgObj.id}`);
                         if (textEl) {
-                            textEl.innerHTML = formatMarkdown(balanceMarkdown(messages[msgIndex].text));
+                            textEl.innerHTML = formatMarkdown(balanceMarkdown(stripWorkspaceTokens(messages[msgIndex].text)));
                             textEl.classList.add('typing-cursor');
                         }
                     }
