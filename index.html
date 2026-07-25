@@ -461,6 +461,60 @@
         
         const STORAGE_KEY = 'clincoo_chats_v1';
         let chatSessions = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+        // ===== WORKSPACE INTEGRATION =====
+        const WS_KEY = 'clincoo_projects_v2';
+        const WS_ACT_KEY = 'clincoo_global_activity_v2';
+
+        function generateWsId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function createWorkspaceProject(data) {
+            let projects = JSON.parse(localStorage.getItem(WS_KEY)) || [];
+            let activities = JSON.parse(localStorage.getItem(WS_ACT_KEY)) || [];
+            const proj = {
+                id: generateWsId(),
+                name: data.name || 'Proyek Baru',
+                desc: data.desc || '',
+                status: data.status || 'Aktif',
+                visibility: data.visibility || 'Public',
+                deadline: data.deadline || null,
+                tags: data.tags || [],
+                createdAt: Date.now(),
+                updatedAt: Date.now(),
+                tasks: [],
+                notes: [],
+                files: [],
+                activities: []
+            };
+            const actEntry = { id: generateWsId(), projectId: proj.id, message: `Proyek "${proj.name}" dibuat oleh Clincoo AI`, icon: 'ph-robot', ts: Date.now() };
+            proj.activities.unshift(actEntry);
+            projects.unshift(proj);
+            activities.unshift(actEntry);
+            if (activities.length > 100) activities.pop();
+            localStorage.setItem(WS_KEY, JSON.stringify(projects));
+            localStorage.setItem(WS_ACT_KEY, JSON.stringify(activities));
+            return proj;
+        }
+
+        function parseAndExecuteWorkspaceActions(text) {
+            const regex = /```workspace-action\s*([\s\S]*?)```/g;
+            let match;
+            let executed = false;
+            while ((match = regex.exec(text)) !== null) {
+                try {
+                    const data = JSON.parse(match[1].trim());
+                    if (data.action === 'create_project') {
+                        createWorkspaceProject(data);
+                        executed = true;
+                    }
+                } catch(e) {
+                    console.warn('workspace-action parse error:', e);
+                }
+            }
+            return executed;
+        }
         let currentSessionId = null;
         let messages = [];
 
@@ -1897,7 +1951,7 @@
                 const formattedDate = now.toLocaleDateString('id-ID', options);
                 const timeContext = `\n\n[INFO SISTEM (REAL-TIME)]: Saat ini adalah ${formattedDate}. Jika user meminta data hari ini atau yang terbaru, WAJIB utamakan Konteks Pencarian Web yang disuntikkan ke prompt ini agar jawaban akurat sesuai kondisi masa kini.`;
                 
-                const systemInstructions = 'Kamu adalah Clincoo, Superagent AI yang sangat cerdas, ramah, dan membantu. Jawablah menggunakan bahasa Indonesia yang natural dan mudah dipahami, kecuali diminta lain. Gunakan format Markdown untuk menyusun jawaban agar lebih rapi dan terstruktur. Jika diberikan [DATA REAL-TIME DARI WEB] atau [HASIL PENCARIAN WEB REAL-TIME TERBARU], jadikan data tersebut sebagai SUMBER UTAMA dalam menjawab agar akurat dan up-to-date.';
+                const systemInstructions = 'Kamu adalah Clincoo, Superagent AI yang sangat cerdas, ramah, dan membantu. Jawablah menggunakan bahasa Indonesia yang natural dan mudah dipahami, kecuali diminta lain. Gunakan format Markdown untuk menyusun jawaban agar lebih rapi dan terstruktur. Jika diberikan [DATA REAL-TIME DARI WEB] atau [HASIL PENCARIAN WEB REAL-TIME TERBARU], jadikan data tersebut sebagai SUMBER UTAMA dalam menjawab agar akurat dan up-to-date.\n\n[KEMAMPUAN WORKSPACE]: Kamu terintegrasi dengan Workspace Clincoo. Jika user memintamu membuat proyek baru (misalnya: "buat proyek X", "tambahkan proyek Y", "bikin proyek Z di workspace"), WAJIB sertakan blok JSON berikut di akhir responsmu (setelah penjelasan teks):\n```workspace-action\n{"action":"create_project","name":"<nama proyek>","desc":"<deskripsi singkat>","status":"Aktif","visibility":"Public","tags":["<tag1>","<tag2>"]}\n```\nJangan tanyakan konfirmasi, langsung buat. Setelah JSON tersebut, jelaskan bahwa proyek sudah dibuat dan user bisa lihat di Workspace.'
                 
                 try {
                     // Menyusun riwayat pesan untuk API
@@ -2012,6 +2066,11 @@
                     }
                     scrollToBottom(false);
                 } else if (isFetchComplete && charIndex >= streamingBuffer.length) {
+                    // Eksekusi workspace action jika ada di respons AI
+                    const finalMsg = messages.find(m => m.id === currentAiMessageId);
+                    if (finalMsg && finalMsg.text) {
+                        parseAndExecuteWorkspaceActions(finalMsg.text);
+                    }
                     stopGeneration();
                 }
             }, 10); 
