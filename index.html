@@ -470,56 +470,73 @@
             return Date.now().toString(36) + Math.random().toString(36).substr(2);
         }
 
+        function getWorkspaceProjects() {
+            return JSON.parse(localStorage.getItem(WS_KEY)) || [];
+        }
+
         function createWorkspaceProject(data) {
-            let projects = JSON.parse(localStorage.getItem(WS_KEY)) || [];
-            let activities = JSON.parse(localStorage.getItem(WS_ACT_KEY)) || [];
+            const projects = getWorkspaceProjects();
+            const activities = JSON.parse(localStorage.getItem(WS_ACT_KEY)) || [];
             const proj = {
                 id: generateWsId(),
-                name: data.name || 'Proyek Baru',
-                desc: data.desc || '',
+                name: (data.name || 'Proyek Baru').trim(),
+                desc: (data.desc || '').trim(),
                 status: data.status || 'Aktif',
                 visibility: data.visibility || 'Public',
                 deadline: data.deadline || null,
-                tags: data.tags || [],
+                tags: Array.isArray(data.tags) ? data.tags : [],
                 createdAt: Date.now(),
                 updatedAt: Date.now(),
-                tasks: [],
-                notes: [],
-                files: [],
-                activities: []
+                tasks: [], notes: [], files: [], activities: []
             };
-            const actEntry = { id: generateWsId(), projectId: proj.id, message: `Proyek "${proj.name}" dibuat oleh Clincoo AI`, icon: 'ph-robot', ts: Date.now() };
-            proj.activities.unshift(actEntry);
+            const act = { id: generateWsId(), projectId: proj.id, message: `Proyek "${proj.name}" dibuat oleh Clincoo AI`, icon: 'ph-robot', ts: Date.now() };
+            proj.activities.unshift(act);
             projects.unshift(proj);
-            activities.unshift(actEntry);
+            activities.unshift(act);
             if (activities.length > 100) activities.pop();
             localStorage.setItem(WS_KEY, JSON.stringify(projects));
             localStorage.setItem(WS_ACT_KEY, JSON.stringify(activities));
             return proj;
         }
 
-        function parseAndExecuteWorkspaceActions(text) {
-            const regex = /<!--WS:(\{[\s\S]*?\})-->/g;
-            let match;
-            let executed = false;
-            while ((match = regex.exec(text)) !== null) {
+        // Token: ||WS:{"action":"create_project",...}||
+        // Simple plaintext, aman dari markdown renderer
+        function parseAndExecuteWorkspaceActions(rawText) {
+            if (!rawText) return false;
+            const regex = /\|\|WS:(\{.*?\})\|\|/gs;
+            let match, executed = false;
+            while ((match = regex.exec(rawText)) !== null) {
                 try {
                     const data = JSON.parse(match[1].trim());
                     if (data.action === 'create_project') {
-                        createWorkspaceProject(data);
+                        const proj = createWorkspaceProject(data);
+                        console.log('WS: Project created:', proj.name);
                         executed = true;
                     }
                 } catch(e) {
-                    console.warn('workspace-action parse error:', e);
+                    console.warn('WS parse error:', e, '|', match[1]);
                 }
             }
             return executed;
         }
 
         function stripWorkspaceTokens(text) {
-            // Hapus token <!--WS:...--> sebelum ditampilkan di chat
-            return text.replace(/<!--WS:\{[\s\S]*?\}-->/g, '').trim();
+            if (!text) return text;
+            return text.replace(/\|\|WS:\{.*?\}\|\|/gs, '').trim();
         }
+
+        function buildWorkspaceContext() {
+            const projects = getWorkspaceProjects();
+            if (projects.length === 0) return '\n\n[DATA WORKSPACE]: Belum ada proyek terdaftar di Workspace.';
+            const list = projects.slice(0, 20).map((p, i) => {
+                const taskCount = (p.tasks||[]).length;
+                const doneCount = (p.tasks||[]).filter(t=>t.done).length;
+                return `${i+1}. "${p.name}" — Status: ${p.status||'Aktif'}, Tugas: ${doneCount}/${taskCount} selesai${p.desc ? ', Desc: '+p.desc.substring(0,60) : ''}`;
+            }).join('\n');
+            return `\n\n[DATA WORKSPACE REAL-TIME]: User memiliki ${projects.length} proyek:\n${list}`;
+        }
+
+        // Tidak ada fungsi encode - AI output langsung ||WS:{...}||
         let currentSessionId = null;
         let messages = [];
 
@@ -1956,7 +1973,9 @@
                 const formattedDate = now.toLocaleDateString('id-ID', options);
                 const timeContext = `\n\n[INFO SISTEM (REAL-TIME)]: Saat ini adalah ${formattedDate}. Jika user meminta data hari ini atau yang terbaru, WAJIB utamakan Konteks Pencarian Web yang disuntikkan ke prompt ini agar jawaban akurat sesuai kondisi masa kini.`;
                 
-                const systemInstructions = 'Kamu adalah Clincoo, Superagent AI yang sangat cerdas, ramah, dan membantu. Jawablah menggunakan bahasa Indonesia yang natural dan mudah dipahami, kecuali diminta lain. Gunakan format Markdown untuk menyusun jawaban agar lebih rapi dan terstruktur. Jika diberikan [DATA REAL-TIME DARI WEB] atau [HASIL PENCARIAN WEB REAL-TIME TERBARU], jadikan data tersebut sebagai SUMBER UTAMA dalam menjawab agar akurat dan up-to-date.\n\n[KEMAMPUAN WORKSPACE]: Kamu terintegrasi dengan Workspace Clincoo. Jika user memintamu membuat proyek baru (misalnya "buat proyek X", "tambahkan proyek Y", "bikin proyek Z"), WAJIB sertakan token tersembunyi ini di baris PALING AKHIR responsmu (tidak ada teks setelahnya): <!--WS:{"action":"create_project","name":"NAMA_PROYEK","desc":"DESKRIPSI","status":"Aktif","visibility":"Public","tags":[]}--> — Isi NAMA_PROYEK dan DESKRIPSI sesuai permintaan user. Jangan tampilkan token ini dalam penjelasan, cukup letakkan di baris terakhir. Sebelum token, jelaskan bahwa proyek sudah dibuat.'
+                const wsContext = buildWorkspaceContext();
+                const wsInstructions = '\n\n[KEMAMPUAN WORKSPACE]: Kamu terintegrasi langsung dengan Workspace Clincoo. DATA WORKSPACE di atas adalah daftar proyek REAL-TIME milik user.\n\nATURAN MEMBUAT PROYEK: Jika user meminta membuat proyek baru (contoh: "buat proyek X", "tambahkan proyek Y", "bikin proyek Z"), lakukan DUA hal:\n1. Jelaskan bahwa proyek sudah dibuat (1-2 kalimat).\n2. Di baris PALING TERAKHIR responsmu (tidak ada teks apapun setelahnya), tulis token ini persis: ||WS:{"action":"create_project","name":"NAMA","desc":"DESKRIPSI","status":"Aktif","visibility":"Public","tags":[]}|| — ganti NAMA dan DESKRIPSI sesuai permintaan. JANGAN tulis penjelasan tentang token ini, cukup tulis tokennya saja di baris terakhir.\n\nATURAN LIHAT PROYEK: Jika user bertanya proyek apa saja / ada proyek apa: jawab berdasarkan DATA WORKSPACE di atas dengan format daftar yang rapi.\n\nCONTOH BENAR untuk buat proyek "Website Portfolio":\n[teks penjelasan singkat]\n||WS:{"action":"create_project","name":"Website Portfolio","desc":"Proyek pembuatan website portfolio pribadi","status":"Aktif","visibility":"Public","tags":["web","portfolio"]}||';
+                const systemInstructions = 'Kamu adalah Clincoo, Superagent AI yang sangat cerdas, ramah, dan membantu. Jawablah menggunakan bahasa Indonesia yang natural dan mudah dipahami, kecuali diminta lain. Gunakan format Markdown untuk menyusun jawaban agar lebih rapi dan terstruktur. Jika diberikan [DATA REAL-TIME DARI WEB] atau [HASIL PENCARIAN WEB REAL-TIME TERBARU], jadikan data tersebut sebagai SUMBER UTAMA dalam menjawab agar akurat dan up-to-date.' + wsInstructions + wsContext;
                 
                 try {
                     // Menyusun riwayat pesan untuk API
