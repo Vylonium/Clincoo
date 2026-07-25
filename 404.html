@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clincoo</title>
+    <script>
+        // Tangkap path yang diminta, strip slash awal
+        var path = window.location.pathname.replace(/^\/Clincoo\/?/, '').replace(/^\//, '').replace(/\.html$/, '').toLowerCase();
+
+        var routes = {
+            '': 'index.html',
+            'workspace': 'workspace.html',
+            'chat': 'index.html',
+            'obrolan': 'index.html',
+        };
+
+        var base = '/Clincoo/';
+        var target = routes[path];
+
+        if (target) {
+            window.location.replace(base + target);
+        } else if (path) {
+            // Path tidak dikenal → ke beranda
+            window.location.replace(base + 'index.html');
+        } else {
+            window.location.replace(base + 'index.html');
+        }
+    </script>
+</head>
+<body></body>
+</html>
