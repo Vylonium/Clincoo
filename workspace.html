@@ -9,75 +9,63 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
-    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
-        
-        html, body {
-            min-height: 100vh;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-            background: #fafafa;
-            color: #000000;
-            -webkit-tap-highlight-color: transparent;
-        }
-
+        html, body { min-height: 100vh; margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: #fafafa; color: #000000; -webkit-tap-highlight-color: transparent; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
-
-        .shiny-text {
-            background: linear-gradient(110deg, #000000 35%, #9ca3af 50%, #000000 65%);
-            background-size: 200% auto;
-            color: transparent;
-            -webkit-background-clip: text;
-            background-clip: text;
-            animation: shine 3s linear infinite;
-        }
-
-        @keyframes shine {
-            0% { background-position: 200% center; }
-            100% { background-position: -200% center; }
-        }
-
+        .shiny-text { background: linear-gradient(110deg, #000000 35%, #9ca3af 50%, #000000 65%); background-size: 200% auto; color: transparent; -webkit-background-clip: text; background-clip: text; animation: shine 3s linear infinite; }
+        @keyframes shine { 0% { background-position: 200% center; } 100% { background-position: -200% center; } }
         .font-montserrat { font-family: 'Montserrat', sans-serif; }
-        
         .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
-        
         .fade-in { animation: fadeIn 0.3s ease-in-out forwards; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         .modal-enter { animation: modalEnter 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        @keyframes modalEnter {
-            from { opacity: 0; transform: scale(0.95) translateY(10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
+        @keyframes modalEnter { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .view-section { display: block; }
+        .view-section.hidden { display: none; }
+        .task-row:hover .task-actions { opacity: 1; }
+        .task-actions { opacity: 0; transition: opacity 0.2s; }
+        .progress-bar { transition: width 0.6s ease; }
+        .stat-card { transition: transform 0.2s, box-shadow 0.2s; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px -4px rgba(0,0,0,0.1); }
+        .activity-dot::before { content: ''; position: absolute; left: -1px; top: 50%; transform: translateY(-50%); width: 8px; height: 8px; border-radius: 50%; background: #6b7280; }
+        .clock-display { font-variant-numeric: tabular-nums; letter-spacing: 0.05em; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen selection:bg-gray-200">
 
+    <!-- HEADER -->
     <header id="app-header" class="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md z-30 flex flex-col transition-transform duration-300 border-b border-gray-100">
-        <div class="w-full px-5 py-3 flex items-center justify-start gap-4">
-            <button id="btn-sidebar-open" class="p-2 -ml-2 text-gray-700 hover:text-black transition rounded-full hover:bg-gray-50 flex items-center justify-center">
-                <i class="ph ph-list text-2xl"></i>
-            </button>
-            <button id="btn-back-header" onclick="switchView('view-beranda')" class="hidden p-2 -ml-2 text-gray-700 hover:text-black transition rounded-full hover:bg-gray-50 flex items-center justify-center" title="Kembali">
-                <i class="ph ph-arrow-left text-2xl"></i>
-            </button>
-            <h1 class="relative inline-block font-extrabold text-2xl tracking-tight font-montserrat">
-                <span class="text-black">Workspace</span>
-            </h1>
+        <div class="w-full px-5 py-3 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <button id="btn-sidebar-open" class="p-2 -ml-2 text-gray-700 hover:text-black transition rounded-full hover:bg-gray-50 flex items-center justify-center">
+                    <i class="ph ph-list text-2xl"></i>
+                </button>
+                <button id="btn-back-header" class="hidden p-2 -ml-2 text-gray-700 hover:text-black transition rounded-full hover:bg-gray-50 flex items-center justify-center">
+                    <i class="ph ph-arrow-left text-2xl"></i>
+                </button>
+                <h1 id="header-title" class="font-extrabold text-2xl tracking-tight font-montserrat text-black">Workspace</h1>
+            </div>
+            <!-- Real-time clock -->
+            <div class="flex items-center gap-3">
+                <div class="hidden sm:flex flex-col items-end">
+                    <span id="clock-time" class="clock-display text-sm font-semibold text-gray-800"></span>
+                    <span id="clock-date" class="text-[11px] text-gray-400"></span>
+                </div>
+                <button onclick="switchView('view-beranda')" title="Beranda" class="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full transition-colors">
+                    <i class="ph ph-house text-xl"></i>
+                </button>
+            </div>
         </div>
     </header>
 
     <div id="sidebar-backdrop" class="fixed inset-0 bg-black/40 z-40 hidden transition-opacity duration-300 opacity-0"></div>
 
+    <!-- SIDEBAR -->
     <div id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-white z-50 transform -translate-x-full transition-transform duration-300 flex flex-col border-r border-gray-100 shadow-2xl">
         <div class="px-5 py-3 flex items-center justify-between flex-shrink-0">
             <div class="flex items-center gap-1 -ml-2">
@@ -91,601 +79,1108 @@
                 <i class="ph ph-x text-xl"></i>
             </button>
         </div>
-
         <nav class="px-3 pt-2 pb-3 border-b border-gray-100 flex-shrink-0">
             <ul class="space-y-0.5">
-                <li>
-                    <button onclick="window.location.href='index.html'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
-                        <i class="ph ph-chat-circle-dots text-xl text-gray-500"></i>
-                        <span>Obrolan AI</span>
-                    </button>
-                </li>
-                <li>
-                    <button onclick="window.location.href='workspace.html'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-100 text-black font-semibold text-sm transition-colors">
-                        <i class="ph-fill ph-folder text-xl text-black"></i>
-                        <span>Workspace</span>
-                    </button>
-                </li>
-                <li>
-                    <button onclick="window.location.href='gambar.html'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
-                        <i class="ph ph-image text-xl text-gray-500"></i>
-                        <span>Gambar</span>
-                    </button>
-                </li>
-                <li>
-                    <button onclick="window.location.href='canvas.html'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
-                        <i class="ph ph-layout text-xl text-gray-500"></i>
-                        <span>Canvas</span>
-                    </button>
-                </li>
-                <li>
-                    <button onclick="window.location.href='perpustakaan.html'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
-                        <i class="ph ph-books text-xl text-gray-500"></i>
-                        <span>Perpustakaan</span>
-                    </button>
-                </li>
-                <li>
-                    <button onclick="window.location.href='aplikasi.html'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
-                        <i class="ph ph-squares-four text-xl text-gray-500"></i>
-                        <span>Aplikasi</span>
-                    </button>
-                </li>
+                <li><button onclick="window.location.href='index.html'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium"><i class="ph ph-chat-circle-dots text-xl text-gray-500"></i><span>Obrolan AI</span></button></li>
+                <li><button onclick="window.location.href='workspace.html'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-100 text-black font-semibold text-sm"><i class="ph-fill ph-folder text-xl text-black"></i><span>Workspace</span></button></li>
+                <li><button onclick="alert('Gambar - Segera hadir')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium"><i class="ph ph-image text-xl text-gray-500"></i><span>Gambar</span></button></li>
+                <li><button onclick="alert('Canvas - Segera hadir')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium"><i class="ph ph-layout text-xl text-gray-500"></i><span>Canvas</span></button></li>
+                <li><button onclick="alert('Perpustakaan - Segera hadir')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium"><i class="ph ph-books text-xl text-gray-500"></i><span>Perpustakaan</span></button></li>
+                <li><button onclick="alert('Aplikasi - Segera hadir')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium"><i class="ph ph-squares-four text-xl text-gray-500"></i><span>Aplikasi</span></button></li>
             </ul>
         </nav>
-        
-        <div class="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
+        <div class="flex-1 overflow-y-auto custom-scrollbar flex flex-col min-h-0">
             <div class="flex items-center justify-between px-4 pt-3 pb-1 flex-shrink-0">
                 <span class="text-[11px] font-semibold text-gray-400 tracking-widest uppercase">Aktivitas Terbaru</span>
-                <button class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors" title="Riwayat">
-                    <i class="ph ph-clock-counter-clockwise text-base"></i>
-                </button>
             </div>
-            <ul id="recent-projects-sidebar" class="flex-1 p-2 space-y-0.5 custom-scrollbar"></ul>
+            <ul id="recent-projects-sidebar" class="flex-1 p-2 space-y-0.5 overflow-y-auto custom-scrollbar"></ul>
         </div>
     </div>
 
-    <main class="flex-1 w-full px-4 sm:px-6 pt-24 pb-32 relative">
-        
+    <main class="flex-1 w-full px-4 sm:px-6 pt-24 pb-16 relative">
+
+        <!-- ===== VIEW: BERANDA ===== -->
         <div id="view-beranda" class="view-section w-full max-w-6xl mx-auto space-y-6">
+
+            <!-- Stats real-time -->
+            <div id="stats-row" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
+
+            <!-- Header + Search -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h2 class="text-3xl font-bold text-gray-900 tracking-tight font-montserrat">Proyek Anda</h2>
                     <p class="text-sm text-gray-500 mt-1">Kelola dan pantau semua ide dan pekerjaan Anda.</p>
                 </div>
-                <button onclick="openProjectForm()" class="bg-white border border-gray-200 text-gray-800 font-medium py-2.5 px-4 rounded-xl shadow-sm hover:bg-gray-50 transition-all flex items-center gap-2 text-sm">
-                    <i class="ph ph-plus text-lg text-gray-500"></i>
+                <button onclick="openProjectForm()" class="bg-black text-white font-medium py-2.5 px-4 rounded-xl shadow-sm hover:bg-gray-800 transition-all flex items-center gap-2 text-sm">
+                    <i class="ph ph-plus text-lg"></i>
                     Proyek Baru
                 </button>
             </div>
 
-            <div class="relative w-full sm:max-w-md">
-                <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
-                <input type="text" id="search-input" placeholder="Cari proyek..." class="w-full bg-white border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none transition shadow-sm">
+            <div class="flex flex-col sm:flex-row gap-3">
+                <div class="relative flex-1 sm:max-w-md">
+                    <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+                    <input type="text" id="search-input" placeholder="Cari proyek..." class="w-full bg-white border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none shadow-sm">
+                </div>
+                <div class="flex gap-2">
+                    <select id="filter-status" class="bg-white border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none shadow-sm text-gray-700">
+                        <option value="">Semua Status</option>
+                        <option value="Aktif">Aktif</option>
+                        <option value="Tidak aktif">Tidak aktif</option>
+                        <option value="Selesai">Selesai</option>
+                    </select>
+                    <select id="sort-by" class="bg-white border border-gray-200 rounded-xl py-2.5 px-3 text-sm focus:outline-none shadow-sm text-gray-700">
+                        <option value="updatedAt">Terbaru</option>
+                        <option value="name">Nama</option>
+                        <option value="progress">Progress</option>
+                    </select>
+                </div>
             </div>
 
             <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse min-w-[700px]">
+                    <table class="w-full text-left border-collapse min-w-[750px]">
                         <thead>
                             <tr class="bg-gray-50/80 border-b border-gray-200 text-sm text-gray-500 font-medium">
-                                <!-- Ditambahkan px-10 untuk memberi jarak, dan diatur bobot kolomnya -->
-                                <th class="py-3 px-10 whitespace-nowrap rounded-tl-2xl w-2/5">Nama Proyek</th>
-                                <th class="py-3 px-10 whitespace-nowrap w-1/4">Status</th>
-                                <th class="py-3 px-10 whitespace-nowrap w-1/4">Visibilitas</th>
-                                <th class="py-3 px-10 whitespace-nowrap rounded-tr-2xl">Terakhir Diubah</th>
+                                <th class="py-3 px-6 w-2/5">Nama Proyek</th>
+                                <th class="py-3 px-6 w-1/6">Status</th>
+                                <th class="py-3 px-6 w-1/6">Visibilitas</th>
+                                <th class="py-3 px-6 w-1/5">Progress</th>
+                                <th class="py-3 px-6 w-1/6">Diperbarui</th>
+                                <th class="py-3 px-6 w-16"></th>
                             </tr>
                         </thead>
-                        <tbody class="text-sm" id="projects-grid">
-                        </tbody>
+                        <tbody id="projects-grid"></tbody>
                     </table>
                 </div>
-                <div id="empty-state" class="hidden flex-col items-center justify-center py-20 text-center fade-in">
-                    <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4 border border-gray-100">
-                        <i class="ph ph-folder-open text-4xl text-gray-400"></i>
+                <div id="empty-state" class="hidden flex-col items-center justify-center py-20 text-center px-4">
+                    <div class="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
+                        <i class="ph ph-folder-open text-3xl text-gray-400"></i>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-800">Belum ada proyek</h3>
-                    <p class="text-gray-500 text-sm mt-1 mb-4">Mulai wujudkan idemu dengan membuat proyek pertama.</p>
+                    <p class="text-gray-900 font-semibold">Belum ada proyek</p>
+                    <p class="text-gray-500 text-sm mt-1 mb-5">Mulai dengan membuat proyek pertama Anda</p>
+                    <button onclick="openProjectForm()" class="bg-black text-white text-sm font-medium py-2 px-5 rounded-xl hover:bg-gray-800 transition-all">Buat Proyek</button>
                 </div>
+            </div>
+
+            <!-- Aktivitas global -->
+            <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold text-gray-900">Aktivitas Terkini</h3>
+                    <span id="activity-clock" class="text-xs text-gray-400 clock-display"></span>
+                </div>
+                <ul id="global-activity-list" class="space-y-3"></ul>
             </div>
         </div>
 
-        <div id="view-project-form" class="view-section hidden w-full max-w-3xl mx-auto pb-10">
-            <div class="mb-8 border-b border-gray-200 pb-5">
-                <h1 id="form-project-title" class="text-2xl font-bold text-gray-900 tracking-tight font-montserrat">Buat Proyek Baru</h1>
-                <p class="text-sm text-gray-500 mt-1">Atur detail dan konfigurasi awal untuk proyek Anda.</p>
+        <!-- ===== VIEW: FORM PROYEK BARU ===== -->
+        <div id="view-project-form" class="view-section hidden w-full max-w-2xl mx-auto">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 font-montserrat">Buat Proyek Baru</h2>
+                <p class="text-sm text-gray-500 mt-1">Isi detail berikut untuk memulai proyek baru.</p>
             </div>
-
-            <form id="project-form" onsubmit="saveNewProject(event)">
-                <div class="relative pl-4 sm:pl-12">
-                    <div class="absolute left-7 sm:left-[3.75rem] top-10 bottom-8 w-px bg-gray-200 hidden sm:block"></div>
-
-                    <!-- Step 1: Umum -->
-                    <div class="relative mb-12">
-                        <div class="hidden sm:flex absolute -left-12 w-8 h-8 rounded-full bg-gray-100 border border-gray-300 items-center justify-center text-sm font-medium text-gray-700 z-10">1</div>
-                        <h3 class="text-lg font-bold font-montserrat text-gray-900 mb-5">Umum</h3>
-                        
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-5">
-                            <div class="sm:col-span-1">
-                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Pemilik *</label>
-                                <div class="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-xl bg-gray-50 cursor-not-allowed">
-                                    <div class="w-5 h-5 rounded-full border border-gray-200 bg-white flex items-center justify-center text-[10px] font-bold text-gray-400">C</div>
-                                    <span class="text-sm text-gray-900 font-medium">Clincoo</span>
-                                    <i class="ph ph-caret-down w-4 h-4 ml-auto text-gray-400"></i>
-                                </div>
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label for="project-name" class="block text-sm font-medium text-gray-700 mb-1.5">Nama proyek *</label>
-                                <input type="text" id="project-name" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-xl focus:outline-none transition-all text-sm">
-                                <p class="text-xs text-gray-500 mt-2">Nama proyek yang bagus itu singkat dan mudah diingat.</p>
-                            </div>
-                        </div>
-                        
+            <form id="project-form" onsubmit="handleProjectSubmit(event)">
+                <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
+                    <!-- Nama -->
+                    <div>
+                        <label for="project-name" class="block text-sm font-medium text-gray-700 mb-1.5">Nama Proyek *</label>
+                        <input type="text" id="project-name" placeholder="Contoh: Aplikasi Kasir" class="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black/10 text-sm" required>
+                    </div>
+                    <!-- Deskripsi -->
+                    <div>
+                        <label for="project-desc" class="block text-sm font-medium text-gray-700 mb-1.5">Deskripsi</label>
+                        <textarea id="project-desc" rows="3" placeholder="Deskripsikan tujuan proyek ini..." class="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black/10 text-sm resize-none" oninput="updateCharCount(this)" maxlength="350"></textarea>
+                        <p id="desc-char-count" class="text-xs text-gray-400 mt-1">0 / 350 karakter</p>
+                    </div>
+                    <!-- Status & Visibilitas -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label for="project-desc" class="block text-sm font-medium text-gray-700 mb-1.5">Deskripsi</label>
-                            <input type="text" id="project-desc" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-xl focus:outline-none transition-all text-sm" oninput="updateCharCount(this)">
-                            <p id="desc-char-count" class="text-xs text-gray-400 mt-1.5">0 / 350 karakter</p>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Status</label>
+                            <select id="project-status" class="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl focus:outline-none text-sm">
+                                <option value="Aktif">Aktif</option>
+                                <option value="Tidak aktif">Tidak aktif</option>
+                                <option value="Selesai">Selesai</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Visibilitas</label>
+                            <select id="project-visibility" class="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl focus:outline-none text-sm">
+                                <option value="Public">Publik</option>
+                                <option value="Private">Privat</option>
+                            </select>
                         </div>
                     </div>
-
-                    <!-- Step 2: Konfigurasi -->
-                    <div class="relative mb-12">
-                        <div class="hidden sm:flex absolute -left-12 w-8 h-8 rounded-full bg-gray-100 border border-gray-300 items-center justify-center text-sm font-medium text-gray-700 z-10">2</div>
-                        <h3 class="text-lg font-bold font-montserrat text-gray-900 mb-5">Konfigurasi</h3>
-                        
-                        <div class="border border-gray-200 rounded-2xl p-5 bg-white shadow-sm">
-                            <label class="block text-sm font-medium text-gray-900 mb-1">Pilih visibilitas *</label>
-                            <p class="text-xs text-gray-500 mb-4">Pilih siapa yang dapat melihat dan berkontribusi ke proyek ini.</p>
-                            
-                            <div class="relative inline-block w-40">
-                                <input type="hidden" id="project-visibility" name="visibility" value="Public">
-                                <button type="button" onclick="toggleCustomDropdown(event, 'dropdown-visibility')" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl p-2.5 pl-9 pr-3 flex items-center justify-between focus:outline-none transition-all cursor-pointer text-left">
-                                    <span id="text-visibility" class="truncate font-medium">Publik</span>
-                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                        <i class="ph ph-book-open text-gray-500 text-lg"></i>
-                                    </div>
-                                    <i class="ph ph-caret-down text-gray-500 shrink-0"></i>
-                                </button>
-                                
-                                <div id="dropdown-visibility" class="custom-dropdown hidden absolute z-50 w-full mt-1.5 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden animate-fade-in-down">
-                                    <button type="button" onclick="selectDropdownOption(event, 'visibility', 'Public', 'Publik')" class="w-full text-left px-3.5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors border-b border-gray-50">Publik</button>
-                                    <button type="button" onclick="selectDropdownOption(event, 'visibility', 'Private', 'Privat')" class="w-full text-left px-3.5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">Privat</button>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- Deadline -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Deadline (opsional)</label>
+                        <input type="date" id="project-deadline" class="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl focus:outline-none text-sm">
                     </div>
-
-                    <!-- Step 3: Inisialisasi -->
-                    <div class="relative mb-8">
-                        <div class="hidden sm:flex absolute -left-12 w-8 h-8 rounded-full bg-gray-100 border border-gray-300 items-center justify-center text-sm font-medium text-gray-700 z-10">3</div>
-                        <h3 class="text-lg font-bold font-montserrat text-gray-900 mb-5">Inisialisasi</h3>
-                        
-                        <div class="border border-gray-100 rounded-2xl bg-white shadow-sm divide-y divide-gray-100">
-                            
-                            <div class="p-5 flex justify-between items-start gap-4">
-                                <div>
-                                    <h4 class="text-sm font-medium text-gray-900">Tambahkan README</h4>
-                                    <p class="text-xs text-gray-500 mt-1">README dapat digunakan sebagai deskripsi yang lebih panjang.</p>
-                                </div>
-                                <label class="inline-flex items-center cursor-pointer shrink-0 mt-1">
-                                    <input type="checkbox" class="sr-only peer">
-                                    <div class="relative w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
-                                </label>
-                            </div>
-
-                            <div class="p-5">
-                                <h4 class="text-sm font-medium text-gray-900">Tambahkan Template</h4>
-                                <p class="text-xs text-gray-500 mt-1 mb-3">Template membantu menyiapkan struktur awal proyek Anda.</p>
-                                
-                                <div class="relative inline-block w-48">
-                                    <input type="hidden" id="project-template" name="template" value="Tanpa template">
-                                    <button type="button" onclick="toggleCustomDropdown(event, 'dropdown-template')" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl p-2.5 pr-3 flex items-center justify-between focus:outline-none transition-all cursor-pointer text-left">
-                                        <span id="text-template" class="truncate font-medium">Tanpa template</span>
-                                        <i class="ph ph-caret-down text-gray-500 shrink-0"></i>
-                                    </button>
-                                    <div id="dropdown-template" class="custom-dropdown hidden absolute z-50 w-full mt-1.5 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden">
-                                        <button type="button" onclick="selectDropdownOption(event, 'template', 'Tanpa template', 'Tanpa template')" class="w-full text-left px-3.5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors border-b border-gray-50">Tanpa template</button>
-                                        <button type="button" onclick="selectDropdownOption(event, 'template', 'Node.js', 'Node.js')" class="w-full text-left px-3.5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors border-b border-gray-50">Node.js</button>
-                                        <button type="button" onclick="selectDropdownOption(event, 'template', 'React', 'React')" class="w-full text-left px-3.5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors border-b border-gray-50">React</button>
-                                        <button type="button" onclick="selectDropdownOption(event, 'template', 'Python', 'Python')" class="w-full text-left px-3.5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">Python</button>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
+                    <!-- Tag -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Tag (pisahkan dengan koma)</label>
+                        <input type="text" id="project-tags" placeholder="web, mobile, api..." class="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl focus:outline-none text-sm">
                     </div>
                 </div>
-
-                <div class="mt-8 flex items-center justify-end gap-3 pt-5 border-t border-gray-200">
-                    <button type="button" onclick="switchView('view-beranda')" class="bg-white border border-gray-200 text-gray-800 font-medium py-2 px-5 rounded-xl shadow-sm hover:bg-gray-50 transition-all text-sm">
-                        Batal
+                <div class="mt-5 flex items-center justify-end gap-3">
+                    <button type="button" onclick="switchView('view-beranda')" class="bg-white border border-gray-200 text-gray-800 font-medium py-2.5 px-5 rounded-xl hover:bg-gray-50 transition-all text-sm">Batal</button>
+                    <button type="submit" class="bg-black text-white font-medium py-2.5 px-6 rounded-xl hover:bg-gray-800 transition-all text-sm flex items-center gap-2">
+                        <i class="ph ph-folder-plus text-base"></i> Buat Proyek
                     </button>
-                    <div class="relative">
-                        <button type="submit" id="btn-save-project" class="bg-black border border-black text-white font-medium py-2 px-6 rounded-xl shadow-sm hover:bg-gray-800 transition-all text-sm flex items-center justify-center min-w-[155px]">
-                            <span id="btn-save-text">Simpan Proyek</span>
-                        </button>
-                        <div id="save-popover" class="absolute bottom-full mb-3 right-0 bg-red-600 text-white text-xs py-2 px-3.5 rounded-xl shadow-xl opacity-0 pointer-events-none transition-all duration-300 transform translate-y-2 z-50 flex items-center gap-2 w-max">
-                            <i class="ph-fill ph-warning-circle text-base"></i>
-                            <span id="save-popover-text" class="font-medium text-sm">Error!</span>
-                            <div id="save-popover-arrow" class="absolute top-full right-8 -mt-px border-[6px] border-transparent border-t-red-600"></div>
-                        </div>
-                    </div>
                 </div>
             </form>
         </div>
 
-        <!-- View Detail Proyek (Halaman Kosong) -->
-        <div id="view-project-detail" class="view-section hidden w-full max-w-6xl mx-auto pb-10 fade-in">
-            <div class="mb-8 border-b border-gray-200 pb-5">
-                <h1 id="detail-project-title" class="text-2xl font-bold text-gray-900 tracking-tight font-montserrat">Nama Proyek</h1>
-                <p class="text-sm text-gray-500 mt-1">Area kerja khusus untuk proyek ini.</p>
-            </div>
-            
-            <div class="w-full flex flex-col items-center justify-center py-24 text-center border-2 border-dashed border-gray-200 rounded-3xl bg-gray-50/50">
-                <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 border border-gray-100 shadow-sm">
-                    <i class="ph ph-kanban text-3xl text-gray-400"></i>
+        <!-- ===== VIEW: DETAIL PROYEK ===== -->
+        <div id="view-project-detail" class="view-section hidden w-full max-w-4xl mx-auto space-y-6">
+            <!-- Header detail -->
+            <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-5 sm:p-6">
+                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span id="detail-visibility-badge" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold border"></span>
+                            <span id="detail-status-badge" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-semibold"></span>
+                        </div>
+                        <h2 id="detail-project-title" class="text-2xl font-bold text-gray-900 font-montserrat mt-1"></h2>
+                        <p id="detail-project-desc" class="text-sm text-gray-500 mt-1.5"></p>
+                        <div id="detail-tags-row" class="flex flex-wrap gap-1.5 mt-2"></div>
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <button onclick="openEditProject()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-200 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                            <i class="ph ph-pencil-simple text-base"></i> Edit
+                        </button>
+                        <button onclick="confirmDeleteProject()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-red-200 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                            <i class="ph ph-trash text-base"></i>
+                        </button>
+                    </div>
                 </div>
-                <h3 class="text-lg font-semibold text-gray-800">Workspace Masih Kosong</h3>
-                <p class="text-gray-500 text-sm mt-1 mb-6 max-w-sm">Halaman detail proyek berhasil dibuka. Fitur workspace akan ditambahkan di sini.</p>
+                <!-- Meta info -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5 pt-5 border-t border-gray-100">
+                    <div>
+                        <p class="text-xs text-gray-400">Dibuat</p>
+                        <p id="detail-created" class="text-sm font-medium text-gray-800 mt-0.5"></p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400">Diperbarui</p>
+                        <p id="detail-updated" class="text-sm font-medium text-gray-800 mt-0.5 time-ago-text"></p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400">Deadline</p>
+                        <p id="detail-deadline" class="text-sm font-medium text-gray-800 mt-0.5"></p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400">Total Tugas</p>
+                        <p id="detail-task-count" class="text-sm font-medium text-gray-800 mt-0.5"></p>
+                    </div>
+                </div>
+                <!-- Progress bar -->
+                <div class="mt-4">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="text-xs text-gray-500">Progress Keseluruhan</span>
+                        <span id="detail-progress-text" class="text-xs font-semibold text-gray-700"></span>
+                    </div>
+                    <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div id="detail-progress-bar" class="progress-bar h-full bg-black rounded-full" style="width:0%"></div>
+                    </div>
+                </div>
             </div>
+
+            <!-- Tab menu -->
+            <div class="flex items-center gap-1 bg-white border border-gray-200 rounded-2xl p-1 shadow-sm">
+                <button onclick="switchTab('tab-tasks')" id="btn-tab-tasks" class="tab-btn flex-1 py-2 px-3 rounded-xl text-sm font-medium transition-all bg-black text-white">
+                    <i class="ph ph-check-square mr-1"></i> Tugas
+                </button>
+                <button onclick="switchTab('tab-notes')" id="btn-tab-notes" class="tab-btn flex-1 py-2 px-3 rounded-xl text-sm font-medium transition-all text-gray-600 hover:bg-gray-50">
+                    <i class="ph ph-note mr-1"></i> Catatan
+                </button>
+                <button onclick="switchTab('tab-files')" id="btn-tab-files" class="tab-btn flex-1 py-2 px-3 rounded-xl text-sm font-medium transition-all text-gray-600 hover:bg-gray-50">
+                    <i class="ph ph-file mr-1"></i> File
+                </button>
+                <button onclick="switchTab('tab-activity')" id="btn-tab-activity" class="tab-btn flex-1 py-2 px-3 rounded-xl text-sm font-medium transition-all text-gray-600 hover:bg-gray-50">
+                    <i class="ph ph-activity mr-1"></i> Aktivitas
+                </button>
+            </div>
+
+            <!-- TAB: TUGAS -->
+            <div id="tab-tasks" class="tab-content space-y-4">
+                <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-gray-900">Daftar Tugas</h3>
+                        <button onclick="openAddTask()" class="flex items-center gap-1.5 bg-black text-white text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-gray-800 transition-colors">
+                            <i class="ph ph-plus text-sm"></i> Tambah
+                        </button>
+                    </div>
+                    <!-- Add task inline form -->
+                    <div id="add-task-form" class="hidden mb-4 p-3 bg-gray-50 rounded-xl border border-gray-200">
+                        <div class="flex gap-2 mb-2">
+                            <input type="text" id="new-task-title" placeholder="Nama tugas..." class="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none">
+                            <select id="new-task-priority" class="px-2 py-2 bg-white border border-gray-200 rounded-lg text-xs focus:outline-none">
+                                <option value="Normal">Normal</option>
+                                <option value="Tinggi">Tinggi</option>
+                                <option value="Rendah">Rendah</option>
+                            </select>
+                        </div>
+                        <div class="flex gap-2">
+                            <input type="date" id="new-task-due" class="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-lg text-xs focus:outline-none">
+                            <button onclick="saveNewTask()" class="px-4 py-2 bg-black text-white text-xs font-medium rounded-lg hover:bg-gray-800">Simpan</button>
+                            <button onclick="document.getElementById('add-task-form').classList.add('hidden')" class="px-3 py-2 bg-white border border-gray-200 text-gray-600 text-xs rounded-lg hover:bg-gray-50">Batal</button>
+                        </div>
+                    </div>
+                    <!-- Filter tugas -->
+                    <div class="flex gap-2 mb-3 overflow-x-auto pb-1">
+                        <button onclick="filterTasks('semua')" data-filter="semua" class="task-filter-btn flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-lg bg-black text-white">Semua</button>
+                        <button onclick="filterTasks('aktif')" data-filter="aktif" class="task-filter-btn flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">Aktif</button>
+                        <button onclick="filterTasks('selesai')" data-filter="selesai" class="task-filter-btn flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">Selesai</button>
+                        <button onclick="filterTasks('tinggi')" data-filter="tinggi" class="task-filter-btn flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">Prioritas Tinggi</button>
+                    </div>
+                    <ul id="task-list" class="space-y-2"></ul>
+                    <p id="task-empty" class="hidden text-center text-sm text-gray-400 py-8">Belum ada tugas. Tambahkan tugas pertama!</p>
+                </div>
+            </div>
+
+            <!-- TAB: CATATAN -->
+            <div id="tab-notes" class="tab-content hidden space-y-4">
+                <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-gray-900">Catatan Proyek</h3>
+                        <button onclick="openAddNote()" class="flex items-center gap-1.5 bg-black text-white text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-gray-800">
+                            <i class="ph ph-plus text-sm"></i> Catatan Baru
+                        </button>
+                    </div>
+                    <div id="add-note-form" class="hidden mb-4 p-3 bg-gray-50 rounded-xl border border-gray-200 space-y-2">
+                        <input type="text" id="new-note-title" placeholder="Judul catatan..." class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none">
+                        <textarea id="new-note-content" rows="3" placeholder="Tulis catatan di sini..." class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none resize-none"></textarea>
+                        <div class="flex gap-2 justify-end">
+                            <button onclick="saveNewNote()" class="px-4 py-2 bg-black text-white text-xs font-medium rounded-lg hover:bg-gray-800">Simpan</button>
+                            <button onclick="document.getElementById('add-note-form').classList.add('hidden')" class="px-3 py-2 bg-white border border-gray-200 text-gray-600 text-xs rounded-lg">Batal</button>
+                        </div>
+                    </div>
+                    <div id="notes-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                    <p id="notes-empty" class="hidden text-center text-sm text-gray-400 py-8">Belum ada catatan.</p>
+                </div>
+            </div>
+
+            <!-- TAB: FILE -->
+            <div id="tab-files" class="tab-content hidden space-y-4">
+                <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-gray-900">File & Tautan</h3>
+                        <button onclick="openAddFile()" class="flex items-center gap-1.5 bg-black text-white text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-gray-800">
+                            <i class="ph ph-plus text-sm"></i> Tambah
+                        </button>
+                    </div>
+                    <div id="add-file-form" class="hidden mb-4 p-3 bg-gray-50 rounded-xl border border-gray-200 space-y-2">
+                        <input type="text" id="new-file-name" placeholder="Nama file / tautan..." class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none">
+                        <input type="url" id="new-file-url" placeholder="URL (opsional, contoh: https://...)" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none">
+                        <select id="new-file-type" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none">
+                            <option value="dokumen">Dokumen</option>
+                            <option value="tautan">Tautan</option>
+                            <option value="desain">Desain</option>
+                            <option value="lainnya">Lainnya</option>
+                        </select>
+                        <div class="flex gap-2 justify-end">
+                            <button onclick="saveNewFile()" class="px-4 py-2 bg-black text-white text-xs font-medium rounded-lg hover:bg-gray-800">Simpan</button>
+                            <button onclick="document.getElementById('add-file-form').classList.add('hidden')" class="px-3 py-2 bg-white border border-gray-200 text-gray-600 text-xs rounded-lg">Batal</button>
+                        </div>
+                    </div>
+                    <div id="files-list" class="space-y-2"></div>
+                    <p id="files-empty" class="hidden text-center text-sm text-gray-400 py-8">Belum ada file atau tautan.</p>
+                </div>
+            </div>
+
+            <!-- TAB: AKTIVITAS -->
+            <div id="tab-activity" class="tab-content hidden space-y-4">
+                <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-gray-900">Riwayat Aktivitas</h3>
+                        <span id="activity-count" class="text-xs text-gray-400"></span>
+                    </div>
+                    <ul id="project-activity-list" class="space-y-3 relative border-l-2 border-gray-100 pl-5 ml-2"></ul>
+                    <p id="activity-empty" class="hidden text-center text-sm text-gray-400 py-8">Belum ada aktivitas.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== VIEW: EDIT PROYEK ===== -->
+        <div id="view-edit-project" class="view-section hidden w-full max-w-2xl mx-auto">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 font-montserrat">Edit Proyek</h2>
+            </div>
+            <form id="edit-project-form" onsubmit="handleEditSubmit(event)">
+                <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 sm:p-8 space-y-5">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Nama Proyek *</label>
+                        <input type="text" id="edit-project-name" class="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl focus:outline-none text-sm" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Deskripsi</label>
+                        <textarea id="edit-project-desc" rows="3" class="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl focus:outline-none text-sm resize-none" maxlength="350"></textarea>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Status</label>
+                            <select id="edit-project-status" class="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl focus:outline-none text-sm">
+                                <option value="Aktif">Aktif</option>
+                                <option value="Tidak aktif">Tidak aktif</option>
+                                <option value="Selesai">Selesai</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Visibilitas</label>
+                            <select id="edit-project-visibility" class="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl focus:outline-none text-sm">
+                                <option value="Public">Publik</option>
+                                <option value="Private">Privat</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Deadline</label>
+                        <input type="date" id="edit-project-deadline" class="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl focus:outline-none text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Tag (pisahkan koma)</label>
+                        <input type="text" id="edit-project-tags" class="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-xl focus:outline-none text-sm">
+                    </div>
+                </div>
+                <div class="mt-5 flex items-center justify-end gap-3">
+                    <button type="button" onclick="switchView('view-project-detail'); loadProjectDetail(currentProjectId)" class="bg-white border border-gray-200 text-gray-800 font-medium py-2.5 px-5 rounded-xl hover:bg-gray-50 text-sm">Batal</button>
+                    <button type="submit" class="bg-black text-white font-medium py-2.5 px-6 rounded-xl hover:bg-gray-800 text-sm">Simpan Perubahan</button>
+                </div>
+            </form>
         </div>
 
     </main>
 
-    <script>
-        const logoContainer = document.getElementById('logo-3d-container');
-        const logoScene = new THREE.Scene();
-        const logoCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-        logoCamera.position.z = 3.2;
+    <!-- MODAL KONFIRMASI HAPUS -->
+    <div id="delete-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-black/50">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm modal-enter">
+            <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
+                <i class="ph ph-trash text-red-600 text-2xl"></i>
+            </div>
+            <h3 class="font-bold text-gray-900 text-lg mb-1">Hapus Proyek?</h3>
+            <p class="text-sm text-gray-500 mb-5">Semua data termasuk tugas, catatan, dan file akan dihapus permanen.</p>
+            <div class="flex gap-3">
+                <button onclick="closeDeleteModal()" class="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50">Batal</button>
+                <button onclick="executeDeleteProject()" class="flex-1 py-2.5 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700">Hapus</button>
+            </div>
+        </div>
+    </div>
 
-        const logoRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
-        logoRenderer.setSize(56, 56);
-        logoRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        if (logoContainer) logoContainer.appendChild(logoRenderer.domElement);
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] hidden">
+        <div class="bg-gray-900 text-white text-sm font-medium px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-2">
+            <i id="toast-icon" class="ph ph-check-circle text-green-400 text-lg"></i>
+            <span id="toast-text"></span>
+        </div>
+    </div>
 
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
-        logoScene.add(ambientLight);
+<script>
+// ===================== DATA =====================
+const STORAGE_KEY = 'clincoo_projects_v2';
+const ACTIVITY_KEY = 'clincoo_global_activity_v2';
+let projects = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+let globalActivities = JSON.parse(localStorage.getItem(ACTIVITY_KEY)) || [];
+let currentProjectId = null;
+let currentTaskFilter = 'semua';
 
-        const pointLight1 = new THREE.PointLight(0x6366f1, 1.8, 10);
-        pointLight1.position.set(2, 2, 2);
-        logoScene.add(pointLight1);
+// ===================== SAVE =====================
+function save() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+    localStorage.setItem(ACTIVITY_KEY, JSON.stringify(globalActivities));
+}
 
-        const pointLight2 = new THREE.PointLight(0xec4899, 1.8, 10);
-        pointLight2.position.set(-2, -2, 2);
-        logoScene.add(pointLight2);
+function generateId() {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
 
-        const coreGeo = new THREE.OctahedronGeometry(0.72, 0);
-        const coreMat = new THREE.MeshStandardMaterial({ color: 0x6366f1, metalness: 0.9, roughness: 0.15, flatShading: true });
-        const coreMesh = new THREE.Mesh(coreGeo, coreMat);
-        logoScene.add(coreMesh); 
+// ===================== TOAST =====================
+function showToast(text, type = 'success') {
+    const toast = document.getElementById('toast');
+    const icon = document.getElementById('toast-icon');
+    const textEl = document.getElementById('toast-text');
+    icon.className = `ph ${type === 'success' ? 'ph-check-circle text-green-400' : 'ph-warning text-yellow-400'} text-lg`;
+    textEl.innerText = text;
+    toast.classList.remove('hidden');
+    toast.querySelector('div').classList.add('fade-in');
+    setTimeout(() => toast.classList.add('hidden'), 2500);
+}
 
-        const ringGeo = new THREE.TorusGeometry(0.98, 0.07, 8, 48);
-        const ringMat = new THREE.MeshStandardMaterial({ color: 0xec4899, metalness: 0.8, roughness: 0.2 });
-        const ringMesh = new THREE.Mesh(ringGeo, ringMat);
-        ringMesh.rotation.y = Math.PI / 6; 
-        ringMesh.rotation.z = Math.PI / 8;
-        logoScene.add(ringMesh);
+// ===================== REAL-TIME CLOCK =====================
+function updateClock() {
+    const now = new Date();
+    const opts = { weekday:'long', day:'numeric', month:'long', year:'numeric' };
+    document.getElementById('clock-time').innerText = now.toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    document.getElementById('clock-date').innerText = now.toLocaleDateString('id-ID', opts);
+    document.getElementById('activity-clock').innerText = 'Diperbarui ' + now.toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+setInterval(updateClock, 1000);
+updateClock();
 
-        let lastFaviconUpdate = 0;
-        function animateLogo() {
-            requestAnimationFrame(animateLogo);
-            ringMesh.rotation.x -= 0.035; 
-            logoRenderer.render(logoScene, logoCamera);
+// ===================== TIME AGO =====================
+function timeAgo(ts) {
+    if (!ts) return '-';
+    const s = Math.round((Date.now() - ts) / 1000);
+    if (s < 60) return 'Baru saja';
+    const m = Math.round(s/60); if (m < 60) return `${m} menit lalu`;
+    const h = Math.round(m/60); if (h < 24) return `${h} jam lalu`;
+    const d = Math.round(h/24); if (d < 30) return `${d} hari lalu`;
+    const mo = Math.round(d/30); if (mo < 12) return `${mo} bulan lalu`;
+    return `${Math.round(d/365)} tahun lalu`;
+}
+function formatDate(ts) {
+    if (!ts) return '-';
+    return new Date(ts).toLocaleDateString('id-ID', {day:'numeric', month:'short', year:'numeric'});
+}
+setInterval(() => {
+    document.querySelectorAll('.time-ago-text').forEach(el => {
+        const ts = parseInt(el.getAttribute('data-time'));
+        if (ts) el.innerText = timeAgo(ts);
+    });
+}, 30000);
 
-            const now = Date.now();
-            if (now - lastFaviconUpdate > 150) {
-                const dataUrl = logoRenderer.domElement.toDataURL('image/png');
-                const faviconLink = document.getElementById('dynamic-favicon');
-                if (faviconLink) {
-                    faviconLink.href = dataUrl;
-                }
-                lastFaviconUpdate = now;
-            }
-        }
-        
-        window.addEventListener('load', () => {
-            if (logoContainer) animateLogo();
-            renderProjects();
-            renderSidebarProjects();
-        });
+// ===================== ACTIVITY LOG =====================
+function logActivity(projectId, message, icon = 'ph-activity') {
+    const entry = { id: generateId(), projectId, message, icon, ts: Date.now() };
+    // Tambahkan ke proyek
+    const p = projects.find(p => p.id === projectId);
+    if (p) { if (!p.activities) p.activities = []; p.activities.unshift(entry); if (p.activities.length > 50) p.activities.pop(); }
+    // Tambahkan ke global
+    globalActivities.unshift(entry);
+    if (globalActivities.length > 100) globalActivities.pop();
+    save();
+}
 
-        const btnSidebarOpen = document.getElementById('btn-sidebar-open');
-        const btnSidebarClose = document.getElementById('btn-sidebar-close');
-        const sidebar = document.getElementById('sidebar');
-        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
-        const btnBackHeader = document.getElementById('btn-back-header');
+// ===================== STATS =====================
+function renderStats() {
+    const total = projects.length;
+    const aktif = projects.filter(p => p.status === 'Aktif').length;
+    const selesai = projects.filter(p => p.status === 'Selesai').length;
+    const totalTasks = projects.reduce((acc, p) => acc + (p.tasks?.length || 0), 0);
+    const doneTasks = projects.reduce((acc, p) => acc + (p.tasks?.filter(t => t.done)?.length || 0), 0);
 
-        btnSidebarOpen.addEventListener('click', () => {
-            sidebar.classList.remove('-translate-x-full');
-            sidebarBackdrop.classList.remove('hidden');
-            setTimeout(() => {
-                sidebarBackdrop.classList.add('opacity-100');
-                sidebarBackdrop.classList.remove('opacity-0');
-            }, 50);
-        });
+    const stats = [
+        { label: 'Total Proyek', value: total, icon: 'ph-folder', color: 'text-blue-600', bg: 'bg-blue-50' },
+        { label: 'Proyek Aktif', value: aktif, icon: 'ph-lightning', color: 'text-green-600', bg: 'bg-green-50' },
+        { label: 'Selesai', value: selesai, icon: 'ph-check-circle', color: 'text-gray-600', bg: 'bg-gray-100' },
+        { label: 'Total Tugas', value: `${doneTasks}/${totalTasks}`, icon: 'ph-check-square', color: 'text-purple-600', bg: 'bg-purple-50' },
+    ];
+    document.getElementById('stats-row').innerHTML = stats.map(s => `
+        <div class="stat-card bg-white border border-gray-200 rounded-2xl shadow-sm p-4 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl ${s.bg} flex items-center justify-center flex-shrink-0">
+                <i class="ph ${s.icon} text-xl ${s.color}"></i>
+            </div>
+            <div>
+                <p class="text-xs text-gray-500">${s.label}</p>
+                <p class="text-xl font-bold text-gray-900">${s.value}</p>
+            </div>
+        </div>`).join('');
+}
 
-        function closeSidebar() {
-            sidebar.classList.add('-translate-x-full');
-            sidebarBackdrop.classList.add('opacity-0');
-            sidebarBackdrop.classList.remove('opacity-100');
-            setTimeout(() => {
-                sidebarBackdrop.classList.add('hidden');
-            }, 300);
-        }
-        
-        btnSidebarClose.addEventListener('click', closeSidebar);
-        sidebarBackdrop.addEventListener('click', closeSidebar);
+// ===================== GLOBAL ACTIVITY =====================
+function renderGlobalActivity() {
+    const list = document.getElementById('global-activity-list');
+    const recent = globalActivities.slice(0, 10);
+    if (recent.length === 0) {
+        list.innerHTML = '<li class="text-sm text-gray-400 text-center py-4">Belum ada aktivitas</li>';
+        return;
+    }
+    list.innerHTML = recent.map(a => {
+        const p = projects.find(pr => pr.id === a.projectId);
+        return `<li class="flex items-start gap-3">
+            <div class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <i class="ph ${a.icon||'ph-activity'} text-sm text-gray-500"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-sm text-gray-700">${a.message}</p>
+                <div class="flex items-center gap-2 mt-0.5">
+                    ${p ? `<span class="text-xs text-gray-400">${p.name}</span> <span class="text-gray-300">·</span>` : ''}
+                    <span class="text-xs text-gray-400 time-ago-text" data-time="${a.ts}">${timeAgo(a.ts)}</span>
+                </div>
+            </div>
+        </li>`;
+    }).join('');
+}
 
-        let projects = JSON.parse(localStorage.getItem('clincoo_projects')) || [];
+// ===================== PROJECTS =====================
+function getStatusBadge(status) {
+    const map = { 'Aktif': 'bg-green-100 text-green-700', 'Tidak aktif': 'bg-red-100 text-red-700', 'Selesai': 'bg-blue-100 text-blue-700' };
+    const dot = { 'Aktif': 'bg-green-500', 'Tidak aktif': 'bg-red-500', 'Selesai': 'bg-blue-500' };
+    return `<div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full ${dot[status]||'bg-gray-400'} flex-shrink-0"></span><span class="text-sm text-gray-700">${status||'Aktif'}</span></div>`;
+}
 
-        function saveToLocalStorage() {
-            localStorage.setItem('clincoo_projects', JSON.stringify(projects));
-        }
+function getProgress(project) {
+    const tasks = project.tasks || [];
+    if (tasks.length === 0) return 0;
+    return Math.round((tasks.filter(t => t.done).length / tasks.length) * 100);
+}
 
-        function generateId() {
-            return Date.now().toString(36) + Math.random().toString(36).substr(2);
-        }
+function renderProjects(search = '') {
+    const grid = document.getElementById('projects-grid');
+    const empty = document.getElementById('empty-state');
+    const filterStatus = document.getElementById('filter-status').value;
+    const sortBy = document.getElementById('sort-by').value;
 
-        function switchView(viewId) {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-            if (document.getElementById(viewId)) {
-                document.getElementById(viewId).classList.remove('hidden');
-            }
-            if(viewId === 'view-beranda') {
-                btnBackHeader.classList.add('hidden');
-                btnSidebarOpen.classList.remove('hidden');
-                renderProjects(document.getElementById('search-input').value);
-                renderSidebarProjects();
-            } else {
-                btnBackHeader.classList.remove('hidden');
-                btnSidebarOpen.classList.add('hidden');
-            }
-        }
+    let filtered = projects.filter(p =>
+        (p.name.toLowerCase().includes(search.toLowerCase()) || (p.desc||'').toLowerCase().includes(search.toLowerCase())) &&
+        (filterStatus === '' || p.status === filterStatus)
+    );
 
-        function getStatusBadge(status) {
-            const isActive = (status === 'Aktif');
-            const dotColor = isActive ? 'bg-green-500' : 'bg-red-500';
-            const statusText = isActive ? 'Aktif' : 'Tidak aktif';
-            // Penambahan `flex-shrink-0 block` pada dot class agar tidak penyok, dan whitespace-nowrap agar 1 baris
-            return `<div class="flex items-center gap-2.5 whitespace-nowrap"><span class="w-2.5 h-2.5 rounded-full ${dotColor} flex-shrink-0 block"></span><span class="text-sm font-medium text-gray-700">${statusText}</span></div>`;
-        }
+    filtered.sort((a,b) => {
+        if (sortBy === 'name') return a.name.localeCompare(b.name);
+        if (sortBy === 'progress') return getProgress(b) - getProgress(a);
+        return b.updatedAt - a.updatedAt;
+    });
 
-        // Fungsi format waktu relatif
-        function timeAgo(dateParam) {
-            if (!dateParam) return '';
-            const date = new Date(dateParam);
-            const seconds = Math.round((new Date() - date) / 1000);
-            if (seconds < 60) return 'Baru saja';
-            const minutes = Math.round(seconds / 60);
-            if (minutes < 60) return `${minutes} menit yang lalu`;
-            const hours = Math.round(minutes / 60);
-            if (hours < 24) return `${hours} jam yang lalu`;
-            const days = Math.round(hours / 24);
-            if (days < 30) return `${days} hari yang lalu`;
-            const months = Math.round(days / 30);
-            if (months < 12) return `${months} bulan yang lalu`;
-            return `${Math.round(days / 365)} tahun yang lalu`;
-        }
+    grid.innerHTML = '';
+    if (filtered.length === 0) {
+        document.querySelector('#view-beranda .overflow-x-auto')?.classList.add('hidden');
+        empty.classList.remove('hidden'); empty.classList.add('flex');
+        return;
+    }
+    document.querySelector('#view-beranda .overflow-x-auto')?.classList.remove('hidden');
+    empty.classList.add('hidden'); empty.classList.remove('flex');
 
-        // Memperbarui waktu secara real-time setiap menit
-        setInterval(() => {
-            document.querySelectorAll('.time-ago-text').forEach(el => {
-                const timestamp = parseInt(el.getAttribute('data-time'));
-                if (timestamp) {
-                    el.innerText = timeAgo(timestamp);
-                }
-            });
-        }, 60000);
-
-        function renderProjects(searchQuery = '') {
-            const grid = document.getElementById('projects-grid');
-            const emptyState = document.getElementById('empty-state');
-            const tableContainer = grid.closest('.overflow-x-auto');
-            
-            grid.innerHTML = '';
-            
-            const filtered = projects.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.desc.toLowerCase().includes(searchQuery.toLowerCase()));
-            
-            if (filtered.length === 0) {
-                tableContainer.classList.add('hidden');
-                emptyState.classList.remove('hidden');
-                emptyState.classList.add('flex');
-            } else {
-                tableContainer.classList.remove('hidden');
-                emptyState.classList.add('hidden');
-                emptyState.classList.remove('flex');
-                
-                filtered.sort((a,b) => b.updatedAt - a.updatedAt).forEach(p => {
-                    const tr = document.createElement('tr');
-                    tr.className = 'border-b border-gray-100 hover:bg-gray-50/50 transition-colors cursor-pointer';
-                    tr.onclick = () => openProjectDetail(p.id);
-                    tr.innerHTML = `
-                        <!-- Menggunakan px-10 pada <td> untuk menyamakan jarak dengan header -->
-                        <td class="py-3 px-10 align-middle whitespace-nowrap">
-                            <p class="font-semibold text-gray-900">${p.name}</p>
-                        </td>
-                        <td class="py-3 px-10 align-middle whitespace-nowrap">
-                            ${getStatusBadge(p.status || 'Aktif')}
-                        </td>
-                        <td class="py-3 px-10 align-middle whitespace-nowrap">
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold border ${p.visibility === 'Private' ? 'border-gray-200 text-gray-600 bg-gray-50' : 'border-green-200 text-green-700 bg-green-50'}">
-                                <i class="ph ${p.visibility === 'Private' ? 'ph-lock' : 'ph-globe'}"></i>
-                                ${p.visibility === 'Private' ? 'Privat' : 'Publik'}
-                            </span>
-                        </td>
-                        <td class="py-3 px-10 align-middle whitespace-nowrap">
-                            <span class="text-sm text-gray-500 time-ago-text" data-time="${p.updatedAt}">${timeAgo(p.updatedAt)}</span>
-                        </td>
-                    `;
-                    grid.appendChild(tr);
-                });
-            }
-        }
-
-        function renderSidebarProjects() {
-            const list = document.getElementById('recent-projects-sidebar');
-            list.innerHTML = '';
-            
-            if (projects.length === 0) {
-                list.innerHTML = '<p class="text-[13px] text-gray-400 text-center mt-4">Belum ada proyek</p>';
-                return;
-            }
-            
-            const recent = [...projects].sort((a,b) => b.updatedAt - a.updatedAt).slice(0, 5);
-            recent.forEach(p => {
-                const li = document.createElement('li');
-                li.innerHTML = `
-                    <div onclick="openProjectDetail('${p.id}')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors group cursor-pointer">
-                        <div class="flex items-center gap-2.5 overflow-hidden">
-                            <i class="ph ph-folder text-gray-400 text-lg group-hover:text-black transition-colors flex-shrink-0"></i>
-                            <span class="text-[13px] font-medium truncate">${p.name}</span>
-                        </div>
+    filtered.forEach(p => {
+        const prog = getProgress(p);
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-gray-100 hover:bg-gray-50/50 transition-colors cursor-pointer';
+        tr.onclick = () => { currentProjectId = p.id; loadProjectDetail(p.id); switchView('view-project-detail'); };
+        tr.innerHTML = `
+            <td class="py-3 px-6 align-middle">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                        <i class="ph ph-folder text-sm text-gray-500"></i>
                     </div>
-                `;
-                list.appendChild(li);
-            });
-        }
+                    <div>
+                        <p class="font-semibold text-gray-900 text-sm">${p.name}</p>
+                        ${p.desc ? `<p class="text-xs text-gray-400 truncate max-w-[200px]">${p.desc}</p>` : ''}
+                    </div>
+                </div>
+            </td>
+            <td class="py-3 px-6 align-middle whitespace-nowrap">${getStatusBadge(p.status||'Aktif')}</td>
+            <td class="py-3 px-6 align-middle whitespace-nowrap">
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold border ${p.visibility==='Private'?'border-gray-200 text-gray-600 bg-gray-50':'border-green-200 text-green-700 bg-green-50'}">
+                    <i class="ph ${p.visibility==='Private'?'ph-lock':'ph-globe'}"></i>${p.visibility==='Private'?'Privat':'Publik'}
+                </span>
+            </td>
+            <td class="py-3 px-6 align-middle">
+                <div class="flex items-center gap-2">
+                    <div class="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden w-20">
+                        <div class="h-full bg-black rounded-full progress-bar" style="width:${prog}%"></div>
+                    </div>
+                    <span class="text-xs text-gray-500 whitespace-nowrap">${prog}%</span>
+                </div>
+            </td>
+            <td class="py-3 px-6 align-middle whitespace-nowrap">
+                <span class="text-sm text-gray-500 time-ago-text" data-time="${p.updatedAt}">${timeAgo(p.updatedAt)}</span>
+            </td>
+            <td class="py-3 px-6 align-middle text-right" onclick="event.stopPropagation()">
+                <button onclick="deleteProjectQuick('${p.id}')" class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+                    <i class="ph ph-trash text-sm"></i>
+                </button>
+            </td>`;
+        grid.appendChild(tr);
+    });
+}
 
-        document.getElementById('search-input').addEventListener('input', (e) => {
-            renderProjects(e.target.value);
-        });
+function renderSidebarProjects() {
+    const list = document.getElementById('recent-projects-sidebar');
+    list.innerHTML = '';
+    if (projects.length === 0) { list.innerHTML = '<p class="text-[13px] text-gray-400 text-center mt-4">Belum ada proyek</p>'; return; }
+    [...projects].sort((a,b) => b.updatedAt - a.updatedAt).slice(0,5).forEach(p => {
+        const li = document.createElement('li');
+        li.innerHTML = `<div onclick="currentProjectId='${p.id}'; loadProjectDetail('${p.id}'); switchView('view-project-detail'); closeSidebar();" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-gray-50 cursor-pointer group">
+            <i class="ph ph-folder text-gray-400 text-lg group-hover:text-black transition-colors flex-shrink-0"></i>
+            <span class="text-[13px] font-medium truncate text-gray-700">${p.name}</span>
+        </div>`;
+        list.appendChild(li);
+    });
+}
 
-        function openProjectDetail(id) {
-            const project = projects.find(p => p.id === id);
-            if (project) {
-                // Menyesuaikan judul dengan nama proyek
-                document.getElementById('detail-project-title').innerText = project.name;
-                
-                // Menutup sidebar jika di mode mobile
-                if (!document.getElementById('sidebar').classList.contains('-translate-x-full')) {
-                    closeSidebar();
-                }
-                
-                switchView('view-project-detail');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        }
+// ===================== PROJECT FORM =====================
+function openProjectForm() {
+    switchView('view-project-form');
+    document.getElementById('project-form').reset();
+    document.getElementById('desc-char-count').innerText = '0 / 350 karakter';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-        function openProjectForm() {
-            switchView('view-project-form');
-            const form = document.getElementById('project-form');
-            form.reset();
-            document.getElementById('desc-char-count').innerText = "0 / 350 karakter";
-            document.getElementById('project-name').classList.remove('border-red-500', 'ring-red-500');
-            
-            document.getElementById('project-visibility').value = 'Public';
-            document.getElementById('text-visibility').innerText = 'Publik';
-            
-            document.getElementById('project-template').value = 'Tanpa template';
-            document.getElementById('text-template').innerText = 'Tanpa template';
-            
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+function handleProjectSubmit(e) {
+    e.preventDefault();
+    const name = document.getElementById('project-name').value.trim();
+    if (!name) return;
+    const proj = {
+        id: generateId(),
+        name,
+        desc: document.getElementById('project-desc').value.trim(),
+        status: document.getElementById('project-status').value,
+        visibility: document.getElementById('project-visibility').value,
+        deadline: document.getElementById('project-deadline').value || null,
+        tags: document.getElementById('project-tags').value.split(',').map(t=>t.trim()).filter(Boolean),
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        tasks: [],
+        notes: [],
+        files: [],
+        activities: []
+    };
+    projects.unshift(proj);
+    logActivity(proj.id, `Proyek "${proj.name}" dibuat`, 'ph-folder-plus');
+    save();
+    showToast('Proyek berhasil dibuat!');
+    currentProjectId = proj.id;
+    loadProjectDetail(proj.id);
+    switchView('view-project-detail');
+}
 
-        function updateCharCount(input) {
-            const count = input.value.length;
-            const limit = 350;
-            const el = document.getElementById('desc-char-count');
-            
-            if (count > limit) {
-                input.value = input.value.substring(0, limit);
-                el.innerText = `${limit} / ${limit} karakter`;
-                el.classList.add('text-red-500');
-                el.classList.remove('text-gray-400');
-            } else {
-                el.innerText = `${count} / ${limit} karakter`;
-                el.classList.remove('text-red-500');
-                el.classList.add('text-gray-400');
-            }
-        }
+function updateCharCount(input) {
+    const count = input.value.length;
+    const el = document.getElementById('desc-char-count');
+    if (el) el.innerText = `${count} / 350 karakter`;
+}
 
-        function toggleCustomDropdown(event, dropdownId) {
-            event.stopPropagation(); 
-            document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
-                if (dropdown.id !== dropdownId) {
-                    dropdown.classList.add('hidden');
-                }
-            });
-            const dropdownTarget = document.getElementById(dropdownId);
-            dropdownTarget.classList.toggle('hidden');
-        }
+// ===================== PROJECT DETAIL =====================
+function loadProjectDetail(id) {
+    const p = projects.find(pr => pr.id === id);
+    if (!p) return;
+    currentProjectId = id;
+    document.getElementById('detail-project-title').innerText = p.name;
+    document.getElementById('detail-project-desc').innerText = p.desc || 'Tidak ada deskripsi.';
+    document.getElementById('header-title').innerText = p.name;
 
-        function selectDropdownOption(event, fieldId, realValue, displayValue) {
-            event.stopPropagation();
-            document.getElementById(`project-${fieldId}`).value = realValue;
-            document.getElementById(`text-${fieldId}`).innerText = displayValue;
-            document.getElementById(`dropdown-${fieldId}`).classList.add('hidden');
-        }
+    // Tags
+    const tagsRow = document.getElementById('detail-tags-row');
+    tagsRow.innerHTML = (p.tags||[]).map(t => `<span class="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-md">${t}</span>`).join('');
 
-        document.addEventListener('click', function(event) {
-            const allDropdowns = document.querySelectorAll('.custom-dropdown');
-            allDropdowns.forEach(dropdown => {
-                if (!dropdown.contains(event.target) && !dropdown.classList.contains('hidden')) {
-                    dropdown.classList.add('hidden');
-                }
-            });
-        });
+    // Status & visibility badge
+    const stMap = { 'Aktif':'bg-green-100 text-green-700', 'Tidak aktif':'bg-red-100 text-red-700', 'Selesai':'bg-blue-100 text-blue-700' };
+    const sbadge = document.getElementById('detail-status-badge');
+    sbadge.className = `inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold ${stMap[p.status||'Aktif']||'bg-gray-100 text-gray-600'}`;
+    sbadge.innerText = p.status || 'Aktif';
 
-        window.addEventListener('scroll', function() {
-            document.querySelectorAll('.custom-dropdown').forEach(p => p.classList.add('hidden'));
-        }, true);
+    const vbadge = document.getElementById('detail-visibility-badge');
+    vbadge.className = `inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold border ${p.visibility==='Private'?'border-gray-200 text-gray-600 bg-gray-50':'border-green-200 text-green-700 bg-green-50'}`;
+    vbadge.innerHTML = `<i class="ph ${p.visibility==='Private'?'ph-lock':'ph-globe'}"></i>${p.visibility==='Private'?'Privat':'Publik'}`;
 
-        function saveNewProject(e) {
-            e.preventDefault();
-            
-            const nameInput = document.getElementById('project-name');
-            const name = nameInput.value.trim();
-            const desc = document.getElementById('project-desc').value.trim();
-            
-            const popover = document.getElementById('save-popover');
-            const popoverText = document.getElementById('save-popover-text');
-            const btnSave = document.getElementById('btn-save-project');
-            
-            if (!name) {
-                popoverText.innerText = 'Nama proyek wajib diisi!';
-                
-                popover.classList.remove('opacity-0', 'translate-y-2');
-                popover.classList.add('opacity-100', 'translate-y-0');
-                
-                nameInput.classList.add('border-red-500', 'ring-red-500');
-                nameInput.focus();
-                
-                setTimeout(() => {
-                    popover.classList.remove('opacity-100', 'translate-y-0');
-                    popover.classList.add('opacity-0', 'translate-y-2');
-                    nameInput.classList.remove('border-red-500', 'ring-red-500');
-                }, 3000);
-                
-                return;
-            }
+    // Meta
+    document.getElementById('detail-created').innerText = formatDate(p.createdAt);
+    const updEl = document.getElementById('detail-updated');
+    updEl.innerText = timeAgo(p.updatedAt);
+    updEl.setAttribute('data-time', p.updatedAt);
 
-            btnSave.disabled = true;
-            btnSave.classList.add('opacity-75', 'cursor-not-allowed');
-            btnSave.innerHTML = `<i class="ph ph-spinner-gap animate-spin text-lg"></i> <span class="ml-2">Menyimpan...</span>`;
+    const deadline = p.deadline ? new Date(p.deadline).toLocaleDateString('id-ID', {day:'numeric',month:'short',year:'numeric'}) : 'Tidak ada';
+    document.getElementById('detail-deadline').innerText = deadline;
+    document.getElementById('detail-task-count').innerText = `${(p.tasks||[]).length} tugas`;
 
-            setTimeout(() => {
-                const visibility = document.getElementById('project-visibility').value;
-                const template = document.getElementById('project-template').value;
-                
-                const newProject = {
-                    id: generateId(),
-                    name: name,
-                    desc: desc,
-                    status: 'Aktif',
-                    visibility: visibility,
-                    template: template,
-                    updatedAt: Date.now()
-                };
-                
-                projects.push(newProject);
-                saveToLocalStorage();
-                
-                btnSave.disabled = false;
-                btnSave.classList.remove('opacity-75', 'cursor-not-allowed');
-                btnSave.innerHTML = `<span id="btn-save-text">Simpan Proyek</span>`;
-                
-                switchView('view-beranda');
-            }, 800);
-        }
-    </script>
+    // Progress
+    const prog = getProgress(p);
+    document.getElementById('detail-progress-text').innerText = `${prog}%`;
+    document.getElementById('detail-progress-bar').style.width = `${prog}%`;
+
+    // Render tabs
+    renderTasks(id);
+    renderNotes(id);
+    renderFiles(id);
+    renderProjectActivity(id);
+}
+
+// ===================== TASKS =====================
+function openAddTask() {
+    document.getElementById('add-task-form').classList.toggle('hidden');
+    document.getElementById('new-task-title').focus();
+}
+
+function saveNewTask() {
+    const title = document.getElementById('new-task-title').value.trim();
+    if (!title) return;
+    const p = projects.find(pr => pr.id === currentProjectId);
+    if (!p) return;
+    if (!p.tasks) p.tasks = [];
+    const task = { id: generateId(), title, done: false, priority: document.getElementById('new-task-priority').value, due: document.getElementById('new-task-due').value || null, createdAt: Date.now() };
+    p.tasks.push(task);
+    p.updatedAt = Date.now();
+    logActivity(p.id, `Tugas "${title}" ditambahkan`, 'ph-check-square');
+    save();
+    document.getElementById('new-task-title').value = '';
+    document.getElementById('new-task-due').value = '';
+    document.getElementById('add-task-form').classList.add('hidden');
+    renderTasks(currentProjectId);
+    loadProjectDetail(currentProjectId);
+    showToast('Tugas ditambahkan!');
+}
+
+function toggleTask(taskId) {
+    const p = projects.find(pr => pr.id === currentProjectId);
+    if (!p) return;
+    const task = p.tasks.find(t => t.id === taskId);
+    if (!task) return;
+    task.done = !task.done;
+    p.updatedAt = Date.now();
+    logActivity(p.id, task.done ? `Tugas "${task.title}" selesai` : `Tugas "${task.title}" dibuka ulang`, task.done ? 'ph-check-circle' : 'ph-circle');
+    save();
+    renderTasks(currentProjectId);
+    loadProjectDetail(currentProjectId);
+}
+
+function deleteTask(taskId) {
+    const p = projects.find(pr => pr.id === currentProjectId);
+    if (!p) return;
+    const task = p.tasks.find(t => t.id === taskId);
+    p.tasks = p.tasks.filter(t => t.id !== taskId);
+    p.updatedAt = Date.now();
+    if (task) logActivity(p.id, `Tugas "${task.title}" dihapus`, 'ph-trash');
+    save();
+    renderTasks(currentProjectId);
+    loadProjectDetail(currentProjectId);
+    showToast('Tugas dihapus', 'warning');
+}
+
+function filterTasks(filter) {
+    currentTaskFilter = filter;
+    document.querySelectorAll('.task-filter-btn').forEach(btn => {
+        const active = btn.getAttribute('data-filter') === filter;
+        btn.className = `task-filter-btn flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-lg ${active ? 'bg-black text-white' : 'border border-gray-200 text-gray-600 hover:bg-gray-50'}`;
+    });
+    renderTasks(currentProjectId);
+}
+
+function renderTasks(id) {
+    const p = projects.find(pr => pr.id === id);
+    const list = document.getElementById('task-list');
+    const empty = document.getElementById('task-empty');
+    if (!p) return;
+    let tasks = p.tasks || [];
+    if (currentTaskFilter === 'aktif') tasks = tasks.filter(t => !t.done);
+    else if (currentTaskFilter === 'selesai') tasks = tasks.filter(t => t.done);
+    else if (currentTaskFilter === 'tinggi') tasks = tasks.filter(t => t.priority === 'Tinggi');
+
+    list.innerHTML = '';
+    if (tasks.length === 0) { empty.classList.remove('hidden'); return; }
+    empty.classList.add('hidden');
+
+    const priorityColors = { Tinggi: 'text-red-500', Normal: 'text-gray-400', Rendah: 'text-blue-400' };
+    tasks.forEach(task => {
+        const li = document.createElement('li');
+        li.className = 'task-row flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-gray-200 hover:bg-gray-50/50 transition-all group';
+        li.innerHTML = `
+            <button onclick="toggleTask('${task.id}')" class="w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${task.done ? 'bg-black border-black' : 'border-gray-300 hover:border-gray-500'}">
+                ${task.done ? '<i class="ph-fill ph-check text-white text-[10px]"></i>' : ''}
+            </button>
+            <div class="flex-1 min-w-0">
+                <p class="text-sm ${task.done ? 'line-through text-gray-400' : 'text-gray-800 font-medium'}">${task.title}</p>
+                ${task.due ? `<p class="text-xs text-gray-400 mt-0.5"><i class="ph ph-calendar-blank"></i> ${new Date(task.due).toLocaleDateString('id-ID',{day:'numeric',month:'short'})}</p>` : ''}
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-medium ${priorityColors[task.priority]||'text-gray-400'} flex-shrink-0">${task.priority||'Normal'}</span>
+                <button onclick="deleteTask('${task.id}')" class="task-actions p-1 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+                    <i class="ph ph-trash text-sm"></i>
+                </button>
+            </div>`;
+        list.appendChild(li);
+    });
+}
+
+// ===================== NOTES =====================
+function openAddNote() {
+    document.getElementById('add-note-form').classList.toggle('hidden');
+    document.getElementById('new-note-title').focus();
+}
+
+function saveNewNote() {
+    const title = document.getElementById('new-note-title').value.trim();
+    const content = document.getElementById('new-note-content').value.trim();
+    if (!title && !content) return;
+    const p = projects.find(pr => pr.id === currentProjectId);
+    if (!p) return;
+    if (!p.notes) p.notes = [];
+    const note = { id: generateId(), title: title || 'Tanpa judul', content, createdAt: Date.now() };
+    p.notes.unshift(note);
+    p.updatedAt = Date.now();
+    logActivity(p.id, `Catatan "${note.title}" ditambahkan`, 'ph-note');
+    save();
+    document.getElementById('new-note-title').value = '';
+    document.getElementById('new-note-content').value = '';
+    document.getElementById('add-note-form').classList.add('hidden');
+    renderNotes(currentProjectId);
+    showToast('Catatan ditambahkan!');
+}
+
+function deleteNote(noteId) {
+    const p = projects.find(pr => pr.id === currentProjectId);
+    if (!p) return;
+    const note = p.notes.find(n => n.id === noteId);
+    p.notes = p.notes.filter(n => n.id !== noteId);
+    p.updatedAt = Date.now();
+    if (note) logActivity(p.id, `Catatan "${note.title}" dihapus`, 'ph-trash');
+    save();
+    renderNotes(currentProjectId);
+    showToast('Catatan dihapus', 'warning');
+}
+
+function renderNotes(id) {
+    const p = projects.find(pr => pr.id === id);
+    const list = document.getElementById('notes-list');
+    const empty = document.getElementById('notes-empty');
+    if (!p || !list) return;
+    const notes = p.notes || [];
+    list.innerHTML = '';
+    if (notes.length === 0) { empty.classList.remove('hidden'); return; }
+    empty.classList.add('hidden');
+    notes.forEach(n => {
+        const div = document.createElement('div');
+        div.className = 'bg-gray-50 border border-gray-200 rounded-xl p-4 group relative';
+        div.innerHTML = `
+            <div class="flex items-start justify-between gap-2">
+                <h4 class="font-semibold text-sm text-gray-900">${n.title}</h4>
+                <button onclick="deleteNote('${n.id}')" class="p-1 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all flex-shrink-0">
+                    <i class="ph ph-trash text-sm"></i>
+                </button>
+            </div>
+            ${n.content ? `<p class="text-sm text-gray-600 mt-1.5 whitespace-pre-wrap">${n.content}</p>` : ''}
+            <p class="text-xs text-gray-400 mt-2">${timeAgo(n.createdAt)}</p>`;
+        list.appendChild(div);
+    });
+}
+
+// ===================== FILES =====================
+function openAddFile() {
+    document.getElementById('add-file-form').classList.toggle('hidden');
+    document.getElementById('new-file-name').focus();
+}
+
+function saveNewFile() {
+    const name = document.getElementById('new-file-name').value.trim();
+    if (!name) return;
+    const p = projects.find(pr => pr.id === currentProjectId);
+    if (!p) return;
+    if (!p.files) p.files = [];
+    const file = { id: generateId(), name, url: document.getElementById('new-file-url').value.trim() || null, type: document.getElementById('new-file-type').value, createdAt: Date.now() };
+    p.files.unshift(file);
+    p.updatedAt = Date.now();
+    logActivity(p.id, `File "${file.name}" ditambahkan`, 'ph-file-plus');
+    save();
+    document.getElementById('new-file-name').value = '';
+    document.getElementById('new-file-url').value = '';
+    document.getElementById('add-file-form').classList.add('hidden');
+    renderFiles(currentProjectId);
+    showToast('File ditambahkan!');
+}
+
+function deleteFile(fileId) {
+    const p = projects.find(pr => pr.id === currentProjectId);
+    if (!p) return;
+    const file = p.files.find(f => f.id === fileId);
+    p.files = p.files.filter(f => f.id !== fileId);
+    p.updatedAt = Date.now();
+    if (file) logActivity(p.id, `File "${file.name}" dihapus`, 'ph-trash');
+    save();
+    renderFiles(currentProjectId);
+    showToast('File dihapus', 'warning');
+}
+
+function renderFiles(id) {
+    const p = projects.find(pr => pr.id === id);
+    const list = document.getElementById('files-list');
+    const empty = document.getElementById('files-empty');
+    if (!p || !list) return;
+    const files = p.files || [];
+    list.innerHTML = '';
+    if (files.length === 0) { empty.classList.remove('hidden'); return; }
+    empty.classList.add('hidden');
+    const typeIcons = { dokumen:'ph-file-text', tautan:'ph-link', desain:'ph-palette', lainnya:'ph-file' };
+    files.forEach(f => {
+        const div = document.createElement('div');
+        div.className = 'flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:bg-gray-50 transition-all group';
+        div.innerHTML = `
+            <div class="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
+                <i class="ph ${typeIcons[f.type]||'ph-file'} text-gray-500 text-lg"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-gray-800 truncate">${f.name}</p>
+                ${f.url ? `<a href="${f.url}" target="_blank" class="text-xs text-blue-500 hover:underline truncate block">${f.url}</a>` : `<p class="text-xs text-gray-400">${f.type}</p>`}
+            </div>
+            <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                ${f.url ? `<a href="${f.url}" target="_blank" class="p-1.5 rounded-lg text-gray-400 hover:text-blue-500 hover:bg-blue-50 transition-colors"><i class="ph ph-arrow-square-out text-base"></i></a>` : ''}
+                <button onclick="deleteFile('${f.id}')" class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"><i class="ph ph-trash text-base"></i></button>
+            </div>`;
+        list.appendChild(div);
+    });
+}
+
+// ===================== PROJECT ACTIVITY =====================
+function renderProjectActivity(id) {
+    const p = projects.find(pr => pr.id === id);
+    const list = document.getElementById('project-activity-list');
+    const empty = document.getElementById('activity-empty');
+    const countEl = document.getElementById('activity-count');
+    if (!p || !list) return;
+    const acts = p.activities || [];
+    countEl.innerText = `${acts.length} entri`;
+    list.innerHTML = '';
+    if (acts.length === 0) { empty.classList.remove('hidden'); return; }
+    empty.classList.add('hidden');
+    acts.forEach(a => {
+        const li = document.createElement('li');
+        li.className = 'relative pb-3';
+        li.innerHTML = `
+            <div class="absolute -left-6 top-1 w-3 h-3 rounded-full bg-gray-200 border-2 border-white"></div>
+            <p class="text-sm text-gray-700">${a.message}</p>
+            <p class="text-xs text-gray-400 mt-0.5 time-ago-text" data-time="${a.ts}">${timeAgo(a.ts)}</p>`;
+        list.appendChild(li);
+    });
+}
+
+// ===================== EDIT PROJECT =====================
+function openEditProject() {
+    const p = projects.find(pr => pr.id === currentProjectId);
+    if (!p) return;
+    document.getElementById('edit-project-name').value = p.name;
+    document.getElementById('edit-project-desc').value = p.desc || '';
+    document.getElementById('edit-project-status').value = p.status || 'Aktif';
+    document.getElementById('edit-project-visibility').value = p.visibility || 'Public';
+    document.getElementById('edit-project-deadline').value = p.deadline || '';
+    document.getElementById('edit-project-tags').value = (p.tags||[]).join(', ');
+    switchView('view-edit-project');
+}
+
+function handleEditSubmit(e) {
+    e.preventDefault();
+    const p = projects.find(pr => pr.id === currentProjectId);
+    if (!p) return;
+    const oldName = p.name;
+    p.name = document.getElementById('edit-project-name').value.trim();
+    p.desc = document.getElementById('edit-project-desc').value.trim();
+    p.status = document.getElementById('edit-project-status').value;
+    p.visibility = document.getElementById('edit-project-visibility').value;
+    p.deadline = document.getElementById('edit-project-deadline').value || null;
+    p.tags = document.getElementById('edit-project-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+    p.updatedAt = Date.now();
+    logActivity(p.id, `Proyek diperbarui: "${p.name}"`, 'ph-pencil-simple');
+    save();
+    showToast('Proyek diperbarui!');
+    loadProjectDetail(currentProjectId);
+    switchView('view-project-detail');
+}
+
+// ===================== DELETE PROJECT =====================
+function confirmDeleteProject() {
+    const modal = document.getElementById('delete-modal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeDeleteModal() {
+    const modal = document.getElementById('delete-modal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+function executeDeleteProject() {
+    const p = projects.find(pr => pr.id === currentProjectId);
+    if (p) {
+        globalActivities = globalActivities.filter(a => a.projectId !== currentProjectId);
+        projects = projects.filter(pr => pr.id !== currentProjectId);
+        save();
+        showToast(`Proyek "${p.name}" dihapus`, 'warning');
+    }
+    closeDeleteModal();
+    switchView('view-beranda');
+}
+
+function deleteProjectQuick(id) {
+    projects = projects.filter(pr => pr.id !== id);
+    globalActivities = globalActivities.filter(a => a.projectId !== id);
+    save();
+    renderProjects(document.getElementById('search-input').value);
+    renderStats();
+    renderGlobalActivity();
+    renderSidebarProjects();
+    showToast('Proyek dihapus', 'warning');
+}
+
+// ===================== TABS =====================
+function switchTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+    document.getElementById(tabId)?.classList.remove('hidden');
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        const active = btn.id === `btn-${tabId}`;
+        btn.className = `tab-btn flex-1 py-2 px-3 rounded-xl text-sm font-medium transition-all ${active ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-50'}`;
+    });
+}
+
+// ===================== VIEW =====================
+function switchView(viewId) {
+    document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+    document.getElementById(viewId)?.classList.remove('hidden');
+    const backBtn = document.getElementById('btn-back-header');
+    const sidebarBtn = document.getElementById('btn-sidebar-open');
+    const titleEl = document.getElementById('header-title');
+    if (viewId === 'view-beranda') {
+        backBtn.classList.add('hidden');
+        sidebarBtn.classList.remove('hidden');
+        titleEl.innerText = 'Workspace';
+        renderProjects(document.getElementById('search-input').value);
+        renderStats();
+        renderGlobalActivity();
+        renderSidebarProjects();
+    } else {
+        backBtn.classList.remove('hidden');
+        sidebarBtn.classList.add('hidden');
+        backBtn.onclick = () => {
+            if (viewId === 'view-project-detail') switchView('view-beranda');
+            else if (viewId === 'view-project-form') switchView('view-beranda');
+            else if (viewId === 'view-edit-project') { switchView('view-project-detail'); loadProjectDetail(currentProjectId); }
+        };
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ===================== SIDEBAR =====================
+document.getElementById('btn-sidebar-open')?.addEventListener('click', () => {
+    document.getElementById('sidebar').classList.remove('-translate-x-full');
+    const bd = document.getElementById('sidebar-backdrop');
+    bd.classList.remove('hidden');
+    setTimeout(() => { bd.classList.add('opacity-100'); bd.classList.remove('opacity-0'); }, 50);
+});
+function closeSidebar() {
+    document.getElementById('sidebar').classList.add('-translate-x-full');
+    const bd = document.getElementById('sidebar-backdrop');
+    bd.classList.add('opacity-0'); bd.classList.remove('opacity-100');
+    setTimeout(() => bd.classList.add('hidden'), 300);
+}
+document.getElementById('btn-sidebar-close')?.addEventListener('click', closeSidebar);
+document.getElementById('sidebar-backdrop')?.addEventListener('click', closeSidebar);
+
+// ===================== SEARCH & FILTER =====================
+document.getElementById('search-input')?.addEventListener('input', e => renderProjects(e.target.value));
+document.getElementById('filter-status')?.addEventListener('change', () => renderProjects(document.getElementById('search-input').value));
+document.getElementById('sort-by')?.addEventListener('change', () => renderProjects(document.getElementById('search-input').value));
+
+// ===================== 3D LOGO =====================
+if (typeof THREE !== 'undefined') {
+    const lc = document.getElementById('logo-3d-container');
+    if (lc) {
+        const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(45,1,0.1,100);
+        camera.position.z = 3.2;
+        const renderer = new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});
+        renderer.setSize(56,56); renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+        lc.appendChild(renderer.domElement);
+        scene.add(new THREE.AmbientLight(0xffffff,0.85));
+        const pl1=new THREE.PointLight(0x6366f1,1.8,10); pl1.position.set(2,2,2); scene.add(pl1);
+        const pl2=new THREE.PointLight(0xec4899,1.8,10); pl2.position.set(-2,-2,2); scene.add(pl2);
+        const core=new THREE.Mesh(new THREE.OctahedronGeometry(0.72,0),new THREE.MeshStandardMaterial({color:0x6366f1,metalness:0.9,roughness:0.15,flatShading:true}));
+        scene.add(core);
+        const ring=new THREE.Mesh(new THREE.TorusGeometry(0.98,0.07,8,48),new THREE.MeshStandardMaterial({color:0xec4899,metalness:0.8,roughness:0.2}));
+        ring.rotation.y=Math.PI/6; ring.rotation.z=Math.PI/8; scene.add(ring);
+        let lf=0;
+        (function anim(){requestAnimationFrame(anim);ring.rotation.x-=0.035;renderer.render(scene,camera);const n=Date.now();if(n-lf>150){const fl=document.getElementById('dynamic-favicon');if(fl)fl.href=renderer.domElement.toDataURL('image/png');lf=n;}})();
+    }
+}
+
+// ===================== CLOSE DROPDOWN ON OUTSIDE CLICK =====================
+document.addEventListener('click', () => document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.add('hidden')));
+
+// ===================== INIT =====================
+switchView('view-beranda');
+</script>
 </body>
 </html>
