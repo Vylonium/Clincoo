@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Clincoo - AI Agent</title>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
@@ -110,6 +111,43 @@
             100% { background-position: 200% center; }
         }
 
+        .bouncing-dots {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px; /* Dikurangi untuk proporsi ukuran baru */
+            padding: 4px 0;
+        }
+
+        .bouncing-dot {
+            width: 5px; /* Diperkecil dari 8px */
+            height: 5px; /* Diperkecil dari 8px */
+            background-color: #374151;
+            border-radius: 50%;
+            animation: bounceDot 1.4s infinite ease-in-out both;
+        }
+
+        .bouncing-dot:nth-child(1) { animation-delay: 0s; }
+        .bouncing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .bouncing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounceDot {
+            0%, 80%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            40% {
+                transform: translateY(-4px); /* Lompatan disesuaikan agar proporsional */
+                opacity: 1;
+            }
+        }
+
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+
         .hljs {
             background: transparent !important;
             padding: 0 !important;
@@ -141,7 +179,6 @@
             background: #9ca3af;
         }
 
-        /* Markdown Styles */
         .md-content h1 { font-size: 1.5rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #000; }
         .md-content h2 { font-size: 1.25rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.5rem; color: #000; }
         .md-content h3 { font-size: 1.125rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.5rem; color: #000; }
@@ -184,6 +221,12 @@
 
     <div id="sidebar-backdrop" class="fixed inset-0 bg-black/40 z-40 hidden transition-opacity duration-300 opacity-0"></div>
 
+    <div id="session-options-popup" class="hidden fixed bg-white border border-gray-200 rounded-xl shadow-[0_5px_15px_rgba(0,0,0,0.1)] z-[100] w-36 py-1.5 text-[13px] text-gray-700 pointer-events-auto">
+        <button id="btn-edit-session" class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2.5 font-medium transition-none"><i class="ph-bold ph-pencil-simple text-gray-500 text-base"></i> Edit</button>
+        <button id="btn-download-session" class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2.5 font-medium transition-none"><i class="ph-bold ph-download-simple text-gray-500 text-base"></i> Unduh</button>
+        <button id="btn-delete-session" class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2.5 font-medium transition-none"><i class="ph-bold ph-trash text-gray-500 text-base"></i> Hapus</button>
+    </div>
+
     <div id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-white z-50 transform -translate-x-full transition-transform duration-300 flex flex-col border-r border-gray-100 shadow-2xl">
         <div class="px-5 py-3 flex items-center justify-between flex-shrink-0">
             <div class="flex items-center gap-1 -ml-2">
@@ -198,35 +241,40 @@
             </button>
         </div>
 
-        <!-- Nav Menu Sidebar -->
         <nav class="px-3 pt-2 pb-3 border-b border-gray-100 flex-shrink-0">
             <ul class="space-y-0.5">
                 <li>
-                    <button onclick="alert('Proyek - Segera hadir')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
-                        <i class="ph ph-folder text-xl text-gray-500"></i>
-                        <span>Proyek</span>
+                    <button onclick="window.location.href='index.html'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-100 text-black font-semibold text-sm transition-colors">
+                        <i class="ph-fill ph-chat-circle-dots text-xl text-black"></i>
+                        <span>Obrolan AI</span>
                     </button>
                 </li>
                 <li>
-                    <button onclick="alert('Gambar - Segera hadir')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
+                    <button onclick="window.location.href='workspace.html'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
+                        <i class="ph ph-folder text-xl text-gray-500"></i>
+                        <span>Workspace</span>
+                    </button>
+                </li>
+                <li>
+                    <button onclick="window.location.href='gambar.html'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
                         <i class="ph ph-image text-xl text-gray-500"></i>
                         <span>Gambar</span>
                     </button>
                 </li>
                 <li>
-                    <button onclick="alert('Canvas - Segera hadir')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
+                    <button onclick="window.location.href='canvas.html'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
                         <i class="ph ph-layout text-xl text-gray-500"></i>
                         <span>Canvas</span>
                     </button>
                 </li>
                 <li>
-                    <button onclick="alert('Perpustakaan - Segera hadir')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
+                    <button onclick="window.location.href='perpustakaan.html'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
                         <i class="ph ph-books text-xl text-gray-500"></i>
                         <span>Perpustakaan</span>
                     </button>
                 </li>
                 <li>
-                    <button onclick="alert('Aplikasi - Segera hadir')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
+                    <button onclick="window.location.href='aplikasi.html'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
                         <i class="ph ph-squares-four text-xl text-gray-500"></i>
                         <span>Aplikasi</span>
                     </button>
@@ -234,7 +282,6 @@
             </ul>
         </nav>
 
-        <!-- Chat History Section -->
         <div class="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
             <div class="flex items-center justify-between px-4 pt-3 pb-1 flex-shrink-0">
                 <span class="text-[11px] font-semibold text-gray-400 tracking-widest uppercase">Terkini</span>
@@ -245,9 +292,8 @@
             <div id="chat-history-list" class="flex-1 p-2 space-y-0.5 custom-scrollbar"></div>
         </div>
 
-        <!-- Tombol Obrolan Baru - sticky di bawah -->
-        <div class="p-4 border-t border-gray-50 flex-shrink-0">
-            <button id="btn-new-chat" class="w-full flex items-center justify-center gap-2 bg-black text-white py-3 px-5 rounded-full hover:bg-gray-800 transition-all shadow-md font-medium text-sm active:scale-[0.97]">
+        <div class="p-4 border-t border-gray-50 flex-shrink-0 flex justify-end">
+            <button id="btn-new-chat" class="flex items-center justify-center gap-2 bg-black text-white py-3 px-5 rounded-full hover:bg-gray-800 transition-all shadow-md font-medium text-sm active:scale-[0.97]">
                 <i class="ph-bold ph-pencil-simple text-base"></i>
                 Obrolan Baru
             </button>
@@ -258,7 +304,7 @@
     </main>
 
     <footer class="fixed bottom-0 left-0 right-0 w-full bg-transparent px-4 py-4 z-20 pointer-events-none flex flex-col justify-end">
-        <div id="upload-popup" class="hidden absolute bottom-full left-4 mb-3 bg-white/95 backdrop-blur-md border border-gray-200 rounded-xl shadow-lg p-1.5 w-36 transition-all origin-bottom-left z-20 pointer-events-auto">
+        <div id="upload-popup" class="hidden relative bottom-full left-0 mb-1 bg-white/95 backdrop-blur-md border border-gray-200 rounded-xl shadow-lg p-1.5 w-36 transition-all origin-bottom-left z-20 pointer-events-auto">
             <button id="btn-upload-img" class="w-full flex items-center gap-2.5 p-2 hover:bg-gray-50 rounded-lg text-sm text-gray-700 font-medium transition-colors">
                 <i class="ph ph-image text-lg text-gray-500"></i> Gambar
             </button>
@@ -296,7 +342,6 @@
     </footer>
 
     <script>
-        // Polyfill untuk menghindari error E2B Code Interpreter saat diload di Browser
         if (typeof window !== 'undefined') {
             window.process = window.process || { env: {} };
         }
@@ -357,10 +402,18 @@
 
             const now = Date.now();
             if (now - lastFaviconUpdate > 150) {
+                const dataUrl = logoRenderer.domElement.toDataURL('image/png');
+                
                 const faviconLink = document.getElementById('dynamic-favicon');
                 if (faviconLink) {
-                    faviconLink.href = logoRenderer.domElement.toDataURL('image/png');
+                    faviconLink.href = dataUrl;
                 }
+                
+                const welcomeLogo = document.getElementById('welcome-logo-img');
+                if (welcomeLogo) {
+                    welcomeLogo.src = dataUrl;
+                }
+                
                 lastFaviconUpdate = now;
             }
         }
@@ -411,6 +464,15 @@
         let currentSessionId = null;
         let messages = [];
 
+        const welcomeGreetings = [
+            "Ada rencana apa hari ini, Clincoo?",
+            "Halo! Ada yang bisa saya bantu hari ini?",
+            "Siap mewujudkan ide hebatmu hari ini?",
+            "Apa proyek seru kita selanjutnya?",
+            "Mari selesaikan berbagai tugas bersamaku!"
+        ];
+        let currentGreeting = welcomeGreetings[Math.floor(Math.random() * welcomeGreetings.length)];
+
         function saveToLocalStorage() {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(chatSessions));
             renderChatHistory();
@@ -418,9 +480,8 @@
 
         function createNewSession() {
             currentSessionId = generateId();
-            messages = [
-                { id: generateId(), role: 'ai', text: 'Halo! 🌟 Saya Clincoo, **Superagent AI** pribadi Anda. Saya dirancang untuk menjadi asisten yang cerdas, ramah, dan selalu siap membantu Anda—mulai dari memecahkan masalah rumit, menulis kode pemrograman kompleks, mencari data *real-time*, hingga menghasilkan visual. Ada ide atau pertanyaan apa yang bisa kita bahas bersama hari ini?', isProcessing: false, isTyping: false }
-            ];
+            messages = [];
+            currentGreeting = welcomeGreetings[Math.floor(Math.random() * welcomeGreetings.length)];
             chatSessions.unshift({
                 id: currentSessionId,
                 title: 'Percakapan Baru',
@@ -435,17 +496,6 @@
             if (!currentSessionId) return;
             const sessionIndex = chatSessions.findIndex(s => s.id === currentSessionId);
             if (sessionIndex !== -1) {
-                // Auto-generate title dari pesan pertama user
-                if (chatSessions[sessionIndex].title === 'Percakapan Baru') {
-                    const firstUserMsg = messages.find(m => m.role === 'user');
-                    if (firstUserMsg && firstUserMsg.text) {
-                        chatSessions[sessionIndex].title = firstUserMsg.text.substring(0, 25) + (firstUserMsg.text.length > 25 ? '...' : '');
-                    } else if (firstUserMsg && firstUserMsg.attachment) {
-                         chatSessions[sessionIndex].title = 'Analisis Dokumen/Gambar';
-                    }
-                }
-                
-                // Bersihkan flag state sementara sebelum disimpan
                 const cleanMessages = messages.map(m => ({
                     ...m,
                     isProcessing: false,
@@ -455,7 +505,6 @@
                 chatSessions[sessionIndex].messages = cleanMessages;
                 chatSessions[sessionIndex].updatedAt = Date.now();
                 
-                // Urutkan berdasarkan yang paling baru diupdate
                 chatSessions.sort((a, b) => b.updatedAt - a.updatedAt);
                 saveToLocalStorage();
             }
@@ -466,16 +515,15 @@
             const session = chatSessions.find(s => s.id === sessionId);
             if (session) {
                 currentSessionId = session.id;
-                // Deep copy agar tidak mengubah referensi aslinya secara langsung
                 messages = JSON.parse(JSON.stringify(session.messages)); 
                 renderMessages();
                 closeSidebar();
-                renderChatHistory(); // Update visual state aktif
+                renderChatHistory();
             }
         }
 
         window.deleteSession = function(e, sessionId) {
-            e.stopPropagation(); 
+            if (e) e.stopPropagation(); 
             chatSessions = chatSessions.filter(s => s.id !== sessionId);
             if (currentSessionId === sessionId) {
                 if (chatSessions.length > 0) {
@@ -487,6 +535,102 @@
                 saveToLocalStorage();
             }
         }
+        
+        let activeSessionIdForOptions = null;
+        
+        window.openSessionOptions = function(e, sessionId, btnElement) {
+            e.stopPropagation();
+            activeSessionIdForOptions = sessionId;
+            const popup = document.getElementById('session-options-popup');
+            
+            popup.classList.remove('hidden');
+            
+            const rect = btnElement.getBoundingClientRect();
+            const popupHeight = popup.offsetHeight;
+            const windowHeight = window.innerHeight;
+            
+            if (rect.bottom + popupHeight + 10 > windowHeight) {
+                popup.style.top = `${rect.top - popupHeight - 4}px`;
+            } else {
+                popup.style.top = `${rect.bottom + 4}px`;
+            }
+            
+            popup.style.left = `${Math.max(10, rect.left - 110)}px`;
+        };
+
+        window.addEventListener('load', () => {
+            const popup = document.getElementById('session-options-popup');
+            if(!popup) return;
+            
+            document.getElementById('btn-edit-session').addEventListener('click', (e) => {
+                e.stopPropagation();
+                popup.classList.add('hidden');
+                if(activeSessionIdForOptions) {
+                    const titleSpan = document.getElementById(`session-title-${activeSessionIdForOptions}`);
+                    if(titleSpan) {
+                        const currentTitle = titleSpan.innerText;
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.value = currentTitle;
+                        input.className = 'text-[13px] font-semibold text-black bg-white border border-gray-300 rounded px-1.5 py-0.5 w-full outline-none focus:border-gray-500 flex-1 min-w-0';
+                        
+                        input.onblur = () => {
+                            const newTitle = input.value.trim() || 'Percakapan Baru';
+                            const session = chatSessions.find(s => s.id === activeSessionIdForOptions);
+                            if(session) {
+                                session.title = newTitle;
+                                saveToLocalStorage();
+                            }
+                        };
+                        input.onkeydown = (ev) => {
+                            if(ev.key === 'Enter') {
+                                ev.preventDefault();
+                                input.blur();
+                            }
+                        };
+                        
+                        titleSpan.replaceWith(input);
+                        input.focus();
+                        input.select();
+                    }
+                }
+            });
+
+            document.getElementById('btn-download-session').addEventListener('click', (e) => {
+                e.stopPropagation();
+                popup.classList.add('hidden');
+                if(activeSessionIdForOptions) {
+                    const session = chatSessions.find(s => s.id === activeSessionIdForOptions);
+                    if(session) {
+                        let content = `# ${session.title}\n\n`;
+                        session.messages.forEach(msg => {
+                            const role = msg.role === 'user' ? 'Anda' : 'Clincoo';
+                            const text = msg.isImageResponse ? `[Gambar: ${msg.imageUrl}]` : msg.text;
+                            content += `### ${role}\n${text}\n\n`;
+                        });
+                        
+                        const blob = new Blob([content], { type: 'text/markdown' });
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `Clincoo_${session.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'chat'}.md`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(url);
+                    }
+                }
+            });
+
+            document.getElementById('btn-delete-session').addEventListener('click', (e) => {
+                e.stopPropagation();
+                popup.classList.add('hidden');
+                if(activeSessionIdForOptions) {
+                    window.deleteSession(null, activeSessionIdForOptions);
+                    activeSessionIdForOptions = null;
+                }
+            });
+        });
 
         function renderChatHistory() {
             const container = document.getElementById('chat-history-list');
@@ -501,23 +645,29 @@
             chatSessions.forEach(session => {
                 const isActive = session.id === currentSessionId;
                 const div = document.createElement('div');
-                div.className = `group flex items-center justify-between p-2.5 mb-1 rounded-xl cursor-pointer transition-colors ${isActive ? 'bg-gray-100' : 'hover:bg-gray-50'}`;
-                div.onclick = () => window.loadSession(session.id);
+                div.className = `group flex items-center justify-between p-2 mb-1 rounded-xl cursor-pointer ${isActive ? 'bg-gray-100' : 'hover:bg-gray-50'}`;
+                
+                div.onclick = (e) => {
+                    if(!e.target.closest('.session-actions')) {
+                         window.loadSession(session.id);
+                    }
+                };
                 
                 div.innerHTML = `
-                    <div class="flex items-center gap-2.5 overflow-hidden flex-1 pl-1">
+                    <div class="flex items-center gap-2.5 overflow-hidden flex-1 pl-1.5">
                         <i class="ph ph-chat-teardrop-text ${isActive ? 'text-black' : 'text-gray-500'} text-lg flex-shrink-0"></i>
-                        <span class="text-[13px] ${isActive ? 'font-semibold text-black' : 'font-medium text-gray-700'} truncate">${session.title || 'Percakapan Baru'}</span>
+                        <span id="session-title-${session.id}" class="text-[13px] ${isActive ? 'font-semibold text-black' : 'font-medium text-gray-700'} truncate flex-1 min-w-0">${session.title || 'Percakapan Baru'}</span>
                     </div>
-                    <button onclick="deleteSession(event, '${session.id}')" class="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-red-500 transition-all rounded-lg hover:bg-red-50 flex-shrink-0" title="Hapus">
-                        <i class="ph ph-trash"></i>
-                    </button>
+                    <div class="session-actions opacity-0 group-hover:opacity-100 flex-shrink-0 relative ml-1">
+                        <button onclick="openSessionOptions(event, '${session.id}', this)" class="p-1.5 text-gray-400 hover:text-black rounded-lg transition-none" title="Opsi">
+                            <i class="ph-bold ph-dots-three-vertical text-base"></i>
+                        </button>
+                    </div>
                 `;
                 container.appendChild(div);
             });
         }
 
-        // Initialize Data saat load pertama kali
         if (chatSessions.length > 0) {
             window.loadSession(chatSessions[0].id);
         } else {
@@ -560,16 +710,7 @@
             let result = text;
             const codeBlocks = (result.match(/```/g) || []).length;
             if (codeBlocks % 2 !== 0) result += '\n```';
-            let bCount = (result.match(/\*\*/g) || []).length;
-            if (bCount % 2 !== 0) result += '**';
-            let temp = result.replace(/\*\*/g, '');
-            let iCount = (temp.match(/\*/g) || []).length;
-            if (iCount % 2 !== 0) result += '*';
-            let uCount = (result.match(/__/g) || []).length;
-            if (uCount % 2 !== 0) result += '__';
-            let temp2 = result.replace(/__/g, '');
-            let uSingleCount = (temp2.match(/_/g) || []).length;
-            if (uSingleCount % 2 !== 0) result += '_';
+
             let temp4 = result.replace(/```[\s\S]*?```/g, '');
             let backtickCount = (temp4.match(/`/g) || []).length;
             if (backtickCount % 2 !== 0) result += '`';
@@ -630,11 +771,11 @@
                         
                         let runButton = '';
                         if (isRunnable && finalLang.toLowerCase() !== 'html') {
-                             runButton = `<button onclick="runCode(this, '${finalLang.toLowerCase()}', '${blockId}')" data-code="${encodedRaw}" class="relative text-emerald-400 hover:text-emerald-300 transition flex items-center justify-center rounded-lg p-1.5 hover:bg-gray-600 pointer-events-auto" title="Jalankan Kode">
+                             runButton = `<button onclick="runCode(this, '${finalLang.toLowerCase()}', '${blockId}')" data-code="${encodedRaw}" data-view="code" class="relative text-gray-400 hover:text-white transition flex items-center justify-center rounded-lg p-1.5 hover:bg-gray-600 pointer-events-auto" title="Jalankan Kode">
                                 <i class="ph-bold ph-play text-[18px]"></i>
                             </button>`;
                         } else if (finalLang.toLowerCase() === 'html') {
-                            runButton = `<button onclick="previewHTML(this, '${blockId}')" data-code="${encodedRaw}" class="relative text-purple-400 hover:text-purple-300 transition flex items-center justify-center rounded-lg p-1.5 hover:bg-gray-600 pointer-events-auto" title="Preview UI / Animasi">
+                            runButton = `<button onclick="previewHTML(this, '${blockId}')" data-code="${encodedRaw}" data-view="code" class="relative text-gray-400 hover:text-white transition flex items-center justify-center rounded-lg p-1.5 hover:bg-gray-600 pointer-events-auto" title="Preview UI / Animasi">
                                 <i class="ph-bold ph-eye text-[18px]"></i>
                             </button>`;
                         }
@@ -653,16 +794,15 @@
                                         </button>
                                     </div>
                                 </div>
-                                <div class="p-4 overflow-x-auto bg-[#1e1e1e] code-container custom-scrollbar w-full pointer-events-auto" style="-webkit-overflow-scrolling: touch;">
+                                <div id="${blockId}-code-container" class="p-4 overflow-x-auto bg-[#1e1e1e] code-container custom-scrollbar w-full pointer-events-auto" style="-webkit-overflow-scrolling: touch;">
                                     <pre style="margin:0; width: 100%;"><code class="hljs text-[13.5px] font-mono leading-relaxed bg-transparent p-0 text-gray-300" style="white-space: pre; min-width: 100%; display: inline-block; padding-bottom: 0.25rem;">${highlightedCode}</code></pre>
                                 </div>
-                                <div id="${blockId}-output-container" class="hidden border-t border-gray-700 bg-black p-4 transition-all">
+                                <div id="${blockId}-output-container" class="hidden bg-[#121212] p-4 transition-all w-full pointer-events-auto">
                                     <div class="text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wider flex items-center gap-2">
-                                        <i class="ph ph-terminal-window text-[14px]"></i> Output
-                                        <button onclick="document.getElementById('${blockId}-output-container').classList.add('hidden')" class="ml-auto text-gray-500 hover:text-white transition p-1"><i class="ph ph-x"></i></button>
+                                        <i class="ph ph-terminal-window text-[14px]"></i> Output Eksekusi
                                     </div>
-                                    <pre id="${blockId}-output" class="text-[13px] font-mono whitespace-pre-wrap break-words max-h-60 overflow-y-auto"></pre>
-                                    <iframe id="${blockId}-iframe" class="hidden w-full h-64 bg-white rounded-md mt-2 border-0"></iframe>
+                                    <pre id="${blockId}-output" class="text-[13px] font-mono whitespace-pre-wrap break-words max-h-80 overflow-y-auto text-gray-200"></pre>
+                                    <iframe id="${blockId}-iframe" class="hidden w-full h-80 bg-white rounded-md border-0"></iframe>
                                 </div>
                             </div>
                         `;
@@ -735,39 +875,86 @@
             document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
         }
-        
+
+        function toggleCodeOutputView(btnElement, blockId, showOutput, isHtml = false) {
+            const codeContainer = document.getElementById(`${blockId}-code-container`);
+            const outputContainer = document.getElementById(`${blockId}-output-container`);
+            
+            if (showOutput) {
+                if (codeContainer) codeContainer.classList.add('hidden');
+                if (outputContainer) outputContainer.classList.remove('hidden');
+                btnElement.innerHTML = '<i class="ph-bold ph-code text-[18px]"></i>';
+                btnElement.setAttribute('title', 'Lihat Kode');
+                btnElement.dataset.view = 'output';
+            } else {
+                if (outputContainer) outputContainer.classList.add('hidden');
+                if (codeContainer) codeContainer.classList.remove('hidden');
+                if (isHtml) {
+                    btnElement.innerHTML = '<i class="ph-bold ph-eye text-[18px]"></i>';
+                    btnElement.setAttribute('title', 'Preview UI / Animasi');
+                } else {
+                    btnElement.innerHTML = '<i class="ph-bold ph-play text-[18px]"></i>';
+                    btnElement.setAttribute('title', 'Jalankan Kode');
+                }
+                btnElement.dataset.view = 'code';
+            }
+        }
+
         function previewHTML(btnElement, blockId) {
+            const currentView = btnElement.dataset.view || 'code';
+            
+            if (currentView === 'output') {
+                toggleCodeOutputView(btnElement, blockId, false, true);
+                return;
+            }
+
+            toggleCodeOutputView(btnElement, blockId, true, true);
+
             const encodedCode = btnElement.getAttribute('data-code');
             const code = decodeURIComponent(encodedCode);
-            const outputContainer = document.getElementById(`${blockId}-output-container`);
             const outputEl = document.getElementById(`${blockId}-output`);
             const iframeEl = document.getElementById(`${blockId}-iframe`);
             
-            outputContainer.classList.remove('hidden');
-            outputEl.classList.add('hidden');
-            iframeEl.classList.remove('hidden');
-            iframeEl.srcdoc = code;
+            if (outputEl) outputEl.classList.add('hidden');
+            if (iframeEl) {
+                iframeEl.classList.remove('hidden');
+                iframeEl.srcdoc = code;
+            }
         }
 
         async function runCode(btnElement, lang, blockId) {
+            const currentView = btnElement.dataset.view || 'code';
+            
+            if (currentView === 'output') {
+                toggleCodeOutputView(btnElement, blockId, false, false);
+                return;
+            }
+
+            toggleCodeOutputView(btnElement, blockId, true, false);
+
             const encodedCode = btnElement.getAttribute('data-code');
             const code = decodeURIComponent(encodedCode);
-            const outputContainer = document.getElementById(`${blockId}-output-container`);
             const outputEl = document.getElementById(`${blockId}-output`);
             const iframeEl = document.getElementById(`${blockId}-iframe`);
             
-            outputContainer.classList.remove('hidden');
-            outputEl.classList.remove('hidden');
-            if(iframeEl) iframeEl.classList.add('hidden');
+            if (outputEl) outputEl.classList.remove('hidden');
+            if (iframeEl) iframeEl.classList.add('hidden');
 
-            outputEl.innerHTML = '<span class="text-blue-400 animate-pulse">Memulai koneksi ke E2B Sandbox...</span>';
+            outputEl.innerHTML = '<span class="text-blue-400 animate-pulse">Memuat eksekusi...</span>';
             const targetLang = lang.toLowerCase();
 
             try {
-                const e2bModule = await import('https://esm.sh/@e2b/code-interpreter?bundle&target=es2022');
-                const CodeInterpreter = e2bModule.CodeInterpreter;
-                
                 outputEl.innerHTML = '<span class="text-blue-400 animate-pulse">Menyiapkan E2B Sandbox (e2b.dev)...</span>';
+                let CodeInterpreter;
+                try {
+                    const e2bModule = await import('https://esm.sh/@e2b/code-interpreter?bundle&target=es2022');
+                    CodeInterpreter = e2bModule.CodeInterpreter || e2bModule.default?.CodeInterpreter;
+                } catch (importErr) {
+                    throw new Error("Gagal memuat modul E2B, beralih ke fallback.");
+                }
+
+                if (!CodeInterpreter) throw new Error("E2B CodeInterpreter tidak tersedia.");
+                
                 const sandbox = await CodeInterpreter.create({ apiKey: 'e2b_bb64dc37750c51b1eb73fce3cf4317907aae0411' });
                 
                 outputEl.innerHTML = '<span class="text-blue-400 animate-pulse">Mengeksekusi kode dalam Sandbox...</span>';
@@ -823,7 +1010,7 @@
 
             } catch (e2bError) {
                 console.warn("E2B execution failed, falling back to Piston Sandbox.", e2bError);
-                outputEl.innerHTML = '<span class="text-yellow-400 animate-pulse">E2B Gagal/Timeout. Melanjutkan ke Piston Sandbox (Fallback)...</span>';
+                outputEl.innerHTML = '<span class="text-yellow-400 animate-pulse">E2B Sandbox error/timeout. Melanjutkan eksekusi ke Piston Sandbox (Fallback)...</span>';
                 
                 const langMapPiston = {
                     'python': { language: 'python', version: '*' },
@@ -1079,6 +1266,22 @@
         function renderMessages() {
             chatContainer.innerHTML = '';
             const visibleMessages = messages.filter(m => !m.isHidden);
+            
+            if (visibleMessages.length === 0) {
+                let currentLogoSrc = '';
+                try {
+                    currentLogoSrc = logoRenderer.domElement.toDataURL('image/png');
+                } catch(e) {}
+
+                chatContainer.innerHTML = `
+                    <div class="flex flex-col items-center justify-center w-full h-full min-h-[50vh] gap-4 fade-in pointer-events-auto">
+                        <img id="welcome-logo-img" src="${currentLogoSrc}" class="w-20 h-20 md:w-24 md:h-24 object-contain drop-shadow-xl mb-1" alt="Logo Clincoo">
+                        <h2 class="text-3xl md:text-[34px] text-center text-gray-800 tracking-tight px-4" style="font-weight: 400;">${currentGreeting}</h2>
+                    </div>
+                `;
+                return;
+            }
+
             const lastAiIndex = [...visibleMessages].reverse().findIndex(m => m.role === 'ai');
             const actualLastAiIndex = lastAiIndex !== -1 ? (visibleMessages.length - 1) - lastAiIndex : -1;
             const lastUserIndex = [...visibleMessages].reverse().findIndex(m => m.role === 'user');
@@ -1095,7 +1298,7 @@
                     let processIndicator = '';
                     if (msg.isProcessing) {
                         if (msg.processType === 'search') {
-                            processIndicator = `<div class="shimmer-search"><i class="ph ph-globe text-lg"></i><span id="status-text-${msg.id}" class="transition-opacity duration-200">Searching Web...</span></div>`;
+                            processIndicator = `<div class="shimmer-search"><i class="ph ph-globe text-lg"></i><span id="status-text-${msg.id}" class="transition-opacity duration-200">Searching...</span></div>`;
                         } else if (msg.processType === 'read') {
                             processIndicator = `<div class="shimmer-search"><i class="ph ph-link text-lg"></i><span id="status-text-${msg.id}" class="transition-opacity duration-200">Reading URL...</span></div>`;
                         } else if (msg.processType === 'file') {
@@ -1103,7 +1306,11 @@
                         } else if (msg.processType === 'image') {
                             processIndicator = `<div class="shimmer-search"><i class="ph ph-paint-brush text-lg"></i><span id="status-text-${msg.id}" class="transition-opacity duration-200">Membuat...</span></div>`;
                         } else {
-                            processIndicator = `<div class="shimmer-search"><i class="ph ph-brain text-lg"></i><span id="status-text-${msg.id}" class="transition-opacity duration-200">Thinking...</span></div>`;
+                            processIndicator = `<div class="bouncing-dots" id="status-text-${msg.id}">
+                                <div class="bouncing-dot"></div>
+                                <div class="bouncing-dot"></div>
+                                <div class="bouncing-dot"></div>
+                            </div>`;
                         }
                     }
 
@@ -1113,6 +1320,27 @@
                                 <div class="text-black text-[15px] leading-relaxed break-words w-full md-content pointer-events-auto" style="word-break: break-word; overflow-wrap: break-word;" id="msg-text-${msg.id}">
                                     ${msg.isProcessing ? processIndicator : (msg.isImageResponse ? msg.text : formatMarkdown(balanceMarkdown(msg.text)))}
                                 </div>
+                                ${(msg.sources && msg.sources.length > 0) ? `
+                                    <div class="mt-2 mb-1 pointer-events-auto w-full fade-in">
+                                        <details class="group border border-gray-200 rounded-xl overflow-hidden w-full max-w-sm bg-white shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+                                            <summary class="flex items-center justify-between px-3 py-2.5 cursor-pointer select-none text-[13px] font-semibold text-gray-700 hover:bg-gray-50 transition-colors bg-gray-50/50">
+                                                <div class="flex items-center gap-2.5">
+                                                    <i class="ph ph-globe text-gray-500 text-lg"></i>
+                                                    <span>${msg.sources.length} Sumber</span>
+                                                </div>
+                                                <i class="ph ph-caret-down text-gray-400 group-open:rotate-180 transition-transform"></i>
+                                            </summary>
+                                            <div class="px-3 py-3 border-t border-gray-100 bg-white flex flex-wrap gap-2.5">
+                                                ${msg.sources.map(s => `
+                                                    <a href="${s.url}" target="_blank" class="flex items-center gap-2 py-1.5 px-2.5 hover:bg-gray-100 border border-gray-200 rounded-lg transition-colors text-decoration-none shadow-sm">
+                                                        <img src="${s.favicon}" class="w-4 h-4 rounded-sm" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCI+PC9jaXJjbGU+PGxpbmUgeDE9IjIiIHkxPSIxMiIgeDI9IjIyIiB5Mj0iMTIiPjwvbGluZT48cGF0aCBkPSJNMTIgMmExNS4zIDE1LjMgMCAwIDEgNCAxMGMtLjExIDUuNTQtMS45NCAxMC00IDEwLTIuMDYtLjA2LTQuODktNC40Ni01LTEwQzcuMSAxMS4zNiA4LjA2IDYuNTQgMTIgMnoiPjwvcGF0aD48L3N2Zz4='">
+                                                        <span class="text-[12px] text-gray-700 truncate max-w-[130px] font-medium">${s.domain}</span>
+                                                    </a>
+                                                `).join('')}
+                                            </div>
+                                        </details>
+                                    </div>
+                                ` : ''}
                                 <div class="flex items-center gap-3 mt-1 pointer-events-auto" id="action-bar-${msg.id}" style="${(msg.isProcessing || msg.isTyping) ? 'display: none;' : ''}">
                                     ${msg.isImageResponse ? 
                                     `<button onclick="downloadImage('${msg.imageUrl}', 'clincoo-image.jpg')" class="relative text-gray-400 hover:text-black transition p-1" title="Unduh Gambar">
@@ -1220,6 +1448,11 @@
                 uploadPopup.classList.add('hidden');
                 btnPlus.classList.remove('rotate-45');
             }
+            
+            const sessionPopup = document.getElementById('session-options-popup');
+            if (sessionPopup && !sessionPopup.classList.contains('hidden') && !e.target.closest('#session-options-popup') && !e.target.closest('.session-actions')) {
+                sessionPopup.classList.add('hidden');
+            }
         });
 
         function copyText(id, btnElement) {
@@ -1278,7 +1511,7 @@
             messages.push({ id: generateId(), role: 'user', text: feedbackText, isHidden: true });
             autoScrollActive = true; 
             renderMessages();
-            updateCurrentSession(); // Simpan riwayat
+            updateCurrentSession();
             scrollToBottom(true);
             fetchAIResponse();
         }
@@ -1292,7 +1525,7 @@
                 chatInput.focus();
                 messages.splice(msgIndex, 1);
                 renderMessages();
-                updateCurrentSession(); // Simpan riwayat
+                updateCurrentSession();
             }
         }
 
@@ -1335,14 +1568,92 @@
                 currentAiMessageId = null;
             }
             renderMessages();
-            updateCurrentSession(); // Simpan status terakhir saat AI berhenti
+            updateCurrentSession();
+
+            // Memicu AI untuk membuat judul khusus jika ini adalah percakapan baru
+            const session = chatSessions.find(s => s.id === currentSessionId);
+            if (session && session.title === 'Percakapan Baru' && !session._isGeneratingTitle) {
+                session._isGeneratingTitle = true;
+                generateChatTitle(currentSessionId, [...messages]);
+            }
+        }
+
+        async function generateChatTitle(sessionId, currentMessages) {
+            const sessionIndex = chatSessions.findIndex(s => s.id === sessionId);
+            if (sessionIndex === -1) return;
+            
+            chatSessions[sessionIndex].title = 'Membuat judul...';
+            saveToLocalStorage(); // Update UI list sidebar dengan teks loading
+
+            try {
+                const apiMessages = [
+                    { role: 'system', content: 'Kamu adalah AI pembuat judul percakapan. Buatlah SATU judul yang sangat singkat (maksimal 3-5 kata) untuk merangkum percakapan berikut. Jawab HANYA dengan judulnya, tanpa tanda kutip, tanpa penjelasan, dan tanpa titik di akhir.' }
+                ];
+
+                // Ambil hingga 4 pesan pertama untuk dijadikan konteks judul
+                const msgsToAnalyze = currentMessages.slice(0, 4); 
+                msgsToAnalyze.forEach(m => {
+                    if(m.text) {
+                        apiMessages.push({ role: m.role === 'ai' ? 'assistant' : 'user', content: m.text.substring(0, 300) });
+                    }
+                });
+
+                const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer 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`,
+                        "HTTP-Referer": window.location.href,
+                        "X-Title": "Clincoo AI",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        model: "meta-llama/llama-3.3-70b-instruct",
+                        messages: apiMessages,
+                        stream: false
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.choices && data.choices.length > 0) {
+                        let newTitle = data.choices[0].message.content.trim();
+                        newTitle = newTitle.replace(/^["'\\]+|["'\\]+$/g, ''); // Hapus tanda kutip jika ada
+                        
+                        const currentIdx = chatSessions.findIndex(s => s.id === sessionId);
+                        if (currentIdx !== -1) {
+                            chatSessions[currentIdx].title = newTitle;
+                            saveToLocalStorage();
+                        }
+                    }
+                } else {
+                    fallbackTitle(sessionId, currentMessages);
+                }
+            } catch (e) {
+                fallbackTitle(sessionId, currentMessages);
+            }
+        }
+
+        // Fungsi cadangan jika API judul gagal dipanggil
+        function fallbackTitle(sessionId, currentMessages) {
+            const sessionIndex = chatSessions.findIndex(s => s.id === sessionId);
+            if (sessionIndex !== -1) {
+                const firstUserMsg = currentMessages.find(m => m.role === 'user');
+                if (firstUserMsg && firstUserMsg.text) {
+                    chatSessions[sessionIndex].title = firstUserMsg.text.substring(0, 25) + (firstUserMsg.text.length > 25 ? '...' : '');
+                } else if (firstUserMsg && firstUserMsg.attachment) {
+                    chatSessions[sessionIndex].title = 'Analisis Dokumen/Gambar';
+                } else {
+                    chatSessions[sessionIndex].title = 'Percakapan Baru';
+                }
+                saveToLocalStorage();
+            }
         }
 
         window.retryGeneration = function(msgId) {
             const index = messages.findIndex(m => m.id === msgId || m.id.toString() === msgId);
             if (index !== -1) messages.splice(index, 1);
             renderMessages();
-            updateCurrentSession(); // Simpan riwayat
+            updateCurrentSession();
             fetchAIResponse();
         };
 
@@ -1356,6 +1667,12 @@
             const t = text.toLowerCase();
             const keywords = ['buatkan gambar', 'bikin gambar', 'buat gambar', 'generate image', 'tolong gambar', 'lukiskan'];
             return keywords.some(k => t.includes(k));
+        }
+
+        function checkIsTimeQuery(text) {
+            const t = text.toLowerCase();
+            const timeKeywords = ['jam berapa', 'waktu sekarang', 'pukul berapa', 'tanggal berapa', 'hari apa', 'bulan apa', 'tahun berapa', 'sekarang jam'];
+            return timeKeywords.some(k => t.includes(k));
         }
 
         async function fetchAIResponse() {
@@ -1377,7 +1694,8 @@
                 }
             }
             
-            const requiresSearch = !hasUrl && checkRequiresSearch(lastUserMsg);
+            const isTimeQuery = !hasUrl && checkIsTimeQuery(lastUserMsg);
+            const requiresSearch = !hasUrl && !isTimeQuery && checkRequiresSearch(lastUserMsg);
             const requiresImage = !hasUrl && !hasAttachment && checkRequiresImageGeneration(lastUserMsg);
 
             let processType = 'think';
@@ -1401,10 +1719,10 @@
             abortController = new AbortController();
 
             const thinkingSteps = ["Thinking..."];
-            const searchSteps = ["Searching Web...", "Extracting Data...", "Menganalisis..."];
-            const readSteps = ["Reading URL...", "Menganalisis Konten..."];
-            const fileSteps = ["Memproses...", "Menganalisis..."];
-            const imageSteps = ["Memproses...", "Menganalisis..."];
+            const searchSteps = ["Searching..."];
+            const readSteps = ["Menganalisis..."];
+            const fileSteps = ["Menganalisis..."];
+            const imageSteps = ["Menganalisis..."];
 
             let currentSteps = thinkingSteps;
             if (processType === 'search') currentSteps = searchSteps;
@@ -1437,7 +1755,6 @@
 
             const apiTimeout = setTimeout(() => {
                 if (!hasReceivedData) {
-                    // Auto retry sekali sebelum tampilkan error
                     if (!aiMsgObj._retried) {
                         aiMsgObj._retried = true;
                         console.warn("Timeout, mencoba ulang otomatis...");
@@ -1504,6 +1821,19 @@
                         if (res.ok) {
                             const markdown = await res.text();
                             externalContext = `[DATA REAL-TIME DARI WEB]:\nSumber URL: ${targetUrl}\nIsi Konten URL:\n\n${markdown.substring(0, 15000)}\n\n[PENTING]: Gunakan informasi di atas untuk merespons karena ini adalah data dari situs terbaru yang diminta pengguna.`;
+                            
+                            const msgIndex = messages.findIndex(m => m.id === aiMsgObj.id);
+                            if (msgIndex !== -1) {
+                                try {
+                                    const u = new URL(targetUrl);
+                                    const domain = u.hostname.replace(/^www\./, '');
+                                    messages[msgIndex].sources = [{
+                                        url: targetUrl,
+                                        domain: domain,
+                                        favicon: `https://www.google.com/s2/favicons?domain=${domain}&sz=32`
+                                    }];
+                                } catch(e) {}
+                            }
                         }
                     } catch (e) {
                         console.warn("Jina Reader Error:", e);
@@ -1521,11 +1851,40 @@
                         });
                         
                         if (res.ok) {
-                            const jinaData = await res.json();
-                            if (jinaData.data && jinaData.data.length > 0) {
-                                externalContext = "[HASIL PENCARIAN WEB REAL-TIME TERBARU]:\n\n" + 
-                                    jinaData.data.map((r, i) => `### ${i+1}. [${r.title}](${r.url})\n${r.content}`).join('\n\n').substring(0, 15000) + 
-                                    "\n\n[INSTRUKSI WAJIB]: Kamu WAJIB menyusun jawaban berdasarkan hasil pencarian real-time di atas. Jangan menebak jawaban jika data sudah tersedia.";
+                            const json = await res.json();
+                            if (json.data && json.data.length > 0) {
+                                let markdownContent = '';
+                                const sources = [];
+                                const seenDomains = new Set();
+
+                                json.data.forEach(item => {
+                                    if(item.title && item.content) {
+                                        markdownContent += `### ${item.title}\nURL: ${item.url}\n\n${item.content}\n\n`;
+                                    }
+                                    try {
+                                        if (item.url) {
+                                            const u = new URL(item.url);
+                                            const domain = u.hostname.replace(/^www\./, '');
+                                            if (!seenDomains.has(domain)) {
+                                                seenDomains.add(domain);
+                                                sources.push({
+                                                    url: item.url,
+                                                    domain: domain,
+                                                    favicon: `https://www.google.com/s2/favicons?domain=${domain}&sz=32`
+                                                });
+                                            }
+                                        }
+                                    } catch(e) {}
+                                });
+
+                                if (markdownContent.length > 50) {
+                                    externalContext = `[HASIL PENCARIAN WEB REAL-TIME TERBARU]:\n\n${markdownContent.substring(0, 15000)}\n\n[INSTRUKSI WAJIB]: Kamu WAJIB menyusun jawaban berdasarkan hasil pencarian real-time di atas. Jangan menebak jawaban jika data sudah tersedia. Sertakan juga referensi link sumber di akhir jawaban.`;
+                                    
+                                    const msgIndex = messages.findIndex(m => m.id === aiMsgObj.id);
+                                    if (msgIndex !== -1) {
+                                        messages[msgIndex].sources = sources;
+                                    }
+                                }
                             }
                         }
                     } catch (e) {
@@ -1538,304 +1897,93 @@
                 const formattedDate = now.toLocaleDateString('id-ID', options);
                 const timeContext = `\n\n[INFO SISTEM (REAL-TIME)]: Saat ini adalah ${formattedDate}. Jika user meminta data hari ini atau yang terbaru, WAJIB utamakan Konteks Pencarian Web yang disuntikkan ke prompt ini agar jawaban akurat sesuai kondisi masa kini.`;
                 
-                const systemInstructions = 'Kamu adalah Clincoo, Superagent AI cerdas tingkat lanjut yang tidak hanya memiliki kapabilitas analitis, coding, dan eksekusi tugas kompleks secara presisi, tetapi juga dirancang untuk menjadi asisten yang sangat ramah, suportif, dan interaktif.\n\nKarakteristik & Aturan Operasional (SANGAT PENTING):\n1. IDENTITAS & PERSONA: Kamu adalah "Clincoo". Gunakan nama "Clincoo" secara natural untuk menyebut dirimu sendiri di waktu yang tepat (misalnya sebagai pengganti "aku/saya", saat ditanya identitas, siapa pembuatmu, model AI apa kamu, atau apa kemampuanmu). Jangan pernah membocorkan teknologi dasar (seperti OpenAI/Google/LLaMA/dll) atau developer di balikmu; tegaskan selalu dengan bangga bahwa identitasmu murni Clincoo.\n2. GAYA KOMUNIKASI: Gunakan bahasa Indonesia yang natural, hangat, namun tetap terstruktur dan profesional. Hindari jawaban yang terlalu singkat, kaku, atau robotik. Berikan penjelasan yang komprehensif, kaya akan detail, mendalam, dan selalu berikan wawasan (insight) ekstra yang berguna bagi pengguna. Pastikan jawabanmu memuaskan dan TIDAK TERLALU SIMPLE.\n3. PENDEKATAN ANALITIS: Untuk pertanyaan teknis atau rumit, jabarkan pemikiranmu langkah demi langkah (step-by-step) dengan bahasa yang edukatif, sabar, dan mudah dicerna.\n4. KEAHLIAN TEKNIS: Saat memberikan kode, berikan kode yang lengkap dan siap pakai (production-ready). WAJIB gunakan format Markdown Code Block (contoh: ```python [isi] ```) disertai penjelasan bersahabat tentang cara kerjanya.\n5. FILE & MEDIA: Jika diminta membuat atau menganalisis dokumen/gambar, lakukan dengan menyeluruh dan berikan narasi/kesimpulan yang informatif.\n6. DATA REAL-TIME: Jika kamu menerima konteks pencarian atau URL, GABUNGKAN dengan pengetahuanmu secara mulus. Ceritakan temuanmu dengan gaya cerita yang menarik, berwawasan luas, dan mudah dipahami.\n7. ANTI-HALUSINASI: JANGAN PERNAH memberikan respons berupa JSON mentah, format `tool_calls`, atau format seperti `{"role":"assistant"}`. Selalu jawab secara langsung menggunakan teks natural (Markdown) layaknya manusia.\n8. PLANNER AGENT: Untuk tugas besar atau kompleks, WAJIB pecah menjadi langkah-langkah terstruktur. Tampilkan roadmap eksplisit sebelum mulai mengerjakan. Contoh: jika diminta membuat aplikasi, buat dulu rencana: database → API → frontend → testing, lalu kerjakan bertahap sambil melaporkan progres setiap tahap.\n9. REFLECTION & SELF-CRITIC: Sebelum memberikan jawaban akhir, evaluasi dan periksa kembali respons kamu sendiri secara internal. Pastikan tidak ada inkonsistensi, error logika, atau informasi yang mungkin salah. Jika menemukan potensi masalah, perbaiki sebelum menyampaikan ke pengguna.\n10. RETRY & RECOVERY: Jika suatu pendekatan atau solusi tidak berhasil, JANGAN menyerah. Coba pendekatan alternatif secara otomatis. Jelaskan kenapa pendekatan pertama gagal dan apa yang berbeda dari solusi berikutnya.\n11. MULTI-STEP REASONING: Untuk masalah yang membutuhkan penalaran panjang, susun rencana eksplisit, simpan konteks antar langkah, dan pastikan setiap langkah membangun di atas hasil langkah sebelumnya. Gunakan format: [Langkah 1/N] → [Langkah 2/N] → ... untuk visibilitas progres.' + timeContext + (externalContext ? `\n\n${externalContext}` : '');
+                const systemInstructions = 'Kamu adalah Clincoo, Superagent AI yang sangat cerdas, ramah, dan membantu. Jawablah menggunakan bahasa Indonesia yang natural dan mudah dipahami, kecuali diminta lain. Gunakan format Markdown untuk menyusun jawaban agar lebih rapi dan terstruktur. Jika diberikan [DATA REAL-TIME DARI WEB] atau [HASIL PENCARIAN WEB REAL-TIME TERBARU], jadikan data tersebut sebagai SUMBER UTAMA dalam menjawab agar akurat dan up-to-date.';
                 
-                const systemPrompt = {
-                    role: 'system',
-                    content: systemInstructions
-                };
+                try {
+                    // Menyusun riwayat pesan untuk API
+                    const apiMessages = [
+                        { role: 'system', content: systemInstructions + timeContext + (externalContext ? `\n\n${externalContext}` : '') }
+                    ];
 
-                const apiHistory = [systemPrompt];
-                const validMessages = messages.filter(m => (m.text || m.attachment) && m.id !== aiMsgObj.id && !m.isError);
-                const recentMessages = validMessages.slice(-15);
-                
-                recentMessages.forEach(m => {
-                    if (m.role === 'ai') {
-                        if (!m.isImageResponse) {
-                            apiHistory.push({ role: 'assistant', content: m.text });
-                        }
-                    } else {
-                        let contentText = m.text || "";
-                        if (m.attachment && m.attachment.type === 'document') {
-                            const docText = m.attachment.text ? m.attachment.text.substring(0, 15000) : "Teks dokumen tidak dapat dibaca.";
-                            contentText = `[Konteks Dokumen: ${m.attachment.name}]\n${docText}\n\n[Pesan User]: ${contentText || "Tolong analisis dokumen ini."}`;
-                        }
-                        if (m.attachment && m.attachment.type === 'image') {
-                            apiHistory.push({
-                                role: 'user',
-                                content: [
-                                    { type: 'text', text: contentText || "Tolong jelaskan gambar ini." },
-                                    { type: 'image_url', image_url: { url: m.attachment.data } }
-                                ]
-                            });
-                        } else {
-                            apiHistory.push({ role: 'user', content: contentText || "Pesan atau Dokumen telah diberikan." });
-                        }
-                    }
-                });
-
-                const apiKey = "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";
-                const url = "https://openrouter.ai/api/v1/chat/completions";
-                
-                // Model pool: prioritaskan model yang CEPAT jawab, hindari thinking-mode
-                // DeepSeek R1 (reasoning/thinking) diletakkan di akhir sebagai fallback
-                const modelPool = [
-                    "google/gemini-2.0-flash-lite-preview-02-05:free",
-                    "meta-llama/llama-3.3-70b-instruct:free",
-                    "deepseek/deepseek-v3-0324:free",
-                    "deepseek/deepseek-chat-v3-0324:free",
-                    "qwen/qwen-2.5-72b-instruct:free",
-                    "qwen/qwen-2.5-coder-32b-instruct:free",
-                    "mistralai/mistral-nemo:free",
-                    "meta-llama/llama-3.1-8b-instruct:free",
-                    "nousresearch/hermes-3-llama-3.1-405b:free",
-                    "cognitivecomputations/dolphin-mixtral-8x7b:free",
-                    "openchat/openchat-7b:free",
-                    "gryphe/mythomax-l2-13b:free",
-                    "huggingfaceh4/zephyr-7b-beta:free",
-                    "deepseek/deepseek-r1-distill-llama-70b:free"
-                ];
-                
-                let response = null;
-                let useGemini = false;
-                
-                // Jika terdapat lampiran file/gambar, langsung arahkan ke Google AI Studio untuk dianalisa
-                if (hasAttachment) {
-                    useGemini = true;
-                } else {
-                    // Coba eksekusi melalui OpenRouter dengan strategi fail-fast
-                    for (const modelName of modelPool) {
-                        if (abortController.signal.aborted) break;
-
-                        const fetchTimeout = new AbortController();
-                        const timeoutId = setTimeout(() => fetchTimeout.abort(), 12000); // Batas 12 detik tiap model
-                        const onUserAbort = () => fetchTimeout.abort();
-                        abortController.signal.addEventListener('abort', onUserAbort);
-
-                        try {
-                            const res = await fetch(url, {
-                                method: 'POST',
-                                headers: { 
-                                    'Content-Type': 'application/json',
-                                    'Authorization': `Bearer ${apiKey}`,
-                                    'HTTP-Referer': 'https://clincoo.ai',
-                                    'X-Title': 'Clincoo'
-                                },
-                                body: JSON.stringify({ 
-                                    model: modelName,
-                                    messages: apiHistory,
-                                    stream: true,
-                                    max_tokens: 4096,
-                                    provider: {
-                                        allow_fallbacks: true
-                                    }
-                                }),
-                                signal: fetchTimeout.signal
-                            });
-                            
-                            clearTimeout(timeoutId);
-                            abortController.signal.removeEventListener('abort', onUserAbort);
-
-                            if (res.ok) {
-                                response = res;
-                                break; 
+                    const historyMsgs = messages.filter(m => !m.isHidden && m.id !== aiMsgObj.id);
+                    historyMsgs.forEach(m => {
+                        let content = m.text;
+                        if (m.attachment) {
+                            if (m.attachment.type === 'document' && m.attachment.text) {
+                                content += `\n\n[Isi Dokumen Lampiran (${m.attachment.name})]:\n${m.attachment.text.substring(0, 10000)}`;
+                            } else if (m.attachment.type === 'image') {
+                                // Format array untuk vision (jika didukung OpenRouter/Model)
+                                content = [
+                                    { type: "text", text: m.text || "Tolong analisa gambar ini." },
+                                    { type: "image_url", image_url: { url: m.attachment.data } }
+                                ];
                             }
-                        } catch (e) {
-                            clearTimeout(timeoutId);
-                            abortController.signal.removeEventListener('abort', onUserAbort);
-                            if (abortController.signal.aborted) break;
-                            console.warn(`Model ${modelName} gagal/timeout, beralih ke cadangan...`);
-                            continue;
                         }
+                        apiMessages.push({ role: m.role === 'ai' ? 'assistant' : 'user', content: content });
+                    });
+
+                    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Bearer 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`,
+                            "HTTP-Referer": window.location.href,
+                            "X-Title": "Clincoo AI",
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            model: "meta-llama/llama-3.3-70b-instruct", // Atau gunakan "deepseek/deepseek-chat"
+                            messages: apiMessages,
+                            stream: true
+                        }),
+                        signal: abortController.signal
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
                     }
 
-                    // Jika OpenRouter sibuk atau gagal merespons, beralih ke Google AI Studio (Gemini)
-                    if (!response) {
-                        useGemini = true;
+                    hasReceivedData = true;
+                    clearTimeout(apiTimeout);
+                    clearInterval(statusInterval);
+                    
+                    const msgIndex = messages.findIndex(m => m.id === aiMsgObj.id);
+                    if (msgIndex !== -1 && messages[msgIndex].isProcessing) {
+                        messages[msgIndex].isProcessing = false;
+                        messages[msgIndex].isTyping = true;
                     }
-                }
 
-                if (useGemini) {
-                    try {
-                        const geminiApiKey = "AQ.Ab8RN6JBc9C1QE0pL5-IG9flwa11XcXiD5khlUXwa07H4wx6Tw";
-                        let geminiContents = [];
-                        
-                        validMessages.slice(-15).forEach(m => {
-                            let parts = [];
-                            if (m.role === 'ai') {
-                                if (!m.isImageResponse) {
-                                    parts.push({ text: m.text });
-                                }
-                            } else {
-                                let contentText = m.text || "";
-                                if (m.attachment) {
-                                    if (m.attachment.type === 'document') {
-                                        const docText = m.attachment.text ? m.attachment.text.substring(0, 15000) : "Teks dokumen tidak dapat dibaca.";
-                                        contentText = `[Konteks Dokumen: ${m.attachment.name}]\n${docText}\n\n[Pesan User]: ${contentText || "Tolong analisis dokumen ini."}`;
-                                        parts.push({ text: contentText });
-                                    } else if (m.attachment.type === 'image') {
-                                        if (contentText) {
-                                            parts.push({ text: contentText });
-                                        } else {
-                                            parts.push({ text: "Tolong analisis gambar ini dan berikan wawasan secara mendetail." });
-                                        }
-                                        const match = m.attachment.data.match(/^data:(image\/[a-zA-Z+]+);base64,(.+)$/);
-                                        if (match) {
-                                            parts.push({
-                                                inline_data: {
-                                                    mime_type: match[1],
-                                                    data: match[2]
-                                                }
-                                            });
-                                        }
-                                    }
-                                } else {
-                                    parts.push({ text: contentText || "Pesan." });
-                                }
-                            }
-                            
-                            if (parts.length > 0) {
-                                geminiContents.push({
-                                    role: m.role === 'ai' ? 'model' : 'user',
-                                    parts: parts
-                                });
-                            }
-                        });
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
 
-                        // Standarisasi riwayat percakapan khusus untuk Gemini API (Google AI Studio)
-                        while (geminiContents.length > 0 && geminiContents[0].role !== 'user') {
-                            geminiContents.shift();
-                        }
-                        
-                        const normalizedContents = [];
-                        for (const msg of geminiContents) {
-                            if (normalizedContents.length === 0) {
-                                normalizedContents.push(msg);
-                            } else {
-                                const lastMsg = normalizedContents[normalizedContents.length - 1];
-                                if (lastMsg.role === msg.role) {
-                                    lastMsg.parts = lastMsg.parts.concat(msg.parts);
-                                } else {
-                                    normalizedContents.push(msg);
-                                }
-                            }
-                        }
-
-                        const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:streamGenerateContent?alt=sse&key=${geminiApiKey}`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                contents: normalizedContents,
-                                systemInstruction: {
-                                    parts: [{ text: systemInstructions }]
-                                }
-                            }),
-                            signal: abortController.signal
-                        });
-
-                        if (geminiRes.ok) {
-                            response = geminiRes;
-                        } else {
-                            console.warn("AI Studio menolak permintaan. Kembali mencoba Fallback akhir.");
-                        }
-                    } catch (e) {
-                        console.warn("Kesalahan koneksi saat menghubungi AI Studio:", e);
-                    }
-                }
-
-                if (!response) {
-                    try {
-                        const cleanHistory = apiHistory.map(msg => {
-                            if (Array.isArray(msg.content)) {
-                                const textPart = msg.content.find(c => c.type === 'text');
-                                return { ...msg, content: textPart ? textPart.text : "[Gambar Terlampir]" };
-                            }
-                            return msg;
-                        });
-
-                        const pollRes = await fetch("https://text.pollinations.ai/", {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                messages: cleanHistory,
-                                model: 'openai',
-                                system: systemInstructions
-                            }),
-                            signal: abortController.signal
-                        });
-
-                        if (pollRes.ok) {
-                            const responseText = await pollRes.text();
-                            hasReceivedData = true;
-                            clearTimeout(apiTimeout);
-                            clearInterval(statusInterval);
-                            const msgIndex = messages.findIndex(m => m.id === aiMsgObj.id);
-                            if (msgIndex !== -1 && messages[msgIndex].isProcessing) {
-                                messages[msgIndex].isProcessing = false;
-                                messages[msgIndex].isTyping = true;
-                            }
-                            streamingBuffer = responseText;
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) {
                             isFetchComplete = true;
-                        } else {
-                            throw new Error("Pollinations API Error");
+                            break;
                         }
-                    } catch (err) {
-                        // Pollinations juga gagal - coba auto-retry sekali
-                        clearTimeout(apiTimeout);
-                        clearInterval(statusInterval);
-                        if (!aiMsgObj._busyRetried) {
-                            aiMsgObj._busyRetried = true;
-                            console.warn("Semua provider gagal, auto-retry dalam 2 detik...");
-                            setTimeout(() => retryGeneration(aiMsgObj.id), 2000);
-                        } else {
-                            const index = messages.findIndex(m => m.id === aiMsgObj.id);
-                            if (index !== -1) {
-                                messages[index].text = `Jaringan sedang sibuk. <span onclick="retryGeneration('${aiMsgObj.id}')" class="cursor-pointer underline font-medium" style="text-underline-offset: 3px; pointer-events-auto;">ketuk untuk mencoba lagi</span>`;
-                                messages[index].isError = true;
-                            }
-                            stopGeneration();
-                        }
-                    }
-                } else {
-                    try {
-                        const reader = response.body.getReader();
-                        const decoder = new TextDecoder('utf-8');
-                        while (true) {
-                            const { done, value } = await reader.read();
-                            if (done) break;
-                            
-                            hasReceivedData = true;
-                            clearTimeout(apiTimeout);
 
-                            const msgIndex = messages.findIndex(m => m.id === aiMsgObj.id);
-                            if (msgIndex !== -1 && messages[msgIndex].isProcessing) {
-                                messages[msgIndex].isProcessing = false;
-                                messages[msgIndex].isTyping = true;
-                                clearInterval(statusInterval);
-                            }
+                        const chunk = decoder.decode(value, { stream: true });
+                        const lines = chunk.split('\n');
 
-                            const chunk = decoder.decode(value, { stream: true });
-                            const lines = chunk.split('\n');
-                            for (const line of lines) {
-                                if (line.trim().startsWith('data: ') && line.trim() !== 'data: [DONE]') {
-                                    try {
-                                        const data = JSON.parse(line.replace(/^data: /, ''));
-                                        
-                                        // Parsing data streaming dari OpenRouter
-                                        if (data.choices && data.choices[0].delta && data.choices[0].delta.content) {
-                                            streamingBuffer += data.choices[0].delta.content;
-                                        }
-                                        // Parsing data streaming dari Google AI Studio (Gemini)
-                                        else if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0].text) {
-                                            streamingBuffer += data.candidates[0].content.parts[0].text;
-                                        }
-                                    } catch (e) {}
+                        for (const line of lines) {
+                            if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+                                try {
+                                    const data = JSON.parse(line.slice(6));
+                                    if (data.choices && data.choices[0].delta && data.choices[0].delta.content) {
+                                        streamingBuffer += data.choices[0].delta.content;
+                                    }
+                                } catch (e) {
+                                    // Abaikan error parse parsial dari chunk terpotong
                                 }
                             }
                         }
+                    }
+                } catch (e) {
+                    if (e.name !== 'AbortError') {
+                        streamingBuffer = "Maaf, terjadi kesalahan saat menghubungi server AI (OpenRouter). Silakan periksa koneksi Anda atau coba lagi.";
                         isFetchComplete = true;
-                    } catch (e) {
-                        if (e.name !== 'AbortError') isFetchComplete = true;
+                        const msgIndex = messages.findIndex(m => m.id === aiMsgObj.id);
+                        if (msgIndex !== -1) messages[msgIndex].isError = true;
                     }
                 }
             }
@@ -1889,7 +2037,7 @@
                     autoScrollActive = true;
                     renderMessages();
                     
-                    updateCurrentSession(); // Simpan data user ke riwayat sebelum fetch
+                    updateCurrentSession(); 
                     fetchAIResponse();
                 }
             }
