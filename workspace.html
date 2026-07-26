@@ -7,7 +7,6 @@
     <link id="dynamic-favicon" rel="icon" type="image/png" href="">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
     
     <style>
@@ -18,34 +17,20 @@
             margin: 0;
             padding: 0;
             font-family: 'Inter', sans-serif;
-            background: #fafafa;
-            color: #000000;
+            background: #ffffff;
+            color: #1f2328;
             -webkit-tap-highlight-color: transparent;
         }
 
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
-
-        .shiny-text {
-            background: linear-gradient(110deg, #000000 35%, #9ca3af 50%, #000000 65%);
-            background-size: 200% auto;
-            color: transparent;
-            -webkit-background-clip: text;
-            background-clip: text;
-            animation: shine 3s linear infinite;
-        }
-
-        @keyframes shine {
-            0% { background-position: 200% center; }
-            100% { background-position: -200% center; }
-        }
+        ::-webkit-scrollbar-thumb { background: #d0d7de; border-radius: 10px; }
 
         .font-montserrat { font-family: 'Montserrat', sans-serif; }
         
         .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d0d7de; border-radius: 10px; }
         
         .fade-in { animation: fadeIn 0.3s ease-in-out forwards; }
         @keyframes fadeIn {
@@ -53,639 +38,774 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .modal-enter { animation: modalEnter 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        @keyframes modalEnter {
-            from { opacity: 0; transform: scale(0.95) translateY(10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="flex flex-col min-h-screen selection:bg-gray-200">
+<body class="flex flex-col min-h-screen selection:bg-blue-100">
 
-    <header id="app-header" class="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md z-30 flex flex-col transition-transform duration-300 border-b border-gray-100">
-        <div class="w-full px-5 py-3 flex items-center justify-start gap-4">
-            <button id="btn-sidebar-open" class="p-2 -ml-2 text-gray-700 hover:text-black transition rounded-full hover:bg-gray-50 flex items-center justify-center">
-                <i class="ph ph-list text-2xl"></i>
-            </button>
-            <button id="btn-back-header" onclick="switchView('view-beranda')" class="hidden p-2 -ml-2 text-gray-700 hover:text-black transition rounded-full hover:bg-gray-50 flex items-center justify-center" title="Kembali">
-                <i class="ph ph-arrow-left text-2xl"></i>
-            </button>
-            <h1 class="relative inline-block font-extrabold text-2xl tracking-tight font-montserrat">
-                <span class="text-black">Workspace</span>
-            </h1>
+    <header id="app-header" class="fixed top-0 left-0 right-0 bg-white z-30 flex flex-col transition-transform duration-300 border-b border-gray-200">
+        <div class="w-full px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <button id="btn-sidebar-open" class="text-gray-600 hover:text-black transition">
+                    <i class="ph ph-list text-2xl"></i>
+                </button>
+                <h1 class="relative inline-block font-bold text-lg font-montserrat flex items-center gap-2">
+                    <span id="header-title" class="text-gray-900">Workspace</span>
+                </h1>
+            </div>
+ 
         </div>
     </header>
 
-    <div id="sidebar-backdrop" class="fixed inset-0 bg-black/40 z-40 hidden transition-opacity duration-300 opacity-0"></div>
+    <div id="sidebar-backdrop" class="fixed inset-0 bg-black/50 z-40 hidden transition-opacity duration-300 opacity-0"></div>
 
-    <div id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-white z-50 transform -translate-x-full transition-transform duration-300 flex flex-col border-r border-gray-100 shadow-2xl">
-        <div class="px-5 py-3 flex items-center justify-between flex-shrink-0">
-            <div class="flex items-center gap-1 -ml-2">
-                <div id="logo-3d-container" class="relative w-14 h-14 flex items-center justify-center overflow-hidden bg-transparent"></div>
-                <h1 class="relative inline-block font-extrabold text-3xl tracking-tight font-montserrat">
-                    <span class="shiny-text">Clincoo</span>
-                    <span class="absolute top-1/2 left-0 w-full h-[3px] bg-white -translate-y-1/2 opacity-100 pointer-events-none"></span>
-                </h1>
-            </div>
-            <button id="btn-sidebar-close" class="p-2 -mr-2 text-gray-500 hover:text-black transition rounded-full hover:bg-gray-50 flex items-center justify-center">
-                <i class="ph ph-x text-xl"></i>
-            </button>
-        </div>
-
-        <nav class="px-3 pt-2 pb-3 border-b border-gray-100 flex-shrink-0">
-            <ul class="space-y-0.5">
-                <li>
-                    <button onclick="window.location.href='index.html'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
-                        <i class="ph ph-chat-circle-dots text-xl text-gray-500"></i>
-                        <span>Obrolan AI</span>
-                    </button>
-                </li>
-                <li>
-                    <button onclick="window.location.href='workspace.html'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-100 text-black font-semibold text-sm transition-colors">
-                        <i class="ph-fill ph-folder text-xl text-black"></i>
-                        <span>Workspace</span>
-                    </button>
-                </li>
-                <li>
-                    <button onclick="window.location.href='gambar.html'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
-                        <i class="ph ph-image text-xl text-gray-500"></i>
-                        <span>Gambar</span>
-                    </button>
-                </li>
-                <li>
-                    <button onclick="window.location.href='canvas.html'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
-                        <i class="ph ph-layout text-xl text-gray-500"></i>
-                        <span>Canvas</span>
-                    </button>
-                </li>
-                <li>
-                    <button onclick="window.location.href='perpustakaan.html'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
-                        <i class="ph ph-books text-xl text-gray-500"></i>
-                        <span>Perpustakaan</span>
-                    </button>
-                </li>
-                <li>
-                    <button onclick="window.location.href='aplikasi.html'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
-                        <i class="ph ph-squares-four text-xl text-gray-500"></i>
-                        <span>Aplikasi</span>
-                    </button>
-                </li>
-            </ul>
-        </nav>
+    <div id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-white z-50 transform -translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
         
-        <div class="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
-            <div class="flex items-center justify-between px-4 pt-3 pb-1 flex-shrink-0">
-                <span class="text-[11px] font-semibold text-gray-400 tracking-widest uppercase">Aktivitas Terbaru</span>
-                <button class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors" title="Riwayat">
-                    <i class="ph ph-clock-counter-clockwise text-base"></i>
+        <!-- Sidebar Content: Workspace (Hanya muncul di dashboard/workspace) -->
+        <div id="sidebar-workspace-content" class="flex-col h-full flex">
+            <div class="px-5 py-3 flex items-center justify-between flex-shrink-0">
+                <div class="flex items-center gap-2 -ml-2">
+                    <h1 class="relative inline-block font-extrabold text-2xl tracking-tight font-montserrat ml-2">
+                        <span class="text-black">Clincoo</span>
+                    </h1>
+                </div>
+                <button onclick="closeSidebar()" class="p-2 -mr-2 text-gray-500 hover:text-black transition rounded-full hover:bg-gray-50 flex items-center justify-center">
+                    <i class="ph ph-x text-xl"></i>
                 </button>
             </div>
-            <ul id="recent-projects-sidebar" class="flex-1 p-2 space-y-0.5 custom-scrollbar"></ul>
+
+            <nav class="px-3 pt-2 pb-3 border-b border-gray-100 flex-shrink-0">
+                <ul class="space-y-0.5">
+                    <li>
+                        <button onclick="switchView('view-beranda')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-100 text-black font-semibold text-sm transition-colors">
+                            <i class="ph-fill ph-squares-four text-xl text-black"></i>
+                            <span>Dashboard</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
+                            <i class="ph ph-folder text-xl text-gray-500"></i>
+                            <span>My Projects</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
+                            <i class="ph ph-users text-xl text-gray-500"></i>
+                            <span>Team</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
+                            <i class="ph ph-gear text-xl text-gray-500"></i>
+                            <span>Settings</span>
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
+                <div class="flex items-center justify-between px-4 pt-3 pb-1 flex-shrink-0">
+                    <span class="text-[11px] font-semibold text-gray-400 tracking-widest uppercase">Repositories</span>
+                    <button class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors" title="Riwayat">
+                        <i class="ph ph-clock-counter-clockwise text-base"></i>
+                    </button>
+                </div>
+                <div id="sidebar-repo-list" class="flex-1 p-2 space-y-0.5 custom-scrollbar"></div>
+            </div>
+
+            <div class="p-4 border-t border-gray-50 flex-shrink-0 flex justify-center">
+                <button onclick="openProjectForm()" class="w-full flex items-center justify-center gap-2 bg-black text-white py-3 px-5 rounded-full hover:bg-gray-800 transition-all shadow-md font-medium text-sm active:scale-[0.97]">
+                    <i class="ph-bold ph-plus text-base"></i>
+                    New Workspace
+                </button>
+            </div>
+        </div>
+
+        <!-- Sidebar Content: Repository (Hanya muncul di dalam halaman repositori/kode) -->
+        <div id="sidebar-repo-content" class="flex-col h-full hidden">
+            <div class="px-4 py-4 flex items-center justify-between border-b border-gray-200 bg-gray-50">
+                <div class="flex items-center gap-2">
+                    <i class="ph-fill ph-house text-xl text-gray-600"></i>
+                    <span class="text-gray-900 font-semibold truncate max-w-[180px]">github.com/Vylonium/Cl...</span>
+                </div>
+                <button onclick="closeSidebar()" class="text-gray-500 hover:text-black transition">
+                    <i class="ph ph-x text-xl"></i>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto custom-scrollbar flex flex-col py-2">
+                <ul class="space-y-0 px-2 pb-2 border-b border-gray-200">
+                    <li>
+                        <button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-gray-900 hover:bg-gray-100 transition-colors text-sm font-medium">
+                            <i class="ph ph-house text-lg text-gray-500"></i> Home
+                        </button>
+                    </li>
+                    <li>
+                        <button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-gray-900 hover:bg-gray-100 transition-colors text-sm font-medium">
+                            <i class="ph ph-record text-lg text-gray-500"></i> All issues
+                        </button>
+                    </li>
+                    <li>
+                        <button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-gray-900 hover:bg-gray-100 transition-colors text-sm font-medium">
+                            <i class="ph ph-git-pull-request text-lg text-gray-500"></i> All pull requests
+                        </button>
+                    </li>
+                    <li>
+                        <!-- Tombol ini kembali ke Dashboard -->
+                        <button onclick="switchView('view-beranda')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-gray-900 hover:bg-gray-100 transition-colors text-sm font-medium">
+                            <i class="ph ph-book-bookmark text-lg text-gray-500"></i> All repositories
+                        </button>
+                    </li>
+                    <li>
+                        <button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-gray-900 hover:bg-gray-100 transition-colors text-sm font-medium">
+                            <i class="ph ph-kanban text-lg text-gray-500"></i> Projects
+                        </button>
+                    </li>
+                    <li>
+                        <button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-gray-900 hover:bg-gray-100 transition-colors text-sm font-medium">
+                            <i class="ph ph-chats text-lg text-gray-500"></i> Discussions
+                        </button>
+                    </li>
+                    <li>
+                        <button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-gray-900 hover:bg-gray-100 transition-colors text-sm font-medium">
+                            <i class="ph ph-desktop text-lg text-gray-500"></i> Codespaces
+                        </button>
+                    </li>
+                    <li>
+                        <button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-gray-900 hover:bg-gray-100 transition-colors text-sm font-medium">
+                            <i class="ph-fill ph-robot text-lg text-gray-500"></i> Copilot
+                        </button>
+                    </li>
+                </ul>
+                
+                <ul class="space-y-0 px-2 py-2 border-b border-gray-200">
+                    <li>
+                        <button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-gray-900 hover:bg-gray-100 transition-colors text-sm font-medium">
+                            <i class="ph ph-telescope text-lg text-gray-500"></i> Explore
+                        </button>
+                    </li>
+                    <li>
+                        <button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-gray-900 hover:bg-gray-100 transition-colors text-sm font-medium">
+                            <i class="ph ph-gift text-lg text-gray-500"></i> Marketplace
+                        </button>
+                    </li>
+                    <li>
+                        <button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-gray-900 hover:bg-gray-100 transition-colors text-sm font-medium">
+                            <i class="ph ph-paperclip text-lg text-gray-500"></i> MCP registry
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="px-5 pt-4 pb-2 flex items-center justify-between">
+                    <span class="text-sm text-gray-500">Top repositories</span>
+                    <i class="ph ph-magnifying-glass text-gray-400"></i>
+                </div>
+                <ul id="sidebar-top-repos" class="space-y-0 px-2 pb-4">
+                    <li>
+                        <button class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-gray-900 hover:bg-gray-100 transition-colors text-sm font-medium">
+                            <div class="w-5 h-5 rounded overflow-hidden bg-gray-200 flex items-center justify-center text-[10px] text-gray-500 font-bold">V</div>
+                            Vylonium/History
+                        </button>
+                    </li>
+                    <li>
+                        <button class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-gray-900 hover:bg-gray-100 transition-colors text-sm font-medium">
+                            <div class="w-5 h-5 rounded overflow-hidden bg-gray-200 flex items-center justify-center text-[10px] text-gray-500 font-bold">V</div>
+                            Vylonium/figure
+                        </button>
+                    </li>
+                    <li>
+                        <button class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-gray-900 hover:bg-gray-100 transition-colors text-sm font-medium">
+                            <div class="w-5 h-5 rounded overflow-hidden bg-gray-200 flex items-center justify-center text-[10px] text-gray-500 font-bold">V</div>
+                            Vylonium/News
+                        </button>
+                    </li>
+                    <li>
+                        <button class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-gray-900 hover:bg-gray-100 transition-colors text-sm font-medium">
+                            <div class="w-5 h-5 rounded overflow-hidden bg-gray-200 flex items-center justify-center text-[10px] text-gray-500 font-bold">V</div>
+                            Vylonium/donate
+                        </button>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 
-    <main class="flex-1 w-full px-4 sm:px-6 pt-24 pb-32 relative">
+    <main class="flex-1 w-full pt-14 pb-20 relative">
         
-        <div id="view-beranda" class="view-section w-full max-w-6xl mx-auto space-y-6">
+        <!-- View Beranda -->
+        <div id="view-beranda" class="view-section w-full max-w-6xl mx-auto space-y-6 px-4 sm:px-6 pt-6">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h2 class="text-3xl font-bold text-gray-900 tracking-tight font-montserrat">Proyek Anda</h2>
-                    <p class="text-sm text-gray-500 mt-1">Kelola dan pantau semua ide dan pekerjaan Anda.</p>
+                    <h2 class="text-2xl font-semibold text-gray-900 tracking-tight font-montserrat">Repositories</h2>
                 </div>
-                <button onclick="openProjectForm()" class="bg-white border border-gray-200 text-gray-800 font-medium py-2.5 px-4 rounded-xl shadow-sm hover:bg-gray-50 transition-all flex items-center gap-2 text-sm">
-                    <i class="ph ph-plus text-lg text-gray-500"></i>
-                    Proyek Baru
+                <button onclick="openProjectForm()" class="bg-green-600 border border-green-700 text-white font-medium py-1.5 px-4 rounded-md shadow-sm hover:bg-green-700 transition-all text-sm">
+                    New
                 </button>
             </div>
 
-            <div class="relative w-full sm:max-w-md">
-                <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
-                <input type="text" id="search-input" placeholder="Cari proyek..." class="w-full bg-white border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none transition shadow-sm">
+            <div class="relative w-full">
+                <input type="text" id="search-input" placeholder="Find a repository..." class="w-full bg-white border border-gray-300 rounded-md py-1.5 px-3 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition shadow-sm">
             </div>
 
-            <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse min-w-[700px]">
-                        <thead>
-                            <tr class="bg-gray-50/80 border-b border-gray-200 text-sm text-gray-500 font-medium">
-                                <!-- Ditambahkan px-10 untuk memberi jarak, dan diatur bobot kolomnya -->
-                                <th class="py-3 px-10 whitespace-nowrap rounded-tl-2xl w-2/5">Nama Proyek</th>
-                                <th class="py-3 px-10 whitespace-nowrap w-1/4">Status</th>
-                                <th class="py-3 px-10 whitespace-nowrap w-1/4">Visibilitas</th>
-                                <th class="py-3 px-10 whitespace-nowrap rounded-tr-2xl">Terakhir Diubah</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-sm" id="projects-grid">
-                        </tbody>
-                    </table>
-                </div>
-                <div id="empty-state" class="hidden flex-col items-center justify-center py-20 text-center fade-in">
-                    <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4 border border-gray-100">
-                        <i class="ph ph-folder-open text-4xl text-gray-400"></i>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-800">Belum ada proyek</h3>
-                    <p class="text-gray-500 text-sm mt-1 mb-4">Mulai wujudkan idemu dengan membuat proyek pertama.</p>
-                </div>
+            <div class="border-t border-gray-200" id="projects-grid">
+                <!-- Data will be loaded here -->
+            </div>
+            <div id="empty-state" class="hidden flex-col items-center justify-center py-20 text-center">
+                <h3 class="text-lg font-semibold text-gray-900">Belum ada proyek</h3>
             </div>
         </div>
 
-        <div id="view-project-form" class="view-section hidden w-full max-w-3xl mx-auto pb-10">
-            <div class="mb-8 border-b border-gray-200 pb-5">
-                <h1 id="form-project-title" class="text-2xl font-bold text-gray-900 tracking-tight font-montserrat">Buat Proyek Baru</h1>
-                <p class="text-sm text-gray-500 mt-1">Atur detail dan konfigurasi awal untuk proyek Anda.</p>
+        <!-- View Project Form -->
+        <div id="view-project-form" class="view-section hidden w-full max-w-3xl mx-auto pb-10 px-4 sm:px-6 pt-6">
+            <div class="mb-6 border-b border-gray-200 pb-4">
+                <h1 class="text-2xl font-semibold text-gray-900">Create a new workspace</h1>
+                <p class="text-sm text-gray-500 mt-1">A workspace manages multiple repositories and settings.</p>
             </div>
-
             <form id="project-form" onsubmit="saveNewProject(event)">
-                <div class="relative pl-4 sm:pl-12">
-                    <div class="absolute left-7 sm:left-[3.75rem] top-10 bottom-8 w-px bg-gray-200 hidden sm:block"></div>
-
-                    <!-- Step 1: Umum -->
-                    <div class="relative mb-12">
-                        <div class="hidden sm:flex absolute -left-12 w-8 h-8 rounded-full bg-gray-100 border border-gray-300 items-center justify-center text-sm font-medium text-gray-700 z-10">1</div>
-                        <h3 class="text-lg font-bold font-montserrat text-gray-900 mb-5">Umum</h3>
-                        
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-5">
-                            <div class="sm:col-span-1">
-                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Pemilik *</label>
-                                <div class="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-xl bg-gray-50 cursor-not-allowed">
-                                    <div class="w-5 h-5 rounded-full border border-gray-200 bg-white flex items-center justify-center text-[10px] font-bold text-gray-400">C</div>
-                                    <span class="text-sm text-gray-900 font-medium">Clincoo</span>
-                                    <i class="ph ph-caret-down w-4 h-4 ml-auto text-gray-400"></i>
-                                </div>
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label for="project-name" class="block text-sm font-medium text-gray-700 mb-1.5">Nama proyek *</label>
-                                <input type="text" id="project-name" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-xl focus:outline-none transition-all text-sm">
-                                <p class="text-xs text-gray-500 mt-2">Nama proyek yang bagus itu singkat dan mudah diingat.</p>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <label for="project-desc" class="block text-sm font-medium text-gray-700 mb-1.5">Deskripsi</label>
-                            <input type="text" id="project-desc" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-xl focus:outline-none transition-all text-sm" oninput="updateCharCount(this)">
-                            <p id="desc-char-count" class="text-xs text-gray-400 mt-1.5">0 / 350 karakter</p>
-                        </div>
-                    </div>
-
-                    <!-- Step 2: Konfigurasi -->
-                    <div class="relative mb-12">
-                        <div class="hidden sm:flex absolute -left-12 w-8 h-8 rounded-full bg-gray-100 border border-gray-300 items-center justify-center text-sm font-medium text-gray-700 z-10">2</div>
-                        <h3 class="text-lg font-bold font-montserrat text-gray-900 mb-5">Konfigurasi</h3>
-                        
-                        <div class="border border-gray-200 rounded-2xl p-5 bg-white shadow-sm">
-                            <label class="block text-sm font-medium text-gray-900 mb-1">Pilih visibilitas *</label>
-                            <p class="text-xs text-gray-500 mb-4">Pilih siapa yang dapat melihat dan berkontribusi ke proyek ini.</p>
-                            
-                            <div class="relative inline-block w-40">
-                                <input type="hidden" id="project-visibility" name="visibility" value="Public">
-                                <button type="button" onclick="toggleCustomDropdown(event, 'dropdown-visibility')" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl p-2.5 pl-9 pr-3 flex items-center justify-between focus:outline-none transition-all cursor-pointer text-left">
-                                    <span id="text-visibility" class="truncate font-medium">Publik</span>
-                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                        <i class="ph ph-book-open text-gray-500 text-lg"></i>
-                                    </div>
-                                    <i class="ph ph-caret-down text-gray-500 shrink-0"></i>
-                                </button>
-                                
-                                <div id="dropdown-visibility" class="custom-dropdown hidden absolute z-50 w-full mt-1.5 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden animate-fade-in-down">
-                                    <button type="button" onclick="selectDropdownOption(event, 'visibility', 'Public', 'Publik')" class="w-full text-left px-3.5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors border-b border-gray-50">Publik</button>
-                                    <button type="button" onclick="selectDropdownOption(event, 'visibility', 'Private', 'Privat')" class="w-full text-left px-3.5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">Privat</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Step 3: Inisialisasi -->
-                    <div class="relative mb-8">
-                        <div class="hidden sm:flex absolute -left-12 w-8 h-8 rounded-full bg-gray-100 border border-gray-300 items-center justify-center text-sm font-medium text-gray-700 z-10">3</div>
-                        <h3 class="text-lg font-bold font-montserrat text-gray-900 mb-5">Inisialisasi</h3>
-                        
-                        <div class="border border-gray-100 rounded-2xl bg-white shadow-sm divide-y divide-gray-100">
-                            
-                            <div class="p-5 flex justify-between items-start gap-4">
-                                <div>
-                                    <h4 class="text-sm font-medium text-gray-900">Tambahkan README</h4>
-                                    <p class="text-xs text-gray-500 mt-1">README dapat digunakan sebagai deskripsi yang lebih panjang.</p>
-                                </div>
-                                <label class="inline-flex items-center cursor-pointer shrink-0 mt-1">
-                                    <input type="checkbox" class="sr-only peer">
-                                    <div class="relative w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-black"></div>
-                                </label>
-                            </div>
-
-                            <div class="p-5">
-                                <h4 class="text-sm font-medium text-gray-900">Tambahkan Template</h4>
-                                <p class="text-xs text-gray-500 mt-1 mb-3">Template membantu menyiapkan struktur awal proyek Anda.</p>
-                                
-                                <div class="relative inline-block w-48">
-                                    <input type="hidden" id="project-template" name="template" value="Tanpa template">
-                                    <button type="button" onclick="toggleCustomDropdown(event, 'dropdown-template')" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl p-2.5 pr-3 flex items-center justify-between focus:outline-none transition-all cursor-pointer text-left">
-                                        <span id="text-template" class="truncate font-medium">Tanpa template</span>
-                                        <i class="ph ph-caret-down text-gray-500 shrink-0"></i>
-                                    </button>
-                                    <div id="dropdown-template" class="custom-dropdown hidden absolute z-50 w-full mt-1.5 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden">
-                                        <button type="button" onclick="selectDropdownOption(event, 'template', 'Tanpa template', 'Tanpa template')" class="w-full text-left px-3.5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors border-b border-gray-50">Tanpa template</button>
-                                        <button type="button" onclick="selectDropdownOption(event, 'template', 'Node.js', 'Node.js')" class="w-full text-left px-3.5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors border-b border-gray-50">Node.js</button>
-                                        <button type="button" onclick="selectDropdownOption(event, 'template', 'React', 'React')" class="w-full text-left px-3.5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors border-b border-gray-50">React</button>
-                                        <button type="button" onclick="selectDropdownOption(event, 'template', 'Python', 'Python')" class="w-full text-left px-3.5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">Python</button>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-900 mb-2">Workspace name *</label>
+                    <input type="text" id="project-name" class="w-full sm:w-1/2 px-3 py-1.5 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm">
                 </div>
-
-                <div class="mt-8 flex items-center justify-end gap-3 pt-5 border-t border-gray-200">
-                    <button type="button" onclick="switchView('view-beranda')" class="bg-white border border-gray-200 text-gray-800 font-medium py-2 px-5 rounded-xl shadow-sm hover:bg-gray-50 transition-all text-sm">
-                        Batal
+                <div class="mt-6 pt-6 border-t border-gray-200 flex gap-2">
+                    <button type="submit" id="btn-save-project" class="bg-green-600 border border-green-700 text-white font-medium py-1.5 px-4 rounded-md shadow-sm hover:bg-green-700 transition-all text-sm">
+                        <span id="btn-save-text">Create workspace</span>
                     </button>
-                    <div class="relative">
-                        <button type="submit" id="btn-save-project" class="bg-black border border-black text-white font-medium py-2 px-6 rounded-xl shadow-sm hover:bg-gray-800 transition-all text-sm flex items-center justify-center min-w-[155px]">
-                            <span id="btn-save-text">Simpan Proyek</span>
-                        </button>
-                        <div id="save-popover" class="absolute bottom-full mb-3 right-0 bg-red-600 text-white text-xs py-2 px-3.5 rounded-xl shadow-xl opacity-0 pointer-events-none transition-all duration-300 transform translate-y-2 z-50 flex items-center gap-2 w-max">
-                            <i class="ph-fill ph-warning-circle text-base"></i>
-                            <span id="save-popover-text" class="font-medium text-sm">Error!</span>
-                            <div id="save-popover-arrow" class="absolute top-full right-8 -mt-px border-[6px] border-transparent border-t-red-600"></div>
-                        </div>
-                    </div>
+                    <button type="button" onclick="switchView('view-beranda')" class="bg-gray-50 border border-gray-300 text-gray-700 font-medium py-1.5 px-4 rounded-md shadow-sm hover:bg-gray-100 transition-all text-sm">Cancel</button>
                 </div>
             </form>
         </div>
 
-        <!-- View Detail Proyek (Halaman Kosong) -->
-        <div id="view-project-detail" class="view-section hidden w-full max-w-6xl mx-auto pb-10 fade-in">
-            <div class="mb-8 border-b border-gray-200 pb-5">
-                <h1 id="detail-project-title" class="text-2xl font-bold text-gray-900 tracking-tight font-montserrat">Nama Proyek</h1>
-                <p class="text-sm text-gray-500 mt-1">Area kerja khusus untuk proyek ini.</p>
-            </div>
-            
-            <div class="w-full flex flex-col items-center justify-center py-24 text-center border-2 border-dashed border-gray-200 rounded-3xl bg-gray-50/50">
-                <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 border border-gray-100 shadow-sm">
-                    <i class="ph ph-kanban text-3xl text-gray-400"></i>
+        <!-- View Project Detail (Repos) -->
+        <div id="view-project-detail" class="view-section hidden w-full max-w-6xl mx-auto pb-10 px-4 sm:px-6 pt-6 fade-in">
+             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                <div>
+                    <h2 class="text-2xl font-semibold text-gray-900">Workspace Repositories</h2>
                 </div>
-                <h3 class="text-lg font-semibold text-gray-800">Workspace Masih Kosong</h3>
-                <p class="text-gray-500 text-sm mt-1 mb-6 max-w-sm">Halaman detail proyek berhasil dibuka. Fitur workspace akan ditambahkan di sini.</p>
+                <button onclick="openRepoForm()" class="bg-green-600 border border-green-700 text-white font-medium py-1.5 px-4 rounded-md shadow-sm hover:bg-green-700 transition-all text-sm">
+                    New Repo
+                </button>
+            </div>
+            <div class="relative w-full mb-4">
+                <input type="text" id="search-repo-input" placeholder="Find a repository..." class="w-full bg-white border border-gray-300 rounded-md py-1.5 px-3 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition shadow-sm">
+            </div>
+            <div class="border-t border-gray-200" id="repos-grid">
+                 <!-- Repos loaded here -->
+            </div>
+            <div id="repo-empty-state" class="hidden flex-col items-center justify-center py-20 text-center">
+                 <h3 class="text-lg font-semibold text-gray-900">Belum ada repositori</h3>
+            </div>
+        </div>
+
+        <!-- View Form Buat Repo -->
+        <div id="view-repo-form" class="view-section hidden w-full max-w-3xl mx-auto pb-10 px-4 sm:px-6 pt-6">
+            <div class="mb-6 border-b border-gray-200 pb-4">
+                <h1 class="text-2xl font-semibold text-gray-900">Create a new repository</h1>
+            </div>
+            <form id="repo-form" onsubmit="saveNewRepo(event)">
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-900 mb-2">Repository name *</label>
+                    <input type="text" id="repo-name" class="w-full sm:w-1/2 px-3 py-1.5 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 transition-all text-sm">
+                </div>
+                <div class="mb-6">
+                     <label class="block text-sm font-semibold text-gray-900 mb-2">Description <span class="text-gray-500 font-normal">(optional)</span></label>
+                    <input type="text" id="repo-desc" class="w-full px-3 py-1.5 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 transition-all text-sm">
+                </div>
+                <div class="border-t border-gray-200 pt-6">
+                    <button type="submit" id="btn-save-repo" class="bg-green-600 border border-green-700 text-white font-medium py-1.5 px-4 rounded-md shadow-sm hover:bg-green-700 transition-all text-sm">
+                        Create repository
+                    </button>
+                    <button type="button" onclick="openProjectDetail(currentProjectId)" class="ml-2 bg-gray-50 border border-gray-300 text-gray-700 font-medium py-1.5 px-4 rounded-md shadow-sm hover:bg-gray-100 transition-all text-sm">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- View Repo Khusus Kode -->
+        <div id="view-repo-content" class="view-section hidden w-full max-w-full mx-auto fade-in">
+            
+            <!-- Header Repo -->
+            <div class="bg-gray-50 pt-4 border-b border-gray-200">
+                <div class="px-4 sm:px-6 max-w-7xl mx-auto">
+                    <!-- Repo Path -->
+                    <div class="flex items-center gap-2 text-xl font-medium text-gray-900 mb-4">
+                        <span class="text-gray-600 hover:underline cursor-pointer">Vylonium</span>
+                        <span class="text-gray-400">/</span>
+                        <span id="label-repo-name" class="font-semibold cursor-pointer hover:underline">Clincoo</span>
+                    </div>
+
+                    <!-- Tabs -->
+                    <div class="flex overflow-x-auto hide-scrollbar gap-1">
+                        <button class="flex items-center gap-2 px-3 py-2 text-sm font-semibold border-b-2 border-orange-500 text-gray-900 whitespace-nowrap">
+                            <i class="ph ph-code"></i> Code
+                        </button>
+                        <button class="flex items-center gap-2 px-3 py-2 text-sm font-medium border-b-2 border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 transition-colors whitespace-nowrap">
+                            <i class="ph ph-record"></i> Issues
+                        </button>
+                        <button class="flex items-center gap-2 px-3 py-2 text-sm font-medium border-b-2 border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 transition-colors whitespace-nowrap">
+                            <i class="ph ph-git-pull-request"></i> Pull requests
+                        </button>
+                        <button class="flex items-center gap-2 px-3 py-2 text-sm font-medium border-b-2 border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 transition-colors whitespace-nowrap">
+                            More <i class="ph ph-caret-down"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-4 sm:px-6 py-6 max-w-7xl mx-auto flex flex-col lg:flex-row gap-6">
+                
+                <!-- Kolom Kiri Utama (Code & Files) -->
+                <div class="flex-1 min-w-0 space-y-4">
+                    
+                    <!-- Watch, Fork, Star Buttons Group -->
+                    <div class="flex gap-2 mb-4">
+                        <div class="flex rounded-md shadow-sm w-1/3">
+                            <button class="flex-1 flex items-center justify-center gap-1.5 px-3 py-1 bg-gray-50 border border-gray-300 rounded-l-md text-xs font-semibold text-gray-700 hover:bg-gray-100 transition-colors">
+                                <i class="ph ph-eye text-base"></i> Watch
+                            </button>
+                            <button class="flex items-center justify-center px-2 py-1 bg-white border border-l-0 border-gray-300 rounded-r-md text-xs font-semibold text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors">
+                                0 <i class="ph ph-caret-down ml-1"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="flex rounded-md shadow-sm w-1/3 border-gray-300 border bg-gray-50 text-gray-700 hover:bg-gray-100 justify-center items-center cursor-pointer transition-colors">
+                            <i class="ph ph-git-fork text-base"></i>
+                        </div>
+                        
+                        <div class="flex rounded-md shadow-sm w-1/3 border border-gray-300 bg-gray-50 items-center justify-between px-2 cursor-pointer hover:bg-gray-100 transition-colors">
+                            <i class="ph ph-star text-base text-gray-500"></i>
+                            <i class="ph ph-caret-down text-gray-500"></i>
+                        </div>
+                    </div>
+
+                    <!-- Text Stats -->
+                    <div class="flex flex-wrap gap-4 text-sm text-gray-600 font-medium">
+                        <span class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><i class="ph ph-star text-base"></i> 0 stars</span>
+                        <span class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><i class="ph ph-git-fork text-base"></i> 0 forks</span>
+                        <span class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><i class="ph ph-eye text-base"></i> 0 watching</span>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-4 text-sm text-gray-600 font-medium border-b border-gray-200 pb-4">
+                        <span class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><i class="ph ph-git-branch text-base"></i> 1 Branch</span>
+                        <span class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><i class="ph ph-tag text-base"></i> 0 Tags</span>
+                        <span class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><i class="ph ph-activity text-base"></i> Activity</span>
+                    </div>
+
+                    <div class="flex items-center gap-2 text-sm text-gray-600 font-medium mt-4 mb-2">
+                        <i class="ph ph-globe text-base"></i> Public repository
+                    </div>
+
+                    <!-- Branch Selector & Code Button -->
+                    <div class="flex justify-between items-center mb-4">
+                        <button class="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 text-gray-700 text-sm font-medium py-1.5 px-3 rounded-md transition-colors">
+                            <i class="ph ph-git-branch text-gray-500"></i>
+                            main
+                            <i class="ph ph-caret-down text-gray-500"></i>
+                        </button>
+                        
+                        <div class="flex gap-2">
+                            <button class="bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-1.5 px-4 rounded-md transition-colors shadow-sm flex items-center gap-1.5">
+                                Code <i class="ph ph-caret-down"></i>
+                            </button>
+                            <button class="bg-gray-50 hover:bg-gray-100 border border-gray-300 text-gray-700 text-sm font-medium py-1.5 px-2 rounded-md transition-colors shadow-sm">
+                                <i class="ph ph-dots-three text-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- File Explorer Box -->
+                    <div class="border border-gray-300 rounded-md bg-white">
+                        <div class="bg-gray-50 border-b border-gray-300 p-3 rounded-t-md flex justify-between items-center">
+                            <div class="flex items-center gap-2 text-sm">
+                                <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white text-[10px] font-bold shadow-sm">V</div>
+                                <span class="font-semibold text-gray-900 hover:text-blue-600 cursor-pointer">Vylonium</span>
+                                <span class="text-gray-500">11 hours ago</span>
+                            </div>
+                            <div class="flex items-center gap-3 text-gray-500">
+                                <i class="ph ph-dots-three text-lg cursor-pointer hover:text-blue-600"></i>
+                                <i class="ph ph-clock-counter-clockwise text-lg cursor-pointer hover:text-blue-600"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- File List -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse min-w-full">
+                                <tbody class="text-sm text-gray-900" id="repo-files-grid">
+                                    <!-- Files Rendered Here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- "Add a README" Block -->
+                    <div id="repo-no-readme-preview" class="border border-gray-200 border-b-4 bg-white rounded-md p-8 mt-6 text-center shadow-sm">
+                        <i class="ph ph-book-open text-gray-500 text-4xl mb-4 block"></i>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">Add a README</h3>
+                        <p class="text-sm text-gray-600 mb-6 max-w-sm mx-auto">Help people interested in this repository understand your project.</p>
+                        <button class="bg-green-600 hover:bg-green-700 text-white text-sm font-semibold py-1.5 px-4 rounded-md transition-colors shadow-sm">
+                            Add a README
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Kolom Kanan (Desktop) atau Bawah (Mobile) -->
+                <div class="w-full lg:w-72 flex-shrink-0 space-y-6 lg:mt-0">
+                    
+                    <div class="border-b-2 border-orange-500 inline-block text-sm font-semibold text-gray-900 pb-1 mb-4 hidden lg:block">
+                        README
+                    </div>
+
+                    <div class="border-t border-gray-200 pt-4 mt-6 lg:mt-0 lg:border-t-0 lg:pt-0">
+                        <h3 class="text-base font-semibold text-gray-900 mb-2">Releases</h3>
+                        <p class="text-sm text-gray-500 mb-1">No releases published</p>
+                        <a href="#" class="text-sm text-blue-600 hover:underline">Create a new release</a>
+                    </div>
+
+                    <div class="border-t border-gray-200 pt-4 mt-6">
+                        <h3 class="text-base font-semibold text-gray-900 flex items-center gap-2 mb-3">
+                            Deployments <span class="bg-gray-100 text-gray-700 px-2 rounded-full text-xs font-semibold py-0.5 border border-gray-200">21</span>
+                        </h3>
+                        <div class="flex items-center gap-2 text-sm">
+                            <i class="ph-fill ph-check-circle text-green-500 text-base"></i>
+                            <span class="font-medium text-gray-900 hover:text-blue-600 cursor-pointer">github-pages</span>
+                            <span class="text-gray-500 ml-auto">11 hours ago</span>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-gray-200 pt-4 mt-6">
+                        <h3 class="text-base font-semibold text-gray-900 mb-2">Packages</h3>
+                        <p class="text-sm text-gray-500 mb-1">No packages published</p>
+                        <a href="#" class="text-sm text-blue-600 hover:underline">Publish your first package</a>
+                    </div>
+
+                    <div class="border-t border-gray-200 pt-4 mt-6">
+                        <h3 class="text-base font-semibold text-gray-900 flex items-center gap-2 mb-3">
+                            Contributors <span class="bg-gray-100 text-gray-700 px-2 rounded-full text-xs font-semibold py-0.5 border border-gray-200">1</span>
+                        </h3>
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white text-sm font-bold shadow-sm relative">
+                                <div class="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm">
+                                    <img src="https://ui-avatars.com/api/?name=V&background=random&size=12" class="w-3 h-3 rounded-full">
+                                </div>
+                                V
+                            </div>
+                            <span class="text-sm font-semibold text-gray-900 hover:text-blue-600 cursor-pointer">Vylonium</span>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-gray-200 pt-4 mt-6">
+                        <h3 class="text-base font-semibold text-gray-900 mb-3">Languages</h3>
+                        <div class="w-full h-2 rounded-full bg-gray-200 mb-3 overflow-hidden flex">
+                            <div class="h-full bg-orange-600 w-[100%]"></div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2 text-sm text-gray-900 cursor-pointer hover:text-blue-600 font-medium">
+                                <span class="w-2.5 h-2.5 rounded-full bg-orange-600 block"></span>
+                                HTML
+                            </div>
+                            <span class="text-gray-500 text-xs">100%</span>
+                        </div>
+                    </div>
+
+                    <div class="pt-20 pb-10 text-center text-xs text-gray-500 space-y-4">
+                        <div class="flex flex-wrap justify-center gap-x-4 gap-y-2">
+                            <a href="#" class="hover:text-blue-600 hover:underline">Terms</a>
+                            <a href="#" class="hover:text-blue-600 hover:underline">Privacy</a>
+                            <a href="#" class="hover:text-blue-600 hover:underline">Security</a>
+                            <a href="#" class="hover:text-blue-600 hover:underline">Status</a>
+                            <a href="#" class="hover:text-blue-600 hover:underline">Community</a>
+                            <a href="#" class="hover:text-blue-600 hover:underline">Docs</a>
+                            <a href="#" class="hover:text-blue-600 hover:underline">Contact</a>
+                            <a href="#" class="hover:text-blue-600 hover:underline">Manage cookies</a>
+                            <a href="#" class="hover:text-blue-600 hover:underline">Do not share my personal information</a>
+                        </div>
+                        <div class="flex items-center justify-center gap-2 mt-4 text-gray-400">
+                            
+                            <span>© 2026 Clincoo, Inc.</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
     </main>
 
     <script>
-        const logoContainer = document.getElementById('logo-3d-container');
-        const logoScene = new THREE.Scene();
-        const logoCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-        logoCamera.position.z = 3.2;
+        let projects = JSON.parse(localStorage.getItem('clincoo_github_clone_projects')) || [
+            {id: '1', name: 'Clincoo', desc: 'Workspace clone', status: 'Aktif', visibility: 'Public', updatedAt: Date.now(), repos: []}
+        ];
+        let currentProjectId = '1';
+        let currentRepoId = null;
+        let currentView = 'view-beranda';
 
-        const logoRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
-        logoRenderer.setSize(56, 56);
-        logoRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        if (logoContainer) logoContainer.appendChild(logoRenderer.domElement);
-
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
-        logoScene.add(ambientLight);
-
-        const pointLight1 = new THREE.PointLight(0x6366f1, 1.8, 10);
-        pointLight1.position.set(2, 2, 2);
-        logoScene.add(pointLight1);
-
-        const pointLight2 = new THREE.PointLight(0xec4899, 1.8, 10);
-        pointLight2.position.set(-2, -2, 2);
-        logoScene.add(pointLight2);
-
-        const coreGeo = new THREE.OctahedronGeometry(0.72, 0);
-        const coreMat = new THREE.MeshStandardMaterial({ color: 0x6366f1, metalness: 0.9, roughness: 0.15, flatShading: true });
-        const coreMesh = new THREE.Mesh(coreGeo, coreMat);
-        logoScene.add(coreMesh); 
-
-        const ringGeo = new THREE.TorusGeometry(0.98, 0.07, 8, 48);
-        const ringMat = new THREE.MeshStandardMaterial({ color: 0xec4899, metalness: 0.8, roughness: 0.2 });
-        const ringMesh = new THREE.Mesh(ringGeo, ringMat);
-        ringMesh.rotation.y = Math.PI / 6; 
-        ringMesh.rotation.z = Math.PI / 8;
-        logoScene.add(ringMesh);
-
-        let lastFaviconUpdate = 0;
-        function animateLogo() {
-            requestAnimationFrame(animateLogo);
-            ringMesh.rotation.x -= 0.035; 
-            logoRenderer.render(logoScene, logoCamera);
-
-            const now = Date.now();
-            if (now - lastFaviconUpdate > 150) {
-                const dataUrl = logoRenderer.domElement.toDataURL('image/png');
-                const faviconLink = document.getElementById('dynamic-favicon');
-                if (faviconLink) {
-                    faviconLink.href = dataUrl;
-                }
-                lastFaviconUpdate = now;
-            }
-        }
-        
         window.addEventListener('load', () => {
-            if (logoContainer) animateLogo();
-            renderProjects();
-            renderSidebarProjects();
+            if(projects.length > 0) {
+                renderProjects();
+                renderSidebarRepos();
+            }
         });
 
         const btnSidebarOpen = document.getElementById('btn-sidebar-open');
-        const btnSidebarClose = document.getElementById('btn-sidebar-close');
         const sidebar = document.getElementById('sidebar');
         const sidebarBackdrop = document.getElementById('sidebar-backdrop');
-        const btnBackHeader = document.getElementById('btn-back-header');
 
         btnSidebarOpen.addEventListener('click', () => {
             sidebar.classList.remove('-translate-x-full');
             sidebarBackdrop.classList.remove('hidden');
-            setTimeout(() => {
-                sidebarBackdrop.classList.add('opacity-100');
-                sidebarBackdrop.classList.remove('opacity-0');
-            }, 50);
+            setTimeout(() => { sidebarBackdrop.classList.add('opacity-100'); sidebarBackdrop.classList.remove('opacity-0'); }, 10);
         });
 
         function closeSidebar() {
             sidebar.classList.add('-translate-x-full');
             sidebarBackdrop.classList.add('opacity-0');
             sidebarBackdrop.classList.remove('opacity-100');
-            setTimeout(() => {
-                sidebarBackdrop.classList.add('hidden');
-            }, 300);
+            setTimeout(() => { sidebarBackdrop.classList.add('hidden'); }, 300);
         }
         
-        btnSidebarClose.addEventListener('click', closeSidebar);
         sidebarBackdrop.addEventListener('click', closeSidebar);
 
-        let projects = JSON.parse(localStorage.getItem('clincoo_projects')) || [];
-
         function saveToLocalStorage() {
-            localStorage.setItem('clincoo_projects', JSON.stringify(projects));
+            localStorage.setItem('clincoo_github_clone_projects', JSON.stringify(projects));
         }
 
-        function generateId() {
-            return Date.now().toString(36) + Math.random().toString(36).substr(2);
-        }
+        function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
 
         function switchView(viewId) {
+            currentView = viewId;
             document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
             if (document.getElementById(viewId)) {
                 document.getElementById(viewId).classList.remove('hidden');
             }
-            if(viewId === 'view-beranda') {
-                btnBackHeader.classList.add('hidden');
-                btnSidebarOpen.classList.remove('hidden');
-                renderProjects(document.getElementById('search-input').value);
-                renderSidebarProjects();
+            
+            const headerTitle = document.getElementById('header-title');
+            const sidebarWorkspace = document.getElementById('sidebar-workspace-content');
+            const sidebarRepo = document.getElementById('sidebar-repo-content');
+            
+            // Logika Sidebar: Workspace memunculkan menu Dashboard/Project, Repo memunculkan menu GitHub-style
+            if(viewId === 'view-beranda' || viewId === 'view-project-form' || viewId === 'view-project-detail' || viewId === 'view-repo-form') {
+                headerTitle.innerText = 'Workspace';
+                
+                sidebarWorkspace.classList.remove('hidden');
+                sidebarWorkspace.classList.add('flex');
+                sidebarRepo.classList.add('hidden');
+                sidebarRepo.classList.remove('flex');
+                
+                if(viewId === 'view-beranda') renderProjects();
+                renderSidebarRepos();
             } else {
-                btnBackHeader.classList.remove('hidden');
-                btnSidebarOpen.classList.add('hidden');
+                headerTitle.innerText = 'Repository';
+                
+                sidebarWorkspace.classList.add('hidden');
+                sidebarWorkspace.classList.remove('flex');
+                sidebarRepo.classList.remove('hidden');
+                sidebarRepo.classList.add('flex');
+                renderSidebarRepos();
             }
+            closeSidebar();
         }
 
-        function getStatusBadge(status) {
-            const isActive = (status === 'Aktif');
-            const dotColor = isActive ? 'bg-green-500' : 'bg-red-500';
-            const statusText = isActive ? 'Aktif' : 'Tidak aktif';
-            // Penambahan `flex-shrink-0 block` pada dot class agar tidak penyok, dan whitespace-nowrap agar 1 baris
-            return `<div class="flex items-center gap-2.5 whitespace-nowrap"><span class="w-2.5 h-2.5 rounded-full ${dotColor} flex-shrink-0 block"></span><span class="text-sm font-medium text-gray-700">${statusText}</span></div>`;
-        }
-
-        // Fungsi format waktu relatif
         function timeAgo(dateParam) {
             if (!dateParam) return '';
-            const date = new Date(dateParam);
-            const seconds = Math.round((new Date() - date) / 1000);
-            if (seconds < 60) return 'Baru saja';
+            const seconds = Math.round((new Date() - new Date(dateParam)) / 1000);
+            if (seconds < 60) return 'Just now';
             const minutes = Math.round(seconds / 60);
-            if (minutes < 60) return `${minutes} menit yang lalu`;
+            if (minutes < 60) return `${minutes} minutes ago`;
             const hours = Math.round(minutes / 60);
-            if (hours < 24) return `${hours} jam yang lalu`;
+            if (hours < 24) return `${hours} hours ago`;
             const days = Math.round(hours / 24);
-            if (days < 30) return `${days} hari yang lalu`;
-            const months = Math.round(days / 30);
-            if (months < 12) return `${months} bulan yang lalu`;
-            return `${Math.round(days / 365)} tahun yang lalu`;
+            if (days < 30) return `${days} days ago`;
+            return 'Long time ago';
         }
-
-        // Memperbarui waktu secara real-time setiap menit
-        setInterval(() => {
-            document.querySelectorAll('.time-ago-text').forEach(el => {
-                const timestamp = parseInt(el.getAttribute('data-time'));
-                if (timestamp) {
-                    el.innerText = timeAgo(timestamp);
-                }
-            });
-        }, 60000);
 
         function renderProjects(searchQuery = '') {
             const grid = document.getElementById('projects-grid');
             const emptyState = document.getElementById('empty-state');
-            const tableContainer = grid.closest('.overflow-x-auto');
-            
             grid.innerHTML = '';
             
-            const filtered = projects.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.desc.toLowerCase().includes(searchQuery.toLowerCase()));
+            const filtered = projects.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
             
             if (filtered.length === 0) {
-                tableContainer.classList.add('hidden');
                 emptyState.classList.remove('hidden');
                 emptyState.classList.add('flex');
             } else {
-                tableContainer.classList.remove('hidden');
                 emptyState.classList.add('hidden');
                 emptyState.classList.remove('flex');
                 
-                filtered.sort((a,b) => b.updatedAt - a.updatedAt).forEach(p => {
-                    const tr = document.createElement('tr');
-                    tr.className = 'border-b border-gray-100 hover:bg-gray-50/50 transition-colors cursor-pointer';
-                    tr.onclick = () => openProjectDetail(p.id);
-                    tr.innerHTML = `
-                        <!-- Menggunakan px-10 pada <td> untuk menyamakan jarak dengan header -->
-                        <td class="py-3 px-10 align-middle whitespace-nowrap">
-                            <p class="font-semibold text-gray-900">${p.name}</p>
-                        </td>
-                        <td class="py-3 px-10 align-middle whitespace-nowrap">
-                            ${getStatusBadge(p.status || 'Aktif')}
-                        </td>
-                        <td class="py-3 px-10 align-middle whitespace-nowrap">
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold border ${p.visibility === 'Private' ? 'border-gray-200 text-gray-600 bg-gray-50' : 'border-green-200 text-green-700 bg-green-50'}">
-                                <i class="ph ${p.visibility === 'Private' ? 'ph-lock' : 'ph-globe'}"></i>
-                                ${p.visibility === 'Private' ? 'Privat' : 'Publik'}
-                            </span>
-                        </td>
-                        <td class="py-3 px-10 align-middle whitespace-nowrap">
-                            <span class="text-sm text-gray-500 time-ago-text" data-time="${p.updatedAt}">${timeAgo(p.updatedAt)}</span>
-                        </td>
-                    `;
-                    grid.appendChild(tr);
+                filtered.forEach(p => {
+                    const div = document.createElement('div');
+                    div.className = 'py-4 border-b border-gray-200 hover:bg-gray-50 cursor-pointer px-4';
+                    div.onclick = () => openProjectDetail(p.id);
+                    div.innerHTML = `<p class="text-blue-600 font-semibold text-base">${p.name}</p><p class="text-sm text-gray-500 mt-1">${timeAgo(p.updatedAt)}</p>`;
+                    grid.appendChild(div);
                 });
             }
         }
 
-        function renderSidebarProjects() {
-            const list = document.getElementById('recent-projects-sidebar');
-            list.innerHTML = '';
+        function renderRepos(searchQuery = '') {
+            const project = projects.find(p => p.id === currentProjectId);
+            if (!project) return;
+            const repos = project.repos || [];
+            const grid = document.getElementById('repos-grid');
+            const emptyState = document.getElementById('repo-empty-state');
+            grid.innerHTML = '';
             
-            if (projects.length === 0) {
-                list.innerHTML = '<p class="text-[13px] text-gray-400 text-center mt-4">Belum ada proyek</p>';
+            if (repos.length === 0) {
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+            } else {
+                emptyState.classList.add('hidden');
+                emptyState.classList.remove('flex');
+                repos.forEach(r => {
+                    const div = document.createElement('div');
+                    div.className = 'py-4 border-b border-gray-200 hover:bg-gray-50 cursor-pointer px-4 flex justify-between items-center';
+                    div.onclick = () => openRepoContent(r.id);
+                    div.innerHTML = `
+                        <div>
+                            <p class="text-blue-600 font-semibold text-base inline-block">${r.name}</p>
+                            <span class="border border-gray-300 text-gray-500 rounded-full px-2 text-xs font-medium ml-2">Public</span>
+                            <p class="text-sm text-gray-500 mt-1">${timeAgo(r.updatedAt)}</p>
+                        </div>
+                    `;
+                    grid.appendChild(div);
+                });
+            }
+        }
+        
+        // Render history list repositori di sidebar
+        function renderSidebarRepos() {
+            const container = document.getElementById('sidebar-repo-list');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            let allRepos = [];
+            projects.forEach(p => {
+                if(p.repos) {
+                    p.repos.forEach(r => {
+                        allRepos.push({ ...r, projectName: p.name });
+                    });
+                }
+            });
+
+            // Urutkan repo berdasarkan yang paling terakhir diupdate
+            allRepos.sort((a, b) => b.updatedAt - a.updatedAt);
+
+            if (allRepos.length === 0) {
+                container.innerHTML = '<p class="text-[13px] text-gray-400 text-center mt-4">Belum ada repositori</p>';
                 return;
             }
-            
-            const recent = [...projects].sort((a,b) => b.updatedAt - a.updatedAt).slice(0, 5);
-            recent.forEach(p => {
-                const li = document.createElement('li');
-                li.innerHTML = `
-                    <div onclick="openProjectDetail('${p.id}')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors group cursor-pointer">
-                        <div class="flex items-center gap-2.5 overflow-hidden">
-                            <i class="ph ph-folder text-gray-400 text-lg group-hover:text-black transition-colors flex-shrink-0"></i>
-                            <span class="text-[13px] font-medium truncate">${p.name}</span>
+
+            allRepos.forEach(repo => {
+                const isActive = repo.id === currentRepoId && currentView === 'view-repo-content';
+                const div = document.createElement('div');
+                div.className = `group flex items-center justify-between p-2 mb-1 rounded-xl cursor-pointer ${isActive ? 'bg-gray-100' : 'hover:bg-gray-50'}`;
+                
+                div.onclick = () => {
+                    const parentProject = projects.find(p => p.repos && p.repos.find(r => r.id === repo.id));
+                    if(parentProject) {
+                        currentProjectId = parentProject.id;
+                        openRepoContent(repo.id);
+                    }
+                };
+                
+                div.innerHTML = `
+                    <div class="flex items-center gap-2.5 overflow-hidden flex-1 pl-1.5">
+                        <i class="ph ph-book-bookmark ${isActive ? 'text-black' : 'text-gray-500'} text-lg flex-shrink-0"></i>
+                        <div class="flex flex-col flex-1 min-w-0">
+                            <span class="text-[13px] ${isActive ? 'font-semibold text-black' : 'font-medium text-gray-700'} truncate w-full">${repo.name}</span>
+                            <span class="text-[10px] text-gray-400 truncate w-full" style="margin-top: -2px;">${repo.projectName}</span>
                         </div>
                     </div>
                 `;
-                list.appendChild(li);
+                container.appendChild(div);
             });
         }
-
-        document.getElementById('search-input').addEventListener('input', (e) => {
-            renderProjects(e.target.value);
-        });
 
         function openProjectDetail(id) {
-            const project = projects.find(p => p.id === id);
+            currentProjectId = id;
+            switchView('view-project-detail');
+            renderRepos();
+        }
+
+        function openRepoContent(repoId) {
+            const project = projects.find(p => p.id === currentProjectId);
             if (project) {
-                // Menyesuaikan judul dengan nama proyek
-                document.getElementById('detail-project-title').innerText = project.name;
-                
-                // Menutup sidebar jika di mode mobile
-                if (!document.getElementById('sidebar').classList.contains('-translate-x-full')) {
-                    closeSidebar();
+                const repo = project.repos.find(r => r.id === repoId);
+                if (repo) {
+                    currentRepoId = repoId;
+                    document.getElementById('label-repo-name').innerText = repo.name;
+                    
+                    repo.files = repo.files || [
+                        { type: 'file', name: '404.html', date: Date.now() - 11*3600000 },
+                        { type: 'file', name: '_config.yml', date: Date.now() - 11*3600000 },
+                        { type: 'file', name: 'index.html', date: Date.now() - 11*3600000 },
+                        { type: 'file', name: 'workspace.html', date: Date.now() - 12*3600000 },
+                    ];
+                    renderRepoFiles(repo.files);
+                    switchView('view-repo-content');
                 }
-                
-                switchView('view-project-detail');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
 
-        function openProjectForm() {
-            switchView('view-project-form');
-            const form = document.getElementById('project-form');
-            form.reset();
-            document.getElementById('desc-char-count').innerText = "0 / 350 karakter";
-            document.getElementById('project-name').classList.remove('border-red-500', 'ring-red-500');
-            
-            document.getElementById('project-visibility').value = 'Public';
-            document.getElementById('text-visibility').innerText = 'Publik';
-            
-            document.getElementById('project-template').value = 'Tanpa template';
-            document.getElementById('text-template').innerText = 'Tanpa template';
-            
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function updateCharCount(input) {
-            const count = input.value.length;
-            const limit = 350;
-            const el = document.getElementById('desc-char-count');
-            
-            if (count > limit) {
-                input.value = input.value.substring(0, limit);
-                el.innerText = `${limit} / ${limit} karakter`;
-                el.classList.add('text-red-500');
-                el.classList.remove('text-gray-400');
-            } else {
-                el.innerText = `${count} / ${limit} karakter`;
-                el.classList.remove('text-red-500');
-                el.classList.add('text-gray-400');
-            }
-        }
-
-        function toggleCustomDropdown(event, dropdownId) {
-            event.stopPropagation(); 
-            document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
-                if (dropdown.id !== dropdownId) {
-                    dropdown.classList.add('hidden');
-                }
+        function renderRepoFiles(files) {
+            const grid = document.getElementById('repo-files-grid');
+            grid.innerHTML = '';
+            files.forEach(f => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-t border-gray-200 hover:bg-gray-50 cursor-pointer';
+                let icon = f.type === 'folder' ? '<i class="ph-fill ph-folder text-blue-400 text-lg"></i>' : '<i class="ph ph-file-text text-gray-400 text-lg"></i>';
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3 w-6 text-center">${icon}</td>
+                    <td class="py-2.5 px-2 font-medium hover:text-blue-600 hover:underline"><a href="#">${f.name}</a></td>
+                    <td class="py-2.5 px-3 text-right text-gray-500 text-[13px] hidden sm:table-cell w-32">${timeAgo(f.date)}</td>
+                    <td class="py-2.5 px-3 text-right text-gray-500 text-[13px] sm:hidden w-24">${timeAgo(f.date).split(' ')[0]} ${timeAgo(f.date).split(' ')[1].charAt(0)}</td>
+                `;
+                grid.appendChild(tr);
             });
-            const dropdownTarget = document.getElementById(dropdownId);
-            dropdownTarget.classList.toggle('hidden');
         }
 
-        function selectDropdownOption(event, fieldId, realValue, displayValue) {
-            event.stopPropagation();
-            document.getElementById(`project-${fieldId}`).value = realValue;
-            document.getElementById(`text-${fieldId}`).innerText = displayValue;
-            document.getElementById(`dropdown-${fieldId}`).classList.add('hidden');
-        }
-
-        document.addEventListener('click', function(event) {
-            const allDropdowns = document.querySelectorAll('.custom-dropdown');
-            allDropdowns.forEach(dropdown => {
-                if (!dropdown.contains(event.target) && !dropdown.classList.contains('hidden')) {
-                    dropdown.classList.add('hidden');
-                }
-            });
-        });
-
-        window.addEventListener('scroll', function() {
-            document.querySelectorAll('.custom-dropdown').forEach(p => p.classList.add('hidden'));
-        }, true);
+        function openProjectForm() { switchView('view-project-form'); document.getElementById('project-form').reset(); }
+        function openRepoForm() { switchView('view-repo-form'); document.getElementById('repo-form').reset(); }
 
         function saveNewProject(e) {
             e.preventDefault();
-            
-            const nameInput = document.getElementById('project-name');
-            const name = nameInput.value.trim();
-            const desc = document.getElementById('project-desc').value.trim();
-            
-            const popover = document.getElementById('save-popover');
-            const popoverText = document.getElementById('save-popover-text');
-            const btnSave = document.getElementById('btn-save-project');
-            
-            if (!name) {
-                popoverText.innerText = 'Nama proyek wajib diisi!';
-                
-                popover.classList.remove('opacity-0', 'translate-y-2');
-                popover.classList.add('opacity-100', 'translate-y-0');
-                
-                nameInput.classList.add('border-red-500', 'ring-red-500');
-                nameInput.focus();
-                
-                setTimeout(() => {
-                    popover.classList.remove('opacity-100', 'translate-y-0');
-                    popover.classList.add('opacity-0', 'translate-y-2');
-                    nameInput.classList.remove('border-red-500', 'ring-red-500');
-                }, 3000);
-                
-                return;
-            }
-
-            btnSave.disabled = true;
-            btnSave.classList.add('opacity-75', 'cursor-not-allowed');
-            btnSave.innerHTML = `<i class="ph ph-spinner-gap animate-spin text-lg"></i> <span class="ml-2">Menyimpan...</span>`;
-
-            setTimeout(() => {
-                const visibility = document.getElementById('project-visibility').value;
-                const template = document.getElementById('project-template').value;
-                
-                const newProject = {
-                    id: generateId(),
-                    name: name,
-                    desc: desc,
-                    status: 'Aktif',
-                    visibility: visibility,
-                    template: template,
-                    updatedAt: Date.now()
-                };
-                
-                projects.push(newProject);
+            const name = document.getElementById('project-name').value.trim();
+            if(name) {
+                projects.push({id: generateId(), name, desc: '', status: 'Aktif', visibility: 'Public', updatedAt: Date.now(), repos: []});
                 saveToLocalStorage();
-                
-                btnSave.disabled = false;
-                btnSave.classList.remove('opacity-75', 'cursor-not-allowed');
-                btnSave.innerHTML = `<span id="btn-save-text">Simpan Proyek</span>`;
-                
+                renderSidebarRepos();
                 switchView('view-beranda');
-            }, 800);
+            }
         }
+
+        function saveNewRepo(e) {
+            e.preventDefault();
+            const name = document.getElementById('repo-name').value.trim();
+            const desc = document.getElementById('repo-desc').value.trim();
+            if(name && currentProjectId) {
+                const pIdx = projects.findIndex(p => p.id === currentProjectId);
+                projects[pIdx].repos.push({id: generateId(), name, desc, updatedAt: Date.now(), files: []});
+                projects[pIdx].updatedAt = Date.now();
+                saveToLocalStorage();
+                renderSidebarRepos();
+                openProjectDetail(currentProjectId);
+            }
+        }
+
+        document.getElementById('search-input').addEventListener('input', e => renderProjects(e.target.value));
+        document.getElementById('search-repo-input').addEventListener('input', e => renderRepos(e.target.value));
+
+        if(projects.length > 0) {
+           if(projects[0].repos.length === 0) {
+               projects[0].repos.push({id: 'repo1', name: 'Clincoo', desc: '', updatedAt: Date.now(), files: [
+                    { type: 'file', name: '404.html', date: Date.now() - 11*3600000 },
+                    { type: 'file', name: '_config.yml', date: Date.now() - 11*3600000 },
+                    { type: 'file', name: 'index.html', date: Date.now() - 11*3600000 },
+                    { type: 'file', name: 'workspace.html', date: Date.now() - 12*3600000 },
+               ]});
+               saveToLocalStorage();
+           }
+           switchView('view-beranda');
+        }
+
     </script>
 </body>
 </html>
