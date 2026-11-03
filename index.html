@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <link id="dynamic-favicon" rel="icon" type="image/png" href="">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -216,6 +217,9 @@
                 <span class="shiny-text">Clincoo</span>
                 <span class="absolute top-1/2 left-0 w-full h-[3px] bg-white -translate-y-1/2 opacity-100 pointer-events-none"></span>
             </h1>
+            <button id="btn-settings" onclick="openSettings()" class="ml-auto p-2 -mr-1 text-gray-500 hover:text-black transition rounded-full hover:bg-gray-50" title="Pengaturan">
+                <i class="ph ph-gear text-xl"></i>
+            </button>
         </div>
     </header>
 
@@ -226,6 +230,47 @@
         <button id="btn-download-session" class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2.5 font-medium transition-none"><i class="ph-bold ph-download-simple text-gray-500 text-base"></i> Unduh</button>
         <button id="btn-delete-session" class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2.5 font-medium transition-none"><i class="ph-bold ph-trash text-gray-500 text-base"></i> Hapus</button>
     </div>
+    <div id="settings-modal" class="hidden fixed inset-0 bg-black/50 z-[120] items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-5 max-h-[85vh] overflow-y-auto custom-scrollbar">
+            <div class="flex items-center justify-between mb-1">
+                <h2 class="text-lg font-bold text-gray-900">Pengaturan API</h2>
+                <button onclick="closeSettings()" class="p-2 -mr-2 text-gray-400 hover:text-black rounded-full transition"><i class="ph ph-x text-lg"></i></button>
+            </div>
+            <p class="text-[12px] text-gray-500 mb-4 leading-relaxed">Key disimpan hanya di perangkat ini (localStorage) dan hanya dikirim ke penyedia API terkait. Tidak ada key yang tertanam di dalam kode.</p>
+
+            <label class="block text-[12px] font-semibold text-gray-700 mb-1">OpenRouter API Key <span class="text-red-500">*</span></label>
+            <input id="key-openrouter" type="password" autocomplete="off" spellcheck="false" placeholder="sk-or-v1-..." class="w-full text-sm border border-gray-300 rounded-xl px-3 py-2 outline-none focus:border-gray-600 mb-1">
+            <p class="text-[11px] text-gray-500 mb-3">Wajib, untuk mengobrol. Buat key di <a href="https://openrouter.ai/keys" target="_blank" rel="noopener" class="text-blue-600 underline">openrouter.ai/keys</a>. Clincoo memakai model gratis.</p>
+
+            <label class="block text-[12px] font-semibold text-gray-700 mb-1">E2B API Key <span class="text-gray-400 font-normal">(opsional)</span></label>
+            <input id="key-e2b" type="password" autocomplete="off" spellcheck="false" placeholder="e2b_..." class="w-full text-sm border border-gray-300 rounded-xl px-3 py-2 outline-none focus:border-gray-600 mb-1">
+            <p class="text-[11px] text-gray-500 mb-3">Untuk menjalankan blok kode di sandbox E2B. Tanpa key ini, eksekusi memakai Piston.</p>
+
+            <label class="block text-[12px] font-semibold text-gray-700 mb-1">Jina AI Key <span class="text-gray-400 font-normal">(opsional)</span></label>
+            <input id="key-jina" type="password" autocomplete="off" spellcheck="false" placeholder="jina_..." class="w-full text-sm border border-gray-300 rounded-xl px-3 py-2 outline-none focus:border-gray-600 mb-1">
+            <p class="text-[11px] text-gray-500 mb-1">Untuk baca URL dan pencarian web real-time.</p>
+
+            <p id="settings-status" class="text-[12px] font-medium mt-2"></p>
+
+            <div class="flex gap-2 mt-4">
+                <button onclick="saveSettingsFromForm()" class="flex-1 bg-black text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-gray-800 transition">Simpan</button>
+                <button onclick="closeSettings()" class="px-4 text-sm font-medium text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="workspace-modal" class="hidden fixed inset-0 bg-black/50 z-[120] items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-5 max-h-[85vh] overflow-y-auto custom-scrollbar">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-lg font-bold text-gray-900">Workspace</h2>
+                <button onclick="closeWorkspace()" class="p-2 -mr-2 text-gray-400 hover:text-black rounded-full transition"><i class="ph ph-x text-lg"></i></button>
+            </div>
+            <p class="text-[12px] text-gray-500 mb-3">Proyek yang dibuat lewat obrolan, misalnya: <span class="font-semibold text-gray-700">"buat proyek Website Portfolio"</span>.</p>
+            <div id="workspace-list"></div>
+        </div>
+    </div>
+
+
 
     <div id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-white z-50 transform -translate-x-full transition-transform duration-300 flex flex-col border-r border-gray-100 shadow-2xl">
         <div class="px-5 py-3 flex items-center justify-between flex-shrink-0">
@@ -250,33 +295,15 @@
                     </button>
                 </li>
                 <li>
-                    <button onclick="window.location.href='workspace.html'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
+                    <button onclick="openWorkspace()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
                         <i class="ph ph-folder text-xl text-gray-500"></i>
                         <span>Workspace</span>
                     </button>
                 </li>
                 <li>
-                    <button onclick="window.location.href='gambar.html'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
-                        <i class="ph ph-image text-xl text-gray-500"></i>
-                        <span>Gambar</span>
-                    </button>
-                </li>
-                <li>
-                    <button onclick="window.location.href='canvas.html'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
-                        <i class="ph ph-layout text-xl text-gray-500"></i>
-                        <span>Canvas</span>
-                    </button>
-                </li>
-                <li>
-                    <button onclick="window.location.href='perpustakaan.html'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
-                        <i class="ph ph-books text-xl text-gray-500"></i>
-                        <span>Perpustakaan</span>
-                    </button>
-                </li>
-                <li>
-                    <button onclick="window.location.href='aplikasi.html'" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
-                        <i class="ph ph-squares-four text-xl text-gray-500"></i>
-                        <span>Aplikasi</span>
+                    <button onclick="openSettings()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium">
+                        <i class="ph ph-gear text-xl text-gray-500"></i>
+                        <span>Pengaturan</span>
                     </button>
                 </li>
             </ul>
@@ -313,20 +340,16 @@
             </button>
         </div>
 
-        <div id="attachment-preview" class="hidden absolute bottom-full left-4 mb-3 bg-white/95 backdrop-blur-md border border-gray-200 rounded-xl p-2 shadow-lg flex items-center gap-3 max-w-[250px] z-10 transition-all origin-bottom-left pointer-events-auto">
-            <div id="attachment-preview-icon" class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+        <div id="attachment-preview" class="hidden absolute bottom-full left-0 right-0 mb-2 z-10 pointer-events-auto">
+            <div class="flex items-center justify-between px-1 pb-1">
+                <span id="attachment-count" class="text-[11px] font-semibold text-gray-500"></span>
+                <button onclick="clearAttachments()" class="text-[11px] font-semibold text-gray-500 hover:text-red-600 transition">Hapus semua</button>
             </div>
-            <div class="flex-1 overflow-hidden">
-                <p id="attachment-preview-name" class="text-sm font-semibold text-gray-800 truncate"></p>
-                <p id="attachment-preview-size" class="text-[11px] text-gray-500"></p>
-            </div>
-            <button id="btn-remove-attachment" class="p-1.5 text-gray-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50">
-                <i class="ph ph-x"></i>
-            </button>
+            <div id="attachment-items" class="flex gap-2 overflow-x-auto custom-scrollbar pb-1"></div>
         </div>
 
-        <input type="file" id="image-upload" accept="image/*" class="hidden">
-        <input type="file" id="doc-upload" accept=".txt,.pdf,.md,.csv,.json,.js,.html,.css" class="hidden">
+        <input type="file" id="image-upload" accept="image/*" multiple class="hidden">
+        <input type="file" id="doc-upload" accept=".txt,.pdf,.md,.csv,.json,.js,.html,.css,.xml,.yml,.yaml,.py,.ts,.tsx,.jsx,.log" multiple class="hidden">
 
         <div id="input-wrapper" class="relative flex items-end bg-white rounded-2xl rounded-br-[24px] p-1.5 transition-all shadow-[0_5px_20px_-5px_rgba(0,0,0,0.15)] focus-within:shadow-[0_8px_30px_-5px_rgba(0,0,0,0.2)] pointer-events-auto duration-200">
             <button id="btn-plus" class="text-gray-500 hover:text-black transition-transform duration-300 ease-in-out flex-shrink-0 rounded-full h-9 w-9 flex items-center justify-center">
@@ -347,74 +370,95 @@
         }
 
         const logoContainer = document.getElementById('logo-3d-container');
-        const logoScene = new THREE.Scene();
-        
-        const logoCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-        logoCamera.position.z = 3.2;
-
-        const logoRenderer = new THREE.WebGLRenderer({ 
-            antialias: true, 
-            alpha: true,
-            preserveDrawingBuffer: true 
-        });
-        logoRenderer.setSize(56, 56);
-        logoRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        logoContainer.appendChild(logoRenderer.domElement);
-
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
-        logoScene.add(ambientLight);
-
-        const pointLight1 = new THREE.PointLight(0x6366f1, 1.8, 10);
-        pointLight1.position.set(2, 2, 2);
-        logoScene.add(pointLight1);
-
-        const pointLight2 = new THREE.PointLight(0xec4899, 1.8, 10);
-        pointLight2.position.set(-2, -2, 2);
-        logoScene.add(pointLight2);
-
-        const coreGeo = new THREE.OctahedronGeometry(0.72, 0);
-        const coreMat = new THREE.MeshStandardMaterial({
-            color: 0x6366f1,
-            metalness: 0.9,
-            roughness: 0.15,
-            flatShading: true
-        });
-        const coreMesh = new THREE.Mesh(coreGeo, coreMat);
-        logoScene.add(coreMesh); 
-
-        const ringGeo = new THREE.TorusGeometry(0.98, 0.07, 8, 48);
-        const ringMat = new THREE.MeshStandardMaterial({
-            color: 0xec4899,
-            metalness: 0.8,
-            roughness: 0.2
-        });
-        const ringMesh = new THREE.Mesh(ringGeo, ringMat);
-        ringMesh.rotation.y = Math.PI / 6; 
-        ringMesh.rotation.z = Math.PI / 8;
-        logoScene.add(ringMesh);
-
+        let logoRenderer = null;
+        let logoScene = null;
+        let logoCamera = null;
+        let ringMesh = null;
+        let cachedLogoDataUrl = '';
         let lastFaviconUpdate = 0;
+
+        function initLogo3D() {
+            if (typeof THREE === 'undefined' || !logoContainer) {
+                console.warn('Three.js tidak tersedia, logo 3D dinonaktifkan.');
+                return;
+            }
+            try {
+                logoScene = new THREE.Scene();
+                logoCamera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+                logoCamera.position.z = 3.2;
+
+                logoRenderer = new THREE.WebGLRenderer({
+                    antialias: true,
+                    alpha: true,
+                    preserveDrawingBuffer: true
+                });
+                logoRenderer.setSize(56, 56);
+                logoRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+                logoContainer.appendChild(logoRenderer.domElement);
+
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+                logoScene.add(ambientLight);
+
+                const pointLight1 = new THREE.PointLight(0x6366f1, 1.8, 10);
+                pointLight1.position.set(2, 2, 2);
+                logoScene.add(pointLight1);
+
+                const pointLight2 = new THREE.PointLight(0xec4899, 1.8, 10);
+                pointLight2.position.set(-2, -2, 2);
+                logoScene.add(pointLight2);
+
+                const coreGeo = new THREE.OctahedronGeometry(0.72, 0);
+                const coreMat = new THREE.MeshStandardMaterial({
+                    color: 0x6366f1,
+                    metalness: 0.9,
+                    roughness: 0.15,
+                    flatShading: true
+                });
+                const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+                logoScene.add(coreMesh);
+
+                const ringGeo = new THREE.TorusGeometry(0.98, 0.07, 8, 48);
+                const ringMat = new THREE.MeshStandardMaterial({
+                    color: 0xec4899,
+                    metalness: 0.8,
+                    roughness: 0.2
+                });
+                ringMesh = new THREE.Mesh(ringGeo, ringMat);
+                ringMesh.rotation.y = Math.PI / 6;
+                ringMesh.rotation.z = Math.PI / 8;
+                logoScene.add(ringMesh);
+            } catch (e) {
+                console.warn('WebGL gagal diinisialisasi, logo 3D dimatikan.', e);
+                logoRenderer = null;
+                ringMesh = null;
+            }
+        }
+        initLogo3D();
 
         function animateLogo() {
             requestAnimationFrame(animateLogo);
-            ringMesh.rotation.x -= 0.035; 
+            if (!logoRenderer || !ringMesh || !logoScene || !logoCamera) return;
+            if (document.hidden) return;
+
+            ringMesh.rotation.x -= 0.035;
             logoRenderer.render(logoScene, logoCamera);
 
             const now = Date.now();
-            if (now - lastFaviconUpdate > 150) {
-                const dataUrl = logoRenderer.domElement.toDataURL('image/png');
-                
-                const faviconLink = document.getElementById('dynamic-favicon');
-                if (faviconLink) {
-                    faviconLink.href = dataUrl;
-                }
-                
-                const welcomeLogo = document.getElementById('welcome-logo-img');
-                if (welcomeLogo) {
-                    welcomeLogo.src = dataUrl;
-                }
-                
+            // Diperbarui tiap 800ms (bukan 150ms) agar hemat CPU dan baterai
+            if (now - lastFaviconUpdate > 800) {
                 lastFaviconUpdate = now;
+                let dataUrl = '';
+                try {
+                    dataUrl = logoRenderer.domElement.toDataURL('image/png');
+                } catch (e) {
+                    return;
+                }
+                if (!dataUrl) return;
+                cachedLogoDataUrl = dataUrl;
+                const faviconLink = document.getElementById('dynamic-favicon');
+                if (faviconLink) faviconLink.href = dataUrl;
+                const welcomeLogo = document.getElementById('welcome-logo-img');
+                if (welcomeLogo) welcomeLogo.src = dataUrl;
             }
         }
 
@@ -434,15 +478,19 @@
         const imgUpload = document.getElementById('image-upload');
         const docUpload = document.getElementById('doc-upload');
         const attachmentPreview = document.getElementById('attachment-preview');
-        const attachmentPreviewIcon = document.getElementById('attachment-preview-icon');
-        const attachmentPreviewName = document.getElementById('attachment-preview-name');
-        const attachmentPreviewSize = document.getElementById('attachment-preview-size');
-        const btnRemoveAttachment = document.getElementById('btn-remove-attachment');
-        
-        let currentAttachment = null;
+        const attachmentItems = document.getElementById('attachment-items');
+        const attachmentCount = document.getElementById('attachment-count');
+
+        let currentAttachments = [];
         
         const appHeader = document.getElementById('app-header');
-        const headerLine = document.getElementById('header-line');
+        // Garis header (opsional): dibuat saat runtime karena tidak ada di markup
+        const headerLineEl = (() => {
+            const el = document.createElement('div');
+            el.className = 'gradient-line h-[1px] w-full opacity-0 transition-opacity duration-300';
+            if (appHeader) appHeader.appendChild(el);
+            return el;
+        })();
         const btnSidebarOpen = document.getElementById('btn-sidebar-open');
         const btnSidebarClose = document.getElementById('btn-sidebar-close');
         const sidebar = document.getElementById('sidebar');
@@ -460,7 +508,209 @@
         let imageGenerationTimeout = null;
         
         const STORAGE_KEY = 'clincoo_chats_v1';
-        let chatSessions = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        let chatSessions = safeParse(localStorage.getItem(STORAGE_KEY), []);
+        if (!Array.isArray(chatSessions)) chatSessions = [];
+
+        /* ================= KONFIGURASI & KEAMANAN ================= */
+        const KEYS_KEY = 'clincoo_keys_v1';
+        const MODEL_CHAIN = [
+            'openrouter/free',
+            'nvidia/nemotron-3-ultra-550b-a55b:free',
+            'google/gemma-4-26b-a4b-it:free',
+            'nvidia/nemotron-3.5-lightning:free'
+        ];
+
+        function safeParse(raw, fallback) {
+            if (!raw) return fallback;
+            try {
+                const v = JSON.parse(raw);
+                return (v === null || v === undefined) ? fallback : v;
+            } catch (e) {
+                console.warn('Data lokal rusak dan diabaikan:', e);
+                return fallback;
+            }
+        }
+
+        function safeSet(key, value) {
+            try {
+                localStorage.setItem(key, value);
+                return true;
+            } catch (e) {
+                console.warn('Gagal menyimpan data lokal:', e);
+                showToast('Penyimpanan perangkat penuh. Hapus beberapa riwayat obrolan.');
+                return false;
+            }
+        }
+
+        function getKeys() {
+            const k = safeParse(localStorage.getItem(KEYS_KEY), {});
+            return (k && typeof k === 'object' && !Array.isArray(k)) ? k : {};
+        }
+
+        function getKey(name) {
+            const v = getKeys()[name];
+            return typeof v === 'string' ? v.trim() : '';
+        }
+
+        function saveKeys(obj) {
+            return safeSet(KEYS_KEY, JSON.stringify(obj || {}));
+        }
+
+        function escapeHtml(str) {
+            return String(str === null || str === undefined ? '' : str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function initSanitizer() {
+            if (!window.DOMPurify || window.__clincooSanitizerReady) return;
+            DOMPurify.addHook('uponSanitizeAttribute', (node, data) => {
+                // Izinkan hanya handler internal tombol blok kode
+                if (data.attrName === 'onclick' && /^(runCode|previewHTML|copyCodeBlock|downloadCode)\(/.test(data.attrValue || '')) {
+                    data.keepAttr = true;
+                    return;
+                }
+                // Iframe preview: buang src, paksa sandbox
+                if (node && node.nodeName === 'IFRAME') {
+                    if (data.attrName === 'src' || data.attrName === 'srcdoc') {
+                        data.keepAttr = false;
+                        return;
+                    }
+                    if (data.attrName === 'sandbox') {
+                        data.keepAttr = true;
+                        data.attrValue = 'allow-scripts allow-modals allow-forms';
+                    }
+                }
+            });
+            DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+                if (node && node.nodeName === 'IFRAME') {
+                    node.setAttribute('sandbox', 'allow-scripts allow-modals allow-forms');
+                    node.removeAttribute('src');
+                    node.removeAttribute('srcdoc');
+                }
+            });
+            window.__clincooSanitizerReady = true;
+        }
+        initSanitizer();
+
+        function sanitizeHtml(html) {
+            if (!html) return '';
+            if (!window.DOMPurify) return escapeHtml(html);
+            try {
+                return DOMPurify.sanitize(html, {
+                    ADD_ATTR: ['target', 'rel', 'title', 'data-code', 'data-view', 'onclick', 'sandbox'],
+                    ADD_TAGS: ['iframe'],
+                    ALLOW_DATA_ATTR: true
+                });
+            } catch (e) {
+                return escapeHtml(html);
+            }
+        }
+
+        function apiErrorMessage(status, body) {
+            let detail = '';
+            try {
+                const j = JSON.parse(body || '{}');
+                detail = (j && j.error && (j.error.message || j.error)) || '';
+            } catch (e) {
+                detail = String(body || '').slice(0, 160);
+            }
+            if (status === 401 || status === 403) return 'API key OpenRouter tidak valid atau ditolak. Buka Pengaturan untuk memperbarui key.';
+            if (status === 402) return 'Kredit OpenRouter habis. Tambah kredit atau pakai akun dengan model gratis.';
+            if (status === 429) return 'Batas permintaan model gratis sedang tercapai. Tunggu sebentar lalu coba lagi.';
+            if (status === 404) return 'Model AI tidak tersedia saat ini. Coba lagi beberapa saat.';
+            if (!status) return 'Tidak dapat menghubungi server AI. Periksa koneksi internet Anda.';
+            return 'Server AI menolak permintaan (' + status + ').' + (detail ? ' ' + detail : '');
+        }
+
+        function stripImageParts(msgs) {
+            return msgs.map(m => {
+                if (Array.isArray(m.content)) {
+                    const textPart = m.content.find(p => p && p.type === 'text');
+                    return { role: m.role, content: (textPart && textPart.text) || 'Tolong jawab berdasarkan pesan sebelumnya.' };
+                }
+                return m;
+            });
+        }
+
+        async function callOpenRouter(opts) {
+            const options = opts || {};
+            let msgs = options.messages || [];
+            const stream = !!options.stream;
+            const maxTokens = options.maxTokens || 2048;
+            const signal = options.signal || null;
+
+            const key = getKey('openrouter');
+            if (!key) {
+                const err = new Error('API key OpenRouter belum diatur. Buka Pengaturan untuk menambahkan key.');
+                err.code = 'NO_KEY';
+                throw err;
+            }
+
+            let visionStripped = false;
+            let lastStatus = 0;
+            let lastBody = '';
+
+            for (let attempt = 0; attempt < 2; attempt++) {
+                for (const model of MODEL_CHAIN) {
+                    let res;
+                    try {
+                        res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': 'Bearer ' + key,
+                                'HTTP-Referer': window.location.href,
+                                'X-Title': 'Clincoo AI',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                model: model,
+                                messages: msgs,
+                                stream: stream,
+                                max_tokens: maxTokens,
+                                reasoning: { exclude: true }
+                            }),
+                            signal: signal
+                        });
+                    } catch (e) {
+                        if (e && e.name === 'AbortError') throw e;
+                        lastStatus = 0;
+                        lastBody = (e && e.message) || 'network error';
+                        continue;
+                    }
+
+                    if (res.ok) return res;
+
+                    lastStatus = res.status;
+                    try { lastBody = await res.text(); } catch (e) { lastBody = ''; }
+
+                    // Key salah: berhenti, tidak ada gunanya ganti model
+                    if (res.status === 401 || res.status === 403) {
+                        const err = new Error(apiErrorMessage(res.status, lastBody));
+                        err.status = res.status;
+                        err.detail = lastBody;
+                        throw err;
+                    }
+                }
+
+                // Semua model gagal pada percobaan pertama: kalau ada gambar, coba tanpa gambar
+                const hasImages = JSON.stringify(msgs).indexOf('"image_url"') !== -1;
+                if (hasImages && !visionStripped) {
+                    visionStripped = true;
+                    msgs = stripImageParts(msgs);
+                    continue;
+                }
+                break;
+            }
+
+            const err = new Error(apiErrorMessage(lastStatus, lastBody));
+            err.status = lastStatus;
+            err.detail = lastBody;
+            throw err;
+        }
 
         // ===== WORKSPACE INTEGRATION =====
         const WS_KEY = 'clincoo_projects';
@@ -471,12 +721,14 @@
         }
 
         function getWorkspaceProjects() {
-            return JSON.parse(localStorage.getItem(WS_KEY)) || [];
+            const stored = safeParse(localStorage.getItem(WS_KEY), []);
+            return Array.isArray(stored) ? stored : [];
         }
 
         function createWorkspaceProject(data) {
             const projects = getWorkspaceProjects();
-            const activities = JSON.parse(localStorage.getItem(WS_ACT_KEY)) || [];
+            const prevActivities = safeParse(localStorage.getItem(WS_ACT_KEY), []);
+            const activities = Array.isArray(prevActivities) ? prevActivities : [];
             const proj = {
                 id: generateWsId(),
                 name: (data.name || 'Proyek Baru').trim(),
@@ -494,8 +746,8 @@
             projects.unshift(proj);
             activities.unshift(act);
             if (activities.length > 100) activities.pop();
-            localStorage.setItem(WS_KEY, JSON.stringify(projects));
-            localStorage.setItem(WS_ACT_KEY, JSON.stringify(activities));
+            safeSet(WS_KEY, JSON.stringify(projects));
+            safeSet(WS_ACT_KEY, JSON.stringify(activities));
             return proj;
         }
 
@@ -550,7 +802,7 @@
         let currentGreeting = welcomeGreetings[Math.floor(Math.random() * welcomeGreetings.length)];
 
         function saveToLocalStorage() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(chatSessions));
+            safeSet(STORAGE_KEY, JSON.stringify(chatSessions));
             renderChatHistory();
         }
 
@@ -572,11 +824,25 @@
             if (!currentSessionId) return;
             const sessionIndex = chatSessions.findIndex(s => s.id === currentSessionId);
             if (sessionIndex !== -1) {
-                const cleanMessages = messages.map(m => ({
-                    ...m,
-                    isProcessing: false,
-                    isTyping: false
-                }));
+                const cleanMessages = messages.map(m => {
+                    const copy = { ...m, isProcessing: false, isTyping: false };
+                    const list = Array.isArray(m.attachments) ? m.attachments : (m.attachment ? [m.attachment] : []);
+                    if (list.length) {
+                        // Isi file disimpan di IndexedDB, bukan localStorage (anti kuota penuh)
+                        copy.attachments = list.map(att => ({
+                            id: att.id,
+                            type: att.type,
+                            name: att.name,
+                            size: att.size,
+                            bytes: att.bytes,
+                            mime: att.mime,
+                            text: att.text ? String(att.text).slice(0, 4000) : undefined,
+                            persisted: att.persisted !== false
+                        }));
+                    }
+                    delete copy.attachment;
+                    return copy;
+                });
 
                 chatSessions[sessionIndex].messages = cleanMessages;
                 chatSessions[sessionIndex].updatedAt = Date.now();
@@ -631,7 +897,8 @@
                 popup.style.top = `${rect.bottom + 4}px`;
             }
             
-            popup.style.left = `${Math.max(10, rect.left - 110)}px`;
+            const popupWidth = popup.offsetWidth || 144;
+            popup.style.left = `${Math.min(Math.max(10, rect.left - 110), Math.max(10, window.innerWidth - popupWidth - 10))}px`;
         };
 
         window.addEventListener('load', () => {
@@ -681,8 +948,13 @@
                         let content = `# ${session.title}\n\n`;
                         session.messages.forEach(msg => {
                             const role = msg.role === 'user' ? 'Anda' : 'Clincoo';
-                            const text = msg.isImageResponse ? `[Gambar: ${msg.imageUrl}]` : msg.text;
-                            content += `### ${role}\n${text}\n\n`;
+                            let text = msg.isImageResponse ? `[Gambar: ${msg.imageUrl}]` : msg.text;
+                            const atts = Array.isArray(msg.attachments) ? msg.attachments : (msg.attachment ? [msg.attachment] : []);
+                            if (atts.length) {
+                                content += `### ${role}\nLampiran: ${atts.map(a => `${a.name} (${a.size || '?'})`).join(', ')}\n${text}\n\n`;
+                            } else {
+                                content += `### ${role}\n${text}\n\n`;
+                            }
                         });
                         
                         const blob = new Blob([content], { type: 'text/markdown' });
@@ -702,7 +974,7 @@
                 e.stopPropagation();
                 popup.classList.add('hidden');
                 if(activeSessionIdForOptions) {
-                    window.deleteSession(null, activeSessionIdForOptions);
+                    if (confirm('Hapus percakapan ini? Tindakan ini tidak bisa dibatalkan.')) { window.deleteSession(null, activeSessionIdForOptions); }
                     activeSessionIdForOptions = null;
                 }
             });
@@ -732,7 +1004,7 @@
                 div.innerHTML = `
                     <div class="flex items-center gap-2.5 overflow-hidden flex-1 pl-1.5">
                         <i class="ph ph-chat-teardrop-text ${isActive ? 'text-black' : 'text-gray-500'} text-lg flex-shrink-0"></i>
-                        <span id="session-title-${session.id}" class="text-[13px] ${isActive ? 'font-semibold text-black' : 'font-medium text-gray-700'} truncate flex-1 min-w-0">${session.title || 'Percakapan Baru'}</span>
+                        <span id="session-title-${session.id}" class="text-[13px] ${isActive ? 'font-semibold text-black' : 'font-medium text-gray-700'} truncate flex-1 min-w-0">${escapeHtml(session.title || 'Percakapan Baru')}</span>
                     </div>
                     <div class="session-actions opacity-0 group-hover:opacity-100 flex-shrink-0 relative ml-1">
                         <button onclick="openSessionOptions(event, '${session.id}', this)" class="p-1.5 text-gray-400 hover:text-black rounded-lg transition-none" title="Opsi">
@@ -889,10 +1161,12 @@
 
         function formatMarkdown(text) {
             if (!text) return '';
+            const src = String(text);
             try {
-                return marked.parse(text);
+                if (!window.marked) return escapeHtml(src).replace(/\n/g, '<br>');
+                return sanitizeHtml(marked.parse(src));
             } catch (e) {
-                return text;
+                return escapeHtml(src);
             }
         }
 
@@ -1031,7 +1305,9 @@
 
                 if (!CodeInterpreter) throw new Error("E2B CodeInterpreter tidak tersedia.");
                 
-                const sandbox = await CodeInterpreter.create({ apiKey: 'e2b_bb64dc37750c51b1eb73fce3cf4317907aae0411' });
+                const e2bKey = getKey('e2b');
+                if (!e2bKey) throw new Error('Key E2B belum diatur, memakai Piston Sandbox.');
+                const sandbox = await CodeInterpreter.create({ apiKey: e2bKey });
                 
                 outputEl.innerHTML = '<span class="text-blue-400 animate-pulse">Mengeksekusi kode dalam Sandbox...</span>';
 
@@ -1157,10 +1433,10 @@
 
             if (chatContainer.scrollTop > 5) {
                 appHeader.classList.add('shadow-[0_5px_15px_-5px_rgba(0,0,0,0.05)]');
-                if(headerLine) headerLine.classList.add('opacity-0');
+                headerLineEl.classList.add('opacity-0');
             } else {
                 appHeader.classList.remove('shadow-[0_5px_15px_-5px_rgba(0,0,0,0.05)]');
-                if(headerLine) headerLine.classList.remove('opacity-0');
+                headerLineEl.classList.remove('opacity-0');
             }
 
             if (currentScrollTop > lastScrollTop && currentScrollTop > 80) {
@@ -1199,9 +1475,9 @@
             
             chatInput.value = '';
             adjustInputHeight();
-            currentAttachment = null;
-            attachmentPreview.classList.add('hidden');
-            
+            currentAttachments = [];
+            renderAttachmentList();
+
             closeSidebar();
         });
 
@@ -1246,48 +1522,232 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
         }
 
-        async function handleFileUpload(e, type) {
-            const file = e.target.files[0];
-            if (!file) return;
+        /* ================= LAMPIRAN MULTI-FILE ================= */
+        const MAX_FILES = 20;
+        const MAX_IMAGE_BYTES = 12 * 1024 * 1024;
+        const MAX_DOC_BYTES = 20 * 1024 * 1024;
+        const MAX_DOC_TEXT = 60000;
 
-            let data = null;
+        let attDBPromise = null;
+        function attDB() {
+            if (attDBPromise) return attDBPromise;
+            attDBPromise = new Promise((resolve, reject) => {
+                if (!window.indexedDB) { reject(new Error('IndexedDB tidak tersedia')); return; }
+                const request = indexedDB.open('clincoo_attachments', 1);
+                request.onupgradeneeded = () => {
+                    const db = request.result;
+                    if (!db.objectStoreNames.contains('files')) db.createObjectStore('files');
+                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+            return attDBPromise;
+        }
+
+        async function idbPut(id, value) {
+            try {
+                const db = await attDB();
+                return await new Promise((resolve, reject) => {
+                    const tx = db.transaction('files', 'readwrite');
+                    tx.objectStore('files').put(value, id);
+                    tx.oncomplete = () => resolve(true);
+                    tx.onerror = () => reject(tx.error);
+                });
+            } catch (e) {
+                console.warn('Gagal menyimpan lampiran ke IndexedDB:', e);
+                return false;
+            }
+        }
+
+        async function idbGet(id) {
+            try {
+                const db = await attDB();
+                return await new Promise((resolve, reject) => {
+                    const tx = db.transaction('files', 'readonly');
+                    const rq = tx.objectStore('files').get(id);
+                    rq.onsuccess = () => resolve(rq.result || null);
+                    rq.onerror = () => reject(rq.error);
+                });
+            } catch (e) {
+                return null;
+            }
+        }
+
+        async function idbDelete(id) {
+            try {
+                const db = await attDB();
+                await new Promise((resolve) => {
+                    const tx = db.transaction('files', 'readwrite');
+                    tx.objectStore('files').delete(id);
+                    tx.oncomplete = () => resolve(true);
+                    tx.onerror = () => resolve(false);
+                });
+            } catch (e) { /* abaikan */ }
+        }
+
+        function downscaleImage(file, maxSide = 1400, quality = 0.82) {
+            return new Promise((resolve) => {
+                const url = URL.createObjectURL(file);
+                const img = new Image();
+                img.onload = () => {
+                    try {
+                        let w = img.naturalWidth || img.width;
+                        let h = img.naturalHeight || img.height;
+                        const scale = Math.min(1, maxSide / Math.max(w, h));
+                        w = Math.max(1, Math.round(w * scale));
+                        h = Math.max(1, Math.round(h * scale));
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                        URL.revokeObjectURL(url);
+                        resolve(dataUrl);
+                    } catch (e) {
+                        URL.revokeObjectURL(url);
+                        resolve(null);
+                    }
+                };
+                img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+                img.src = url;
+            });
+        }
+
+        async function buildAttachment(file) {
+            const mime = file.type || 'application/octet-stream';
+            const isImage = mime.indexOf('image/') === 0;
+            const id = 'att-' + generateId();
+            let dataUrl = null;
             let text = null;
 
-            if (type === 'image') {
-                data = await readAsDataURL(file);
+            if (isImage) {
+                dataUrl = await downscaleImage(file);
+                if (!dataUrl) dataUrl = await readAsDataURL(file);
+            } else if (mime === 'application/pdf') {
+                text = await loadPDF(file);
             } else {
-                if (file.type === 'application/pdf') {
-                    text = await loadPDF(file);
-                } else {
-                    text = await readAsText(file);
+                try {
+                    const raw = await readAsText(file);
+                    text = raw.length > MAX_DOC_TEXT ? raw.slice(0, MAX_DOC_TEXT) + '\n...[isi file dipotong]' : raw;
+                } catch (e) {
+                    text = null;
                 }
             }
 
-            currentAttachment = {
-                file: file,
-                type: type,
+            const persisted = await idbPut(id, { dataUrl: dataUrl, text: text, name: file.name, mime: mime });
+
+            return {
+                id: id,
+                type: isImage ? 'image' : 'document',
                 name: file.name,
                 size: formatSize(file.size),
-                data: data,
-                text: text
+                bytes: file.size,
+                mime: mime,
+                data: dataUrl,
+                text: text,
+                persisted: persisted
             };
-
-            showAttachmentPreview();
-            e.target.value = '';
         }
 
-        function showAttachmentPreview() {
-            if (!currentAttachment) return;
-            attachmentPreviewName.innerText = currentAttachment.name;
-            attachmentPreviewSize.innerText = currentAttachment.size;
+        async function addFiles(fileList) {
+            const files = Array.from(fileList || []);
+            if (!files.length) return;
 
-            if (currentAttachment.type === 'image') {
-                attachmentPreviewIcon.innerHTML = `<img src="${currentAttachment.data}" class="w-full h-full object-cover">`;
-            } else {
-                attachmentPreviewIcon.innerHTML = `<i class="ph ph-file-text text-xl text-gray-500"></i>`;
+            let added = 0;
+            let skippedSize = 0;
+            let skippedLimit = 0;
+
+            for (const file of files) {
+                if (currentAttachments.length >= MAX_FILES) { skippedLimit++; continue; }
+                const isImage = (file.type || '').indexOf('image/') === 0;
+                const limit = isImage ? MAX_IMAGE_BYTES : MAX_DOC_BYTES;
+                if (file.size > limit) { skippedSize++; continue; }
+
+                showToast('Memproses ' + file.name + '...');
+                try {
+                    const att = await buildAttachment(file);
+                    currentAttachments.push(att);
+                    added++;
+                } catch (e) {
+                    console.warn('Gagal memproses file:', file.name, e);
+                    skippedSize++;
+                }
+                renderAttachmentList();
             }
+
+            renderAttachmentList();
+
+            const parts = [];
+            if (added) parts.push(added + ' file siap dikirim');
+            if (skippedSize) parts.push(skippedSize + ' file gagal/terlalu besar');
+            if (skippedLimit) parts.push(skippedLimit + ' file dilewati (maksimal ' + MAX_FILES + ')');
+            if (parts.length) showToast(parts.join(', '));
+        }
+
+        function renderAttachmentList() {
+            if (!attachmentPreview || !attachmentItems) return;
+
+            if (!currentAttachments.length) {
+                attachmentPreview.classList.add('hidden');
+                attachmentItems.innerHTML = '';
+                if (attachmentCount) attachmentCount.innerText = '';
+                return;
+            }
+
             attachmentPreview.classList.remove('hidden');
-            attachmentPreview.classList.add('fade-in');
+            if (attachmentCount) {
+                const total = currentAttachments.reduce((sum, a) => sum + (a.bytes || 0), 0);
+                attachmentCount.innerText = currentAttachments.length + ' file · ' + formatSize(total);
+            }
+
+            attachmentItems.innerHTML = currentAttachments.map((att, index) => {
+                const isImage = att.type === 'image';
+                return `
+                    <div class="relative flex-shrink-0 w-[76px] fade-in">
+                        <div class="h-[76px] w-[76px] rounded-xl border border-gray-200 bg-white overflow-hidden flex items-center justify-center shadow-sm">
+                            ${isImage && att.data
+                                ? `<img src="${att.data}" class="w-full h-full object-cover" alt="${escapeHtml(att.name)}">`
+                                : `<i class="ph ph-file-text text-2xl text-gray-400"></i>`}
+                        </div>
+                        <button onclick="removeAttachment(${index})" class="absolute -top-1.5 -right-1.5 w-6 h-6 bg-black text-white rounded-full flex items-center justify-center shadow active:scale-95" title="Hapus file ini">
+                            <i class="ph ph-x text-[11px]"></i>
+                        </button>
+                        <p class="text-[10px] text-gray-600 mt-1 truncate" title="${escapeHtml(att.name)}">${escapeHtml(att.name)}</p>
+                    </div>`;
+            }).join('');
+        }
+
+        window.removeAttachment = function (index) {
+            const att = currentAttachments[index];
+            if (att && att.id) idbDelete(att.id);
+            currentAttachments.splice(index, 1);
+            renderAttachmentList();
+        };
+
+        window.clearAttachments = function () {
+            currentAttachments.forEach(att => { if (att && att.id) idbDelete(att.id); });
+            currentAttachments = [];
+            renderAttachmentList();
+        };
+
+        async function handleFileUpload(e) {
+            const input = e.target;
+            const files = Array.from(input.files || []);
+            if (!files.length) return;
+            await addFiles(files);
+            input.value = '';
+        }
+
+        async function rehydrateAttachmentImages(root) {
+            if (!root) return;
+            const imgs = root.querySelectorAll('img.att-thumb[data-att-id]');
+            for (const img of imgs) {
+                if (img.getAttribute('src')) continue;
+                const id = img.getAttribute('data-att-id');
+                if (!id) continue;
+                const rec = await idbGet(id);
+                if (rec && rec.dataUrl) img.src = rec.dataUrl;
+            }
         }
 
         btnPlus.addEventListener('click', (e) => {
@@ -1303,11 +1763,15 @@
 
         btnUploadImg.addEventListener('click', () => { imgUpload.click(); uploadPopup.classList.add('hidden'); btnPlus.classList.remove('rotate-45'); });
         btnUploadDoc.addEventListener('click', () => { docUpload.click(); uploadPopup.classList.add('hidden'); btnPlus.classList.remove('rotate-45'); });
-        imgUpload.addEventListener('change', (e) => handleFileUpload(e, 'image'));
-        docUpload.addEventListener('change', (e) => handleFileUpload(e, 'document'));
-        btnRemoveAttachment.addEventListener('click', () => {
-            currentAttachment = null;
-            attachmentPreview.classList.add('hidden');
+        imgUpload.addEventListener('change', handleFileUpload);
+        docUpload.addEventListener('change', handleFileUpload);
+
+        // Drag & drop file ke layar (mirip GitHub)
+        document.addEventListener('dragover', (e) => { e.preventDefault(); });
+        document.addEventListener('drop', async (e) => {
+            if (!e.dataTransfer || !e.dataTransfer.files || !e.dataTransfer.files.length) return;
+            e.preventDefault();
+            await addFiles(e.dataTransfer.files);
         });
 
         function scrollToBottom(forceSmooth = false) {
@@ -1344,14 +1808,11 @@
             const visibleMessages = messages.filter(m => !m.isHidden);
             
             if (visibleMessages.length === 0) {
-                let currentLogoSrc = '';
-                try {
-                    currentLogoSrc = logoRenderer.domElement.toDataURL('image/png');
-                } catch(e) {}
+                const currentLogoSrc = cachedLogoDataUrl;
 
                 chatContainer.innerHTML = `
                     <div class="flex flex-col items-center justify-center w-full h-full min-h-[50vh] gap-4 fade-in pointer-events-auto">
-                        <img id="welcome-logo-img" src="${currentLogoSrc}" class="w-20 h-20 md:w-24 md:h-24 object-contain drop-shadow-xl mb-1" alt="Logo Clincoo">
+                        ${currentLogoSrc ? `<img id="welcome-logo-img" src="${currentLogoSrc}" class="w-20 h-20 md:w-24 md:h-24 object-contain drop-shadow-xl mb-1" alt="Logo Clincoo">` : ''}
                         <h2 class="text-3xl md:text-[34px] text-center text-gray-800 tracking-tight px-4" style="font-weight: 400;">${currentGreeting}</h2>
                     </div>
                 `;
@@ -1362,6 +1823,8 @@
             const actualLastAiIndex = lastAiIndex !== -1 ? (visibleMessages.length - 1) - lastAiIndex : -1;
             const lastUserIndex = [...visibleMessages].reverse().findIndex(m => m.role === 'user');
             const actualLastUserIndex = lastUserIndex !== -1 ? (visibleMessages.length - 1) - lastUserIndex : -1;
+
+            const msgAttachmentsNeedingHydration = visibleMessages.some(m => (Array.isArray(m.attachments) ? m.attachments : []).some(a => a && a.type === 'image' && !a.data));
 
             visibleMessages.forEach((msg, index) => {
                 const messageEl = document.createElement('div');
@@ -1409,7 +1872,7 @@
                                             <div class="px-3 py-3 border-t border-gray-100 bg-white flex flex-wrap gap-2.5">
                                                 ${msg.sources.map(s => `
                                                     <a href="${s.url}" target="_blank" class="flex items-center gap-2 py-1.5 px-2.5 hover:bg-gray-100 border border-gray-200 rounded-lg transition-colors text-decoration-none shadow-sm">
-                                                        <img src="${s.favicon}" class="w-4 h-4 rounded-sm" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCI+PC9jaXJjbGU+PGxpbmUgeDE9IjIiIHkxPSIxMiIgeDI9IjIyIiB5Mj0iMTIiPjwvbGluZT48cGF0aCBkPSJNMTIgMmExNS4zIDE1LjMgMCAwIDEgNCAxMGMtLjExIDUuNTQtMS45NCAxMC00IDEwLTIuMDYtLjA2LTQuODktNC40Ni01LTEwQzcuMSAxMS4zNiA4LjA2IDYuNTQgMTIgMnoiPjwvcGF0aD48L3N2Zz4='">
+                                                        <img src="${s.favicon}" class="w-4 h-4 rounded-sm" data-fallback="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCI+PC9jaXJjbGU+PGxpbmUgeDE9IjIiIHkxPSIxMiIgeDI9IjIyIiB5Mj0iMTIiPjwvbGluZT48cGF0aCBkPSJNMTIgMmExNS4zIDE1LjMgMCAwIDEgNCAxMGMtLjExIDUuNTQtMS45NCAxMC00IDEwLTIuMDYtLjA2LTQuODktNC40Ni01LTEwQzcuMSAxMS4zNiA4LjA2IDYuNTQgMTIgMnoiPjwvcGF0aD48L3N2Zz4=">
                                                         <span class="text-[12px] text-gray-700 truncate max-w-[130px] font-medium">${s.domain}</span>
                                                     </a>
                                                 `).join('')}
@@ -1444,20 +1907,21 @@
                     const isLastUser = index === actualLastUserIndex;
                     messageEl.classList.add('justify-end');
                     
+                    const msgAttachments = Array.isArray(msg.attachments) ? msg.attachments : (msg.attachment ? [msg.attachment] : []);
                     let attachmentHtml = '';
-                    if (msg.attachment) {
-                        if (msg.attachment.type === 'image') {
-                            attachmentHtml = `<img src="${msg.attachment.data}" class="max-w-[200px] sm:max-w-[250px] rounded-lg mb-2 border border-gray-200/50 shadow-sm" alt="Attached Image">`;
-                        } else {
-                            attachmentHtml = `
-                                <div class="flex items-center gap-2 bg-black/5 p-2 rounded-lg mb-2 border border-black/5">
-                                    <i class="ph ph-file-text text-2xl text-gray-700"></i>
-                                    <div class="flex-1 overflow-hidden">
-                                        <p class="text-sm font-semibold truncate text-gray-800">${msg.attachment.name}</p>
-                                    </div>
+                    if (msgAttachments.length) {
+                        attachmentHtml = '<div class="flex flex-wrap gap-2 justify-end mb-2">' + msgAttachments.map(att => {
+                            if (att.type === 'image') {
+                                return `<img src="${att.data || ''}" data-att-id="${att.id || ''}" class="att-thumb max-w-[150px] max-h-[150px] rounded-lg border border-gray-200/50 shadow-sm" alt="${escapeHtml(att.name || 'Gambar')}">`;
+                            }
+                            return `<div class="flex items-center gap-2 bg-black/5 p-2 rounded-lg border border-black/5 max-w-[210px]">
+                                <i class="ph ph-file-text text-xl text-gray-700 flex-shrink-0"></i>
+                                <div class="flex-1 overflow-hidden">
+                                    <p class="text-[12px] font-semibold truncate text-gray-800">${escapeHtml(att.name || 'Dokumen')}</p>
+                                    <p class="text-[10px] text-gray-500">${escapeHtml(att.size || '')}</p>
                                 </div>
-                            `;
-                        }
+                            </div>`;
+                        }).join('') + '</div>';
                     }
 
                     messageEl.innerHTML = `
@@ -1482,6 +1946,7 @@
                     `;
                 }
                 chatContainer.appendChild(messageEl);
+                if (msgAttachmentsNeedingHydration) rehydrateAttachmentImages(messageEl);
             });
             attachBubbleClickListeners();
             scrollToBottom(false);
@@ -1597,6 +2062,11 @@
             if (msgIndex !== -1) {
                 const msg = messages[msgIndex];
                 chatInput.value = msg.text;
+                const editAtts = Array.isArray(msg.attachments) ? msg.attachments : (msg.attachment ? [msg.attachment] : []);
+                if (editAtts.length) {
+                    currentAttachments = editAtts.map(att => ({ ...att }));
+                }
+                renderAttachmentList();
                 adjustInputHeight();
                 chatInput.focus();
                 messages.splice(msgIndex, 1);
@@ -1674,20 +2144,7 @@
                     }
                 });
 
-                const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer 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`,
-                        "HTTP-Referer": window.location.href,
-                        "X-Title": "Clincoo AI",
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        model: "meta-llama/llama-3.3-70b-instruct",
-                        messages: apiMessages,
-                        stream: false
-                    })
-                });
+                const response = await callOpenRouter({ messages: apiMessages, stream: false, maxTokens: 64 });
 
                 if (response.ok) {
                     const data = await response.json();
@@ -1859,7 +2316,7 @@
                     imageGenerationTimeout = setTimeout(() => {
                         const msgIndex = messages.findIndex(m => m.id === aiMsgObj.id);
                         if (msgIndex !== -1) {
-                            messages[msgIndex].text = `<div class="flex justify-center w-full my-2 pointer-events-auto"><img src="${imageUrl}" class="w-full max-w-sm rounded-xl shadow-[0_5px_15px_rgba(0,0,0,0.1)] border border-gray-200" alt="Generated Image" loading="lazy" onload="scrollToBottom(true)"></div>`;
+                            messages[msgIndex].text = `<div class="flex justify-center w-full my-2 pointer-events-auto"><img src="${imageUrl}" class="w-full max-w-sm rounded-xl shadow-[0_5px_15px_rgba(0,0,0,0.1)] border border-gray-200" alt="Generated Image" loading="lazy" onload="scrollToBottom(true)" onerror="onGeneratedImageError(this)"></div>`;
                             messages[msgIndex].isProcessing = false;
                             messages[msgIndex].isTyping = false;
                             messages[msgIndex].isImageResponse = true;
@@ -1880,9 +2337,12 @@
             } 
             else {
                 let externalContext = "";
-                const jinaApiKey = 'jina_63e2d53d1206498cab46852560cae811LwNFVAvbXqLnGGhopb3zlYh3TB4T';
+                const jinaApiKey = getKey('jina');
+                if (!jinaApiKey && (hasUrl || requiresSearch)) {
+                    console.warn('Key Jina belum diatur: pencarian web dan baca URL dilewati.');
+                }
                 
-                if (hasUrl) {
+                if (hasUrl && jinaApiKey) {
                     try {
                         const targetUrl = extractedUrls[0];
                         const res = await fetch(`https://r.jina.ai/${targetUrl}`, {
@@ -1915,7 +2375,7 @@
                         console.warn("Jina Reader Error:", e);
                     }
                 } 
-                else if (requiresSearch) {
+                else if (requiresSearch && jinaApiKey) {
                     try {
                         const res = await fetch(`https://s.jina.ai/${encodeURIComponent(lastUserMsg)}`, {
                             method: 'GET',
@@ -1984,37 +2444,33 @@
                     ];
 
                     const historyMsgs = messages.filter(m => !m.isHidden && m.id !== aiMsgObj.id);
-                    historyMsgs.forEach(m => {
-                        let content = m.text;
-                        if (m.attachment) {
-                            if (m.attachment.type === 'document' && m.attachment.text) {
-                                content += `\n\n[Isi Dokumen Lampiran (${m.attachment.name})]:\n${m.attachment.text.substring(0, 10000)}`;
-                            } else if (m.attachment.type === 'image') {
-                                // Format array untuk vision (jika didukung OpenRouter/Model)
-                                content = [
-                                    { type: "text", text: m.text || "Tolong analisa gambar ini." },
-                                    { type: "image_url", image_url: { url: m.attachment.data } }
-                                ];
+                    for (const m of historyMsgs) {
+                        let content = m.text || '';
+                        const atts = Array.isArray(m.attachments) ? m.attachments : (m.attachment ? [m.attachment] : []);
+                        if (atts.length) {
+                            const docTexts = [];
+                            const imageParts = [];
+                            for (const att of atts) {
+                                if (att.type === 'image') {
+                                    let dataUrl = att.data;
+                                    if (!dataUrl && att.id) {
+                                        const rec = await idbGet(att.id);
+                                        if (rec && rec.dataUrl) dataUrl = rec.dataUrl;
+                                    }
+                                    if (dataUrl) imageParts.push({ type: 'image_url', image_url: { url: dataUrl } });
+                                } else if (att.text) {
+                                    docTexts.push(`\n\n[Isi Dokumen Lampiran (${att.name})]:\n${String(att.text).slice(0, 12000)}`);
+                                }
+                            }
+                            if (docTexts.length) content += docTexts.join('');
+                            if (imageParts.length) {
+                                content = [{ type: 'text', text: content || 'Tolong analisa lampiran ini.' }].concat(imageParts.slice(0, 6));
                             }
                         }
                         apiMessages.push({ role: m.role === 'ai' ? 'assistant' : 'user', content: content });
-                    });
+                    }
 
-                    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                        method: "POST",
-                        headers: {
-                            "Authorization": `Bearer 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`,
-                            "HTTP-Referer": window.location.href,
-                            "X-Title": "Clincoo AI",
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            model: "meta-llama/llama-3.3-70b-instruct", // Atau gunakan "deepseek/deepseek-chat"
-                            messages: apiMessages,
-                            stream: true
-                        }),
-                        signal: abortController.signal
-                    });
+                    const response = await callOpenRouter({ messages: apiMessages, stream: true, maxTokens: 4096, signal: abortController.signal });
 
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
@@ -2032,36 +2488,62 @@
 
                     const reader = response.body.getReader();
                     const decoder = new TextDecoder();
+                    let sseBuffer = '';
+                    let streamError = '';
 
                     while (true) {
                         const { done, value } = await reader.read();
-                        if (done) {
-                            isFetchComplete = true;
-                            break;
-                        }
+                        if (done) break;
 
-                        const chunk = decoder.decode(value, { stream: true });
-                        const lines = chunk.split('\n');
+                        sseBuffer += decoder.decode(value, { stream: true });
+                        const sseLines = sseBuffer.split('\n');
+                        sseBuffer = sseLines.pop() || '';
 
-                        for (const line of lines) {
-                            if (line.startsWith('data: ') && line !== 'data: [DONE]') {
-                                try {
-                                    const data = JSON.parse(line.slice(6));
-                                    if (data.choices && data.choices[0].delta && data.choices[0].delta.content) {
-                                        streamingBuffer += data.choices[0].delta.content;
-                                    }
-                                } catch (e) {
-                                    // Abaikan error parse parsial dari chunk terpotong
+                        for (const rawLine of sseLines) {
+                            const line = rawLine.trim();
+                            if (!line || line.indexOf('data:') !== 0) continue;
+                            const payload = line.slice(5).trim();
+                            if (!payload || payload === '[DONE]') continue;
+                            try {
+                                const data = JSON.parse(payload);
+                                if (data && data.error) {
+                                    streamError = (data.error.message || 'kesalahan model');
+                                    continue;
                                 }
+                                const choice = data && data.choices && data.choices[0];
+                                const delta = choice && choice.delta;
+                                if (delta && typeof delta.content === 'string' && delta.content) {
+                                    streamingBuffer += delta.content;
+                                }
+                            } catch (e) {
+                                // chunk JSON terpotong: abaikan
                             }
                         }
                     }
+                    isFetchComplete = true;
+
+                    if (!streamingBuffer && streamError) {
+                        streamingBuffer = 'Model gratis sedang bermasalah: ' + streamError + ' Silakan coba lagi.';
+                        const idx = messages.findIndex(m => m.id === aiMsgObj.id);
+                        if (idx !== -1) messages[idx].isError = true;
+                    } else if (!streamingBuffer) {
+                        streamingBuffer = 'Model tidak mengembalikan jawaban. Coba kirim ulang pesannya.';
+                        const idx = messages.findIndex(m => m.id === aiMsgObj.id);
+                        if (idx !== -1) messages[idx].isError = true;
+                    }
                 } catch (e) {
                     if (e.name !== 'AbortError') {
-                        streamingBuffer = "Maaf, terjadi kesalahan saat menghubungi server AI (OpenRouter). Silakan periksa koneksi Anda atau coba lagi.";
+                        clearInterval(statusInterval);
+                        if (e.code === 'NO_KEY') openSettings(true);
+                        streamingBuffer = (e.message && e.message.length > 15)
+                            ? e.message
+                            : apiErrorMessage(e.status, e.detail || '');
                         isFetchComplete = true;
                         const msgIndex = messages.findIndex(m => m.id === aiMsgObj.id);
-                        if (msgIndex !== -1) messages[msgIndex].isError = true;
+                        if (msgIndex !== -1) {
+                            messages[msgIndex].isError = true;
+                            messages[msgIndex].isProcessing = false;
+                        }
                     }
                 }
             }
@@ -2082,10 +2564,14 @@
                     const msgIndex = messages.findIndex(m => m.id === aiMsgObj.id);
                     if (msgIndex !== -1) {
                         messages[msgIndex].text = localText;
-                        const textEl = document.getElementById(`msg-text-${aiMsgObj.id}`);
-                        if (textEl) {
-                            textEl.innerHTML = formatMarkdown(balanceMarkdown(stripWorkspaceTokens(messages[msgIndex].text)));
-                            textEl.classList.add('typing-cursor');
+                        const nowTick = Date.now();
+                        if (!window.__clincooLastRender || nowTick - window.__clincooLastRender > 70) {
+                            window.__clincooLastRender = nowTick;
+                            const textEl = document.getElementById(`msg-text-${aiMsgObj.id}`);
+                            if (textEl) {
+                                textEl.innerHTML = formatMarkdown(balanceMarkdown(stripWorkspaceTokens(messages[msgIndex].text)));
+                                textEl.classList.add('typing-cursor');
+                            }
                         }
                     }
                     scrollToBottom(false);
@@ -2105,18 +2591,18 @@
                 stopGeneration();
             } else {
                 const text = chatInput.value.trim();
-                if (text || currentAttachment) {
+                if (text || currentAttachments.length) {
                     messages.push({
                         id: generateId(),
                         role: 'user',
                         text: text,
-                        attachment: currentAttachment
+                        attachments: currentAttachments.map(att => ({ ...att }))
                     });
-                    
+
                     chatInput.value = '';
                     adjustInputHeight();
-                    currentAttachment = null;
-                    attachmentPreview.classList.add('hidden');
+                    currentAttachments = [];
+                    renderAttachmentList();
                     autoScrollActive = true;
                     renderMessages();
                     
@@ -2132,6 +2618,146 @@
                 if (!isGenerating) btnAction.click();
             }
         });
+
+        /* ================= UI: TOAST, PENGATURAN, WORKSPACE ================= */
+        let toastTimer = null;
+        function showToast(message) {
+            let el = document.getElementById('clincoo-toast');
+            if (!el) {
+                el = document.createElement('div');
+                el.id = 'clincoo-toast';
+                el.className = 'fixed left-1/2 -translate-x-1/2 bottom-24 z-[200] bg-black text-white text-[13px] font-medium px-4 py-2.5 rounded-xl shadow-lg max-w-[90%] text-center pointer-events-none transition-opacity duration-200';
+                document.body.appendChild(el);
+            }
+            el.innerText = message;
+            el.style.opacity = '1';
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => { el.style.opacity = '0'; }, 2600);
+        }
+
+        window.onGeneratedImageError = function (img) {
+            const note = document.createElement('div');
+            note.className = 'text-[13px] text-red-500 font-medium my-2';
+            note.innerText = 'Gambar gagal dimuat. Coba kirim ulang permintaannya.';
+            if (img && img.parentNode) {
+                img.parentNode.replaceChild(note, img);
+            }
+        };
+
+        // Fallback favicon sumber (pengganti atribut onerror yang disanitasi)
+        document.addEventListener('error', (e) => {
+            const img = e.target;
+            if (img && img.tagName === 'IMG' && img.dataset && img.dataset.fallback && img.src !== img.dataset.fallback) {
+                img.src = img.dataset.fallback;
+            }
+        }, true);
+
+        window.openSettings = function (highlightMissing) {
+            const modal = document.getElementById('settings-modal');
+            if (!modal) return;
+            const keys = getKeys();
+            document.getElementById('key-openrouter').value = keys.openrouter || '';
+            document.getElementById('key-e2b').value = keys.e2b || '';
+            document.getElementById('key-jina').value = keys.jina || '';
+            const status = document.getElementById('settings-status');
+            status.textContent = highlightMissing ? 'Isi OpenRouter API Key dulu agar bisa mengobrol.' : '';
+            status.className = highlightMissing ? 'text-[12px] font-medium mt-2 text-red-500' : 'text-[12px] font-medium mt-2 text-green-600';
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => document.getElementById('key-openrouter').focus(), 100);
+        };
+
+        window.closeSettings = function () {
+            const modal = document.getElementById('settings-modal');
+            if (!modal) return;
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        };
+
+        window.saveSettingsFromForm = function () {
+            const openrouter = document.getElementById('key-openrouter').value.trim();
+            const e2b = document.getElementById('key-e2b').value.trim();
+            const jina = document.getElementById('key-jina').value.trim();
+            const status = document.getElementById('settings-status');
+
+            if (!openrouter) {
+                status.textContent = 'OpenRouter API Key wajib diisi.';
+                status.className = 'text-[12px] font-medium mt-2 text-red-500';
+                return;
+            }
+            if (!/^sk-or-/.test(openrouter)) {
+                status.textContent = 'Format key OpenRouter biasanya diawali "sk-or-". Periksa kembali.';
+                status.className = 'text-[12px] font-medium mt-2 text-amber-600';
+                return;
+            }
+            const ok = saveKeys({ openrouter, e2b, jina });
+            if (!ok) {
+                status.textContent = 'Gagal menyimpan key. Penyimpanan perangkat penuh.';
+                status.className = 'text-[12px] font-medium mt-2 text-red-500';
+                return;
+            }
+            status.textContent = 'Tersimpan. Key hanya tersimpan di perangkat ini.';
+            status.className = 'text-[12px] font-medium mt-2 text-green-600';
+            showToast('Pengaturan disimpan');
+            setTimeout(() => window.closeSettings(), 700);
+        };
+
+        window.openWorkspace = function () {
+            const modal = document.getElementById('workspace-modal');
+            const list = document.getElementById('workspace-list');
+            if (!modal || !list) return;
+            let projects = [];
+            try { projects = getWorkspaceProjects(); } catch (e) { projects = []; }
+
+            if (!projects.length) {
+                list.innerHTML = '<div class="text-center text-[13px] text-gray-500 py-8 px-2">Belum ada proyek. Minta Clincoo membuat proyek di obrolan, contoh: <span class="font-semibold text-gray-700">"buat proyek Website Portfolio"</span>.</div>';
+            } else {
+                list.innerHTML = projects.map(project => {
+                    const tasks = Array.isArray(project.tasks) ? project.tasks : [];
+                    const done = tasks.filter(t => t && t.done).length;
+                    return `
+                        <div class="border border-gray-200 rounded-xl p-3 mb-2">
+                            <div class="flex items-start justify-between gap-2">
+                                <div class="min-w-0">
+                                    <p class="text-sm font-bold text-gray-900 truncate">${escapeHtml(project.name || 'Proyek')}</p>
+                                    <p class="text-[12px] text-gray-500 mt-0.5">${escapeHtml(project.desc || 'Tanpa deskripsi')}</p>
+                                </div>
+                                <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 flex-shrink-0">${escapeHtml(project.status || 'Aktif')}</span>
+                            </div>
+                            <div class="flex items-center gap-3 mt-2 text-[11px] text-gray-500">
+                                <span class="flex items-center gap-1"><i class="ph ph-check-square"></i> ${done}/${tasks.length} tugas</span>
+                                <span class="flex items-center gap-1"><i class="ph ph-eye"></i> ${escapeHtml(project.visibility || 'Public')}</span>
+                            </div>
+                        </div>`;
+                }).join('');
+            }
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+
+        window.closeWorkspace = function () {
+            const modal = document.getElementById('workspace-modal');
+            if (!modal) return;
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        };
+
+        ['settings-modal', 'workspace-modal'].forEach(id => {
+            const modal = document.getElementById(id);
+            if (modal) {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.add('hidden');
+                        modal.classList.remove('flex');
+                    }
+                });
+            }
+        });
+
+        // Sapa pengguna baru: minta key sekali saja
+        if (!getKey('openrouter')) {
+            setTimeout(() => openSettings(true), 900);
+        }
 
         renderMessages();
     </script>
